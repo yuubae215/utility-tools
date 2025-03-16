@@ -3,20 +3,34 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
+
+# GitHubリポジトリに対する読み書き権限を設定
+permissions:
+  contents: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
-      # ビルドステップ（必要に応じて）
+      # デプロイ前に実行する処理があれば追加（必要に応じて）
       # - name: Build
       #   run: npm ci && npm run build
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages
           folder: .  # または 'build'（ビルドステップを使用する場合）
+          # branch設定は必要に応じて（デフォルトはgh-pages）
+          branch: gh-pages
+          # 明示的にトークンを指定（GitHub Actionsの環境から自動で提供）
+          token: ${{ github.token }}
+          # コミットメッセージをカスタマイズ
+          commit-message: Deploy from GitHub Actions
+          # クリーンデプロイ（既存のブランチの内容を削除してから追加）
+          clean: true
