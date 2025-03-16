@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>レイアウト・スタイル プロンプトジェネレーター - 設計支援ツール</title>
-    <!-- Font Awesome CDNを追加 -->
+    <title>Layout & Style Prompt Generator - Design Support Tools</title>
+    <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         :root {
-            /* 共通カラー変数 */
+            /* Common color variables */
             --primary-color: #3498db;
             --primary-dark: #2980b9;
             --primary-light: #EEF2FF;
@@ -20,7 +20,7 @@
             --text-primary: #2c3e50;
             --text-secondary: #636e72;
             --text-tertiary: #9CA3AF;
-            --bg-color: #f8f9fa;
+            --bg-color: #f8fafc;
             --card-color: #fff;
             --surface-color: #F9FAFB;
             --border-color: #E5E7EB;
@@ -40,7 +40,7 @@
             --space-2xl: 3rem;
         }
 
-        /* 統一されたダークモード変数 */
+        /* Dark mode variables */
         body.dark-mode {
             --primary-color: #5dade2;
             --primary-dark: #3498db;
@@ -71,6 +71,11 @@
             color: var(--text-primary);
             line-height: 1.5;
             transition: var(--transition);
+        }
+
+        body.dark-mode {
+            color: var(--text-primary);
+            background-color: var(--bg-color);
         }
 
         header {
@@ -598,7 +603,7 @@
             }
         }
 
-        /* 新規追加: カラーテーマセレクター */
+        /* Color theme selector */
         .color-theme-selector {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -721,7 +726,7 @@
             padding: var(--space-md) 0;
         }
 
-        /* フッター */
+        /* Footer */
         footer {
             text-align: center;
             margin-top: 70px;
@@ -741,7 +746,7 @@
             text-decoration: underline;
         }
 
-        /* アニメーション */
+        /* Animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -771,22 +776,103 @@
         .form-section:nth-child(4) {
             animation-delay: 0.4s;
         }
+
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-md);
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.1rem;
+                margin-bottom: var(--space-md);
+            }
+
+            .concept-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .color-theme-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-section-title {
+                font-size: 1rem;
+            }
+
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+                font-size: 1.2rem;
+            }
+
+            .result-content {
+                min-height: 300px;
+            }
+
+            .btn {
+                font-size: 0.9rem;
+            }
+
+            .tab-buttons {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn {
+                padding: var(--space-xs) var(--space-sm);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: var(--space-sm);
+            }
+
+            .form-container,
+            .result-card {
+                padding: var(--space-md);
+            }
+
+            .concept-card {
+                padding: var(--space-sm);
+            }
+
+            .form-section-number {
+                width: 24px;
+                height: 24px;
+                font-size: 0.75rem;
+            }
+
+            .color-theme-selector {
+                gap: var(--space-sm);
+            }
+
+            .result-content {
+                padding: var(--space-sm);
+                font-size: 0.75rem;
+                min-height: 250px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <button class="theme-toggle" id="theme-toggle" title="ダークモード切替">
+        <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">
             <i class="fas fa-moon"></i>
         </button>
-        <h1>レイアウト・スタイル プロンプトジェネレーター</h1>
-        <h2>効果的なデザイン指示プロンプトを簡単に作成</h2>
-        <a href="index.html" class="home-link"><i class="fas fa-arrow-left"></i> ホームに戻る</a>
+        <h1>Layout & Style Prompt Generator</h1>
+        <h2>Create effective design instruction prompts easily</h2>
+        <a href="index.html" class="home-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
     </header>
 
     <div class="container">
         <div class="responsive-hint">
-            より良いエクスペリエンスのために、デスクトップでの閲覧をお勧めします。
+            For a better experience, desktop viewing is recommended.
         </div>
 
         <div class="app-container">
@@ -794,54 +880,59 @@
                 <div class="form-section">
                     <div class="form-section-title">
                         <div class="form-section-number">1</div>
-                        コンテンツ情報
+                        Content Information
                     </div>
 
                     <div class="form-group">
-                        <label for="topic">メインテーマ/トピック</label>
-                        <input type="text" id="topic" placeholder="例: 気候変動、製品紹介、会社案内など">
+                        <label for="topic">Main Theme/Topic</label>
+                        <input type="text" id="topic"
+                            placeholder="E.g., Climate change, product introduction, company profile, etc.">
                     </div>
 
                     <div class="form-group">
-                        <label for="content-description">詳細説明（何についての説明が欲しいか）</label>
+                        <label for="content-description">Detailed Description (what you'd like explained)</label>
                         <textarea id="content-description"
-                            placeholder="例: 気候変動の原因と影響について詳細に説明し、解決策を提案してください。"></textarea>
+                            placeholder="E.g., Please explain the causes and effects of climate change in detail and suggest solutions."></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label for="content-focus">重点項目</label>
-                        <input type="text" id="content-focus" placeholder="例: データ分析、ビジュアル表現、シンプルな説明など">
+                        <label for="content-focus">Key Focus Areas</label>
+                        <input type="text" id="content-focus"
+                            placeholder="E.g., Data analysis, visual representation, simplified explanation, etc.">
                     </div>
                 </div>
 
                 <div class="form-section">
                     <div class="form-section-title">
                         <div class="form-section-number">2</div>
-                        デザインコンセプト選択
+                        Design Concept Selection
                     </div>
 
                     <div class="concept-cards">
                         <div class="concept-card" data-concept="neumorphism">
                             <h3>Fluid Neumorphism</h3>
-                            <p>柔らかな影と微妙な3D効果による触感的なデザイン。エレガントで高級感のあるインターフェースに適しています。</p>
+                            <p>A tactile design with soft shadows and subtle 3D effects. Suitable for elegant, premium
+                                interfaces.</p>
                             <div class="preview-neumorphism" style="margin-top: 10px;">
-                                <div class="preview-title">プレビュー</div>
+                                <div class="preview-title">Preview</div>
                             </div>
                         </div>
 
                         <div class="concept-card" data-concept="colorscape">
                             <h3>Dynamic Colorscape</h3>
-                            <p>鮮やかな色、グラデーション、空間的な奥行きを活用したエネルギッシュなデザイン。視覚的なインパクトが重要な場合に適しています。</p>
+                            <p>Energetic design using vibrant colors, gradients, and spatial depth. Ideal when visual
+                                impact is important.</p>
                             <div class="preview-colorscape" style="margin-top: 10px;">
-                                <div class="preview-title">プレビュー</div>
+                                <div class="preview-title">Preview</div>
                             </div>
                         </div>
 
                         <div class="concept-card" data-concept="typographic">
                             <h3>Typographic Grid</h3>
-                            <p>タイポグラフィ、空白、構造的なレイアウトに焦点を当てたミニマルなデザイン。読みやすさとコンテンツ構造が重要な場合に適しています。</p>
+                            <p>Minimal design focusing on typography, whitespace, and structural layout. Perfect when
+                                readability and content structure matter.</p>
                             <div class="preview-typographic" style="margin-top: 10px;">
-                                <div class="preview-title">プレビュー</div>
+                                <div class="preview-title">Preview</div>
                             </div>
                         </div>
                     </div>
@@ -850,12 +941,12 @@
                 <div class="form-section">
                     <div class="form-section-title">
                         <div class="form-section-number">3</div>
-                        カラースキーム
+                        Color Scheme
                     </div>
 
                     <div class="color-option-toggle">
-                        <button class="color-option-btn active" data-option="theme">テーマから選択</button>
-                        <button class="color-option-btn" data-option="custom">カスタム</button>
+                        <button class="color-option-btn active" data-option="theme">Choose from themes</button>
+                        <button class="color-option-btn" data-option="custom">Custom</button>
                     </div>
 
                     <div id="theme-selector" class="color-theme-selector">
@@ -865,7 +956,7 @@
                                 <div class="color-secondary" style="background-color: #12B981;"></div>
                                 <div class="color-accent" style="background-color: #F97316;"></div>
                             </div>
-                            <div class="color-theme-name">モダン</div>
+                            <div class="color-theme-name">Modern</div>
                         </div>
 
                         <div class="color-theme" data-theme="classic">
@@ -874,7 +965,7 @@
                                 <div class="color-secondary" style="background-color: #D4AF37;"></div>
                                 <div class="color-accent" style="background-color: #7D3C3C;"></div>
                             </div>
-                            <div class="color-theme-name">クラシック</div>
+                            <div class="color-theme-name">Classic</div>
                         </div>
 
                         <div class="color-theme" data-theme="vivid">
@@ -883,7 +974,7 @@
                                 <div class="color-secondary" style="background-color: #33CCFF;"></div>
                                 <div class="color-accent" style="background-color: #FFCC00;"></div>
                             </div>
-                            <div class="color-theme-name">ビビッド</div>
+                            <div class="color-theme-name">Vivid</div>
                         </div>
 
                         <div class="color-theme" data-theme="monochrome">
@@ -892,7 +983,7 @@
                                 <div class="color-secondary" style="background-color: #666666;"></div>
                                 <div class="color-accent" style="background-color: #999999;"></div>
                             </div>
-                            <div class="color-theme-name">モノクローム</div>
+                            <div class="color-theme-name">Monochrome</div>
                         </div>
 
                         <div class="color-theme" data-theme="pastel">
@@ -901,7 +992,7 @@
                                 <div class="color-secondary" style="background-color: #A8E6CF;"></div>
                                 <div class="color-accent" style="background-color: #FFD3B6;"></div>
                             </div>
-                            <div class="color-theme-name">パステル</div>
+                            <div class="color-theme-name">Pastel</div>
                         </div>
 
                         <div class="color-theme" data-theme="corporate">
@@ -910,23 +1001,23 @@
                                 <div class="color-secondary" style="background-color: #3E92CC;"></div>
                                 <div class="color-accent" style="background-color: #D8315B;"></div>
                             </div>
-                            <div class="color-theme-name">コーポレート</div>
+                            <div class="color-theme-name">Corporate</div>
                         </div>
                     </div>
 
                     <div id="custom-colors" class="custom-colors hidden">
                         <div class="form-group">
-                            <label for="primary-color">プライマリカラー</label>
+                            <label for="primary-color">Primary Color</label>
                             <input type="color" id="primary-color" value="#4263EB">
                         </div>
 
                         <div class="form-group">
-                            <label for="secondary-color">セカンダリカラー</label>
+                            <label for="secondary-color">Secondary Color</label>
                             <input type="color" id="secondary-color" value="#12B981">
                         </div>
 
                         <div class="form-group">
-                            <label for="accent-color">アクセントカラー</label>
+                            <label for="accent-color">Accent Color</label>
                             <input type="color" id="accent-color" value="#F97316">
                         </div>
                     </div>
@@ -935,25 +1026,25 @@
                 <div class="form-section">
                     <div class="form-section-title">
                         <div class="form-section-number">4</div>
-                        スタイルとフォーマット
+                        Style and Format
                     </div>
 
                     <div class="form-group">
-                        <label for="font-style">フォントスタイル</label>
+                        <label for="font-style">Font Style</label>
                         <select id="font-style">
-                            <option value="modern">モダン（Sans-serif）</option>
-                            <option value="classic">クラシック（Serif）</option>
-                            <option value="creative">クリエイティブ（ディスプレイ）</option>
-                            <option value="minimal">ミニマル（モノスペース）</option>
+                            <option value="modern">Modern (Sans-serif)</option>
+                            <option value="classic">Classic (Serif)</option>
+                            <option value="creative">Creative (Display)</option>
+                            <option value="minimal">Minimal (Monospace)</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="output-format">出力フォーマット</label>
+                        <label for="output-format">Output Format</label>
                         <select id="output-format">
                             <option value="html">HTML</option>
                             <option value="markdown">Markdown</option>
-                            <option value="svg">SVG (図表向け)</option>
+                            <option value="svg">SVG (for diagrams)</option>
                             <option value="react">React Component</option>
                             <option value="drawio">Draw.io Diagram</option>
                             <option value="mermaid">Mermaid Diagram</option>
@@ -962,33 +1053,34 @@
 
                     <div class="tabs-container">
                         <div class="tab-buttons">
-                            <button class="tab-btn active" data-tab="infographic">インフォグラフィック</button>
-                            <button class="tab-btn" data-tab="recording">グラフィックレコーディング</button>
+                            <button class="tab-btn active" data-tab="infographic">Infographic</button>
+                            <button class="tab-btn" data-tab="recording">Graphic Recording</button>
                         </div>
 
                         <div class="tab-content">
                             <div id="infographic-tab" class="tab-pane active">
                                 <div class="form-group">
-                                    <label for="infographic-style">インフォグラフィック技法</label>
+                                    <label for="infographic-style">Infographic Technique</label>
                                     <select id="infographic-style">
-                                        <option value="comparative">比較分析型（データの比較・対照）</option>
-                                        <option value="hierarchical">階層型（情報の優先順位表示）</option>
-                                        <option value="process">プロセス型（ステップバイステップのフロー）</option>
-                                        <option value="statistical">統計型（数値データの視覚化）</option>
-                                        <option value="conceptual">概念図型（アイデアの関連性表示）</option>
+                                        <option value="comparative">Comparative (Data comparison/contrast)</option>
+                                        <option value="hierarchical">Hierarchical (Information priority display)
+                                        </option>
+                                        <option value="process">Process (Step-by-step flow)</option>
+                                        <option value="statistical">Statistical (Numerical data visualization)</option>
+                                        <option value="conceptual">Conceptual (Displaying idea relationships)</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div id="recording-tab" class="tab-pane hidden">
                                 <div class="form-group">
-                                    <label for="recording-style">グラフィックレコーディング技法</label>
+                                    <label for="recording-style">Graphic Recording Technique</label>
                                     <select id="recording-style">
-                                        <option value="timeline">タイムライン型（時間的進行の表現）</option>
-                                        <option value="mindmap">マインドマップ型（関連性の放射状表現）</option>
-                                        <option value="journey">ジャーニー型（体験プロセスの表現）</option>
-                                        <option value="quadrant">象限型（2軸での分類表現）</option>
-                                        <option value="modal">モーダル型（可能性・必然性の表現）</option>
+                                        <option value="timeline">Timeline (Temporal progression)</option>
+                                        <option value="mindmap">Mind Map (Radial relationship)</option>
+                                        <option value="journey">Journey (Experience process)</option>
+                                        <option value="quadrant">Quadrant (Classification on 2 axes)</option>
+                                        <option value="modal">Modal (Possibility/necessity expression)</option>
                                     </select>
                                 </div>
                             </div>
@@ -997,16 +1089,16 @@
                 </div>
 
                 <div class="generate-container">
-                    <button id="generate-btn" class="btn btn-primary">プロンプトを生成する</button>
+                    <button id="generate-btn" class="btn btn-primary">Generate Prompt</button>
                 </div>
             </div>
 
             <div class="result-container">
                 <div class="result-card">
                     <div class="result-header">
-                        <div class="result-title">生成されたプロンプト</div>
+                        <div class="result-title">Generated Prompt</div>
                         <button id="copy-btn" class="btn btn-secondary">
-                            コピー
+                            Copy
                             <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -1014,8 +1106,7 @@
                             </svg>
                         </button>
                     </div>
-                    <div id="result-content" class="result-content">
-                        ここに生成されたプロンプトが表示されます。左のフォームに必要事項を入力して「プロンプトを生成する」ボタンをクリックしてください。
+                    <div id="result-content" class="result-content">The generated prompt will appear here. Fill out the form on the left and click "Generate Prompt" button.
                     </div>
                 </div>
             </div>
@@ -1023,13 +1114,14 @@
     </div>
 
     <footer>
-        <p>&copy; 2025 設計支援ツールポータル｜<a href="https://github.com/yuubae215/utility-tools" class="github-link">GitHub</a>
+        <p>&copy; 2025 Design Support Tools Portal｜<a href="https://github.com/yuubae215/utility-tools"
+                class="github-link">GitHub</a>
         </p>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // ダークモード切り替え機能
+            // Dark mode toggle
             const themeToggle = document.getElementById('theme-toggle');
             const themeIcon = themeToggle.querySelector('i');
 
@@ -1045,7 +1137,7 @@
                 }
             });
 
-            // コンセプトカード選択機能
+            // Concept card selection
             const conceptCards = document.querySelectorAll('.concept-card');
             let selectedConcept = null;
 
@@ -1057,7 +1149,7 @@
                 });
             });
 
-            // カラーオプション切り替え
+            // Color option toggle
             const colorOptionBtns = document.querySelectorAll('.color-option-btn');
             const themeSelector = document.getElementById('theme-selector');
             const customColors = document.getElementById('custom-colors');
@@ -1078,7 +1170,7 @@
                 });
             });
 
-            // カラーテーマ選択
+            // Color theme selection
             const colorThemes = document.querySelectorAll('.color-theme');
             let selectedTheme = 'modern';
 
@@ -1090,7 +1182,7 @@
                 });
             });
 
-            // タブ切り替え
+            // Tab switching
             const tabBtns = document.querySelectorAll('.tab-btn');
             const tabPanes = document.querySelectorAll('.tab-pane');
 
@@ -1109,7 +1201,7 @@
                 });
             });
 
-            // カラーテーマ定義
+            // Color theme definitions
             const colorThemeMap = {
                 modern: {
                     primary: '#4263EB',
@@ -1143,7 +1235,7 @@
                 }
             };
 
-            // プロンプト生成機能
+            // Prompt generation functionality
             const generateBtn = document.getElementById('generate-btn');
             const resultContent = document.getElementById('result-content');
 
@@ -1156,7 +1248,7 @@
                 const infographicStyle = document.getElementById('infographic-style').value;
                 const recordingStyle = document.getElementById('recording-style').value;
 
-                // カラー値を取得（テーマまたはカスタム）
+                // Get color values (themes or custom)
                 let primaryColor, secondaryColor, accentColor;
                 const isCustomColor = document.querySelector('.color-option-btn[data-option="custom"]').classList.contains('active');
 
@@ -1172,15 +1264,15 @@
                 }
 
                 if (!topic || !contentDescription || !selectedConcept) {
-                    alert('メインテーマ、詳細説明、デザインコンセプトは必須項目です。');
+                    alert('Main theme, detailed description, and design concept are required fields.');
                     return;
                 }
 
-                // 各デザインコンセプトに応じたプロンプトテンプレート
+                // Prompt templates based on design concept
                 let promptTemplate = '';
                 let fontFamily = '';
 
-                // フォントスタイルの設定
+                // Font style settings
                 switch (fontStyle) {
                     case 'modern':
                         fontFamily = 'Inter, system-ui, sans-serif';
@@ -1196,7 +1288,7 @@
                         break;
                 }
 
-                // インフォグラフィックスタイルの設定
+                // Infographic style settings
                 let infographicDesc = '';
                 switch (infographicStyle) {
                     case 'comparative':
@@ -1216,7 +1308,7 @@
                         break;
                 }
 
-                // グラフィックレコーディングスタイルの設定
+                // Graphic recording style settings
                 let recordingDesc = '';
                 switch (recordingStyle) {
                     case 'timeline':
@@ -1236,7 +1328,7 @@
                         break;
                 }
 
-                // デザインコンセプトに応じたスタイルと設定
+                // Design concept specific styles and settings
                 let designStyle = '';
                 let colorApproach = '';
                 let interactions = '';
@@ -1261,7 +1353,7 @@
                         break;
                 }
 
-                // 出力フォーマットに応じた指示
+                // Output format specific instructions
                 let formatInstructions = '';
                 switch (outputFormat) {
                     case 'html':
@@ -1330,7 +1422,7 @@
                         break;
                 }
 
-                // 最終的なプロンプトテンプレート生成
+                // Final prompt template generation
                 promptTemplate = `# Layout and Style Instructions for "${topic}"
 
 Create a comprehensive explanation about ${topic} with the following design approach:
@@ -1376,7 +1468,7 @@ ${formatInstructions}
 
 Remember to prioritize clarity, readability, and information hierarchy throughout the entire explanation.`;
 
-                // 結果を表示 (アニメーション効果を追加)
+                // Display result (with animation effect)
                 resultContent.style.opacity = '0';
                 setTimeout(() => {
                     resultContent.textContent = promptTemplate;
@@ -1384,7 +1476,7 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
                 }, 300);
             });
 
-            // コピー機能
+            // Copy functionality
             const copyBtn = document.getElementById('copy-btn');
 
             copyBtn.addEventListener('click', () => {
@@ -1392,9 +1484,9 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
 
                 navigator.clipboard.writeText(resultText)
                     .then(() => {
-                        // コピー成功時の処理
+                        // Success handler
                         const originalText = copyBtn.innerHTML;
-                        copyBtn.textContent = 'コピーしました！';
+                        copyBtn.textContent = 'Copied!';
 
                         setTimeout(() => {
                             copyBtn.innerHTML = originalText;
@@ -1402,11 +1494,11 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
                     })
                     .catch(err => {
                         console.error('Failed to copy text: ', err);
-                        alert('コピーに失敗しました。');
+                        alert('Copy failed.');
                     });
             });
 
-            // 初期選択設定
+            // Initial selection setup
             document.querySelector('.concept-card[data-concept="neumorphism"]').click();
             document.querySelector('.color-theme[data-theme="modern"]').click();
         });
