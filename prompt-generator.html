@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>レイアウト・スタイル プロンプトジェネレーター - 設計支援ツール</title>
+    <!-- Font Awesome CDNを追加 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            /* 共通カラー変数 */
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --primary-light: #EEF2FF;
+            --accent-color: #e74c3c;
+            --secondary-color: #12B981;
+            --text-color: #2c3e50;
+            --text-light: #636e72;
+            --text-primary: #2c3e50;
+            --text-secondary: #636e72;
+            --text-tertiary: #9CA3AF;
+            --bg-color: #f8f9fa;
+            --card-color: #fff;
+            --surface-color: #F9FAFB;
+            --border-color: #E5E7EB;
+            --border-radius: 12px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+            --transition-normal: 0.2s ease-in-out;
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+        }
+
+        /* 統一されたダークモード変数 */
+        body.dark-mode {
+            --primary-color: #5dade2;
+            --primary-dark: #3498db;
+            --primary-light: #2d3748;
+            --accent-color: #e76f51;
+            --text-color: #ecf0f1;
+            --text-light: #bdc3c7;
+            --text-primary: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --text-tertiary: #a0aec0;
+            --bg-color: #1a202c;
+            --card-color: #2d3748;
+            --surface-color: #2d3748;
+            --border-color: #4a5568;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            transition: var(--transition);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--space-lg);
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-lg);
+            font-weight: 500;
+        }
+
+        .home-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .home-link:hover {
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+
+        .home-link i {
+            margin-right: 5px;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(30deg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+        }
+
+        .app-container {
+            display: flex;
+            gap: var(--space-lg);
+            flex-direction: column;
+        }
+
+        @media (min-width: 1024px) {
+            .app-container {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+
+        .form-container {
+            flex: 1;
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: var(--space-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .result-container {
+            flex: 1;
+            position: sticky;
+            top: var(--space-lg);
+        }
+
+        .form-section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .form-section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--space-md);
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .form-section-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 50%;
+            margin-right: var(--space-sm);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+
+        label {
+            display: block;
+            margin-bottom: var(--space-xs);
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-color);
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: border-color var(--transition-normal);
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(66, 99, 235, 0.1);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .color-input-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .color-input-group label {
+            margin-bottom: 0;
+            margin-right: var(--space-sm);
+        }
+
+        .color-input-group input[type="color"] {
+            width: 40px;
+            height: 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0;
+            background-color: transparent;
+        }
+
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .concept-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--space-md);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            position: relative;
+            background-color: var(--card-color);
+        }
+
+        .concept-card.selected {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .concept-card.selected::after {
+            content: "✓";
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+            width: 20px;
+            height: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .concept-card:hover {
+            box-shadow: var(--hover-shadow);
+            transform: translateY(-2px);
+        }
+
+        .concept-card h3 {
+            margin-bottom: var(--space-sm);
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+
+        .concept-card p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-sm) var(--space-md);
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--card-color);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            margin-left: var(--space-sm);
+        }
+
+        .generate-container {
+            display: flex;
+            justify-content: center;
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .result-card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: var(--space-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .result-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .result-content {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--space-md);
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+
+        .prompt-preview {
+            margin-top: var(--space-md);
+            padding: var(--space-md);
+            background-color: var(--primary-light);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-indicator {
+            display: flex;
+            margin-bottom: var(--space-xl);
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .progress-step::after {
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+
+        .progress-step:last-child::after {
+            display: none;
+        }
+
+        .step-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-xs);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            position: relative;
+            z-index: 2;
+        }
+
+        .progress-step.active .step-indicator {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .progress-step.completed .step-indicator {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-tertiary);
+        }
+
+        .progress-step.active .step-label {
+            color: var(--text-primary);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: var(--space-md);
+        }
+
+        .tab {
+            padding: var(--space-sm) var(--space-md);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Neumorphism Preview */
+        .preview-neumorphism {
+            background-color: #F0F2F9;
+            border-radius: 12px;
+            padding: var(--space-sm);
+            box-shadow:
+                6px 6px 12px rgba(210, 215, 230, 0.6),
+                -6px -6px 12px rgba(255, 255, 255, 0.8);
+        }
+
+        body.dark-mode .preview-neumorphism {
+            background-color: #2d3748;
+            box-shadow:
+                6px 6px 12px rgba(0, 0, 0, 0.4),
+                -6px -6px 12px rgba(71, 85, 105, 0.3);
+        }
+
+        /* Colorscape Preview */
+        .preview-colorscape {
+            background: linear-gradient(135deg, #5F43B2 0%, #9659FF 100%);
+            border-radius: 12px;
+            padding: var(--space-sm);
+            color: white;
+        }
+
+        /* Typographic Preview */
+        .preview-typographic {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-sm);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--card-color);
+            color: var(--text-color);
+        }
+
+        .preview-typographic .preview-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: var(--space-sm);
+        }
+
+        .preview-typographic .preview-title::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 2px;
+            background-color: var(--text-color);
+            bottom: -4px;
+            left: 0;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            margin-left: var(--space-xs);
+        }
+
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--text-tertiary);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--text-primary);
+            color: white;
+            text-align: center;
+            border-radius: var(--border-radius);
+            padding: 8px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.75rem;
+            font-weight: normal;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .error-message {
+            color: var(--accent-color);
+            font-size: 0.875rem;
+            margin-top: var(--space-xs);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .responsive-hint {
+            display: none;
+            padding: var(--space-md);
+            background-color: var(--primary-light);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--space-md);
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        @media (max-width: 1023px) {
+            .responsive-hint {
+                display: block;
+            }
+        }
+
+        /* 新規追加: カラーテーマセレクター */
+        .color-theme-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .color-theme {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            position: relative;
+            background-color: var(--card-color);
+        }
+
+        .color-theme:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .color-theme.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(66, 99, 235, 0.3);
+        }
+
+        .color-theme.selected::after {
+            content: "✓";
+            position: absolute;
+            top: var(--space-xs);
+            right: var(--space-xs);
+            width: 16px;
+            height: 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+        }
+
+        .color-preview {
+            height: 24px;
+            display: flex;
+        }
+
+        .color-primary,
+        .color-secondary,
+        .color-accent {
+            flex: 1;
+            height: 100%;
+        }
+
+        .color-theme-name {
+            padding: var(--space-xs);
+            font-size: 0.75rem;
+            text-align: center;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .color-option-toggle {
+            display: flex;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: var(--space-md);
+        }
+
+        .color-option-btn {
+            flex: 1;
+            padding: var(--space-xs) var(--space-sm);
+            background: none;
+            border: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            color: var(--text-color);
+        }
+
+        .color-option-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .custom-colors {
+            margin-top: var(--space-md);
+        }
+
+        .tabs-container {
+            margin-bottom: var(--space-md);
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            padding: var(--space-sm) var(--space-md);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            color: var(--text-color);
+        }
+
+        .tab-btn.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            padding: var(--space-md) 0;
+        }
+
+        /* フッター */
+        footer {
+            text-align: center;
+            margin-top: 70px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(99, 110, 114, 0.2);
+            color: var(--text-light);
+        }
+
+        .github-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .github-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* アニメーション */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .form-section {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .form-section:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .form-section:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .form-section:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .form-section:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <button class="theme-toggle" id="theme-toggle" title="ダークモード切替">
+            <i class="fas fa-moon"></i>
+        </button>
+        <h1>レイアウト・スタイル プロンプトジェネレーター</h1>
+        <h2>効果的なデザイン指示プロンプトを簡単に作成</h2>
+        <a href="index.html" class="home-link"><i class="fas fa-arrow-left"></i> ホームに戻る</a>
+    </header>
+
+    <div class="container">
+        <div class="responsive-hint">
+            より良いエクスペリエンスのために、デスクトップでの閲覧をお勧めします。
+        </div>
+
+        <div class="app-container">
+            <div class="form-container">
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <div class="form-section-number">1</div>
+                        コンテンツ情報
+                    </div>
+
+                    <div class="form-group">
+                        <label for="topic">メインテーマ/トピック</label>
+                        <input type="text" id="topic" placeholder="例: 気候変動、製品紹介、会社案内など">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content-description">詳細説明（何についての説明が欲しいか）</label>
+                        <textarea id="content-description"
+                            placeholder="例: 気候変動の原因と影響について詳細に説明し、解決策を提案してください。"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content-focus">重点項目</label>
+                        <input type="text" id="content-focus" placeholder="例: データ分析、ビジュアル表現、シンプルな説明など">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <div class="form-section-number">2</div>
+                        デザインコンセプト選択
+                    </div>
+
+                    <div class="concept-cards">
+                        <div class="concept-card" data-concept="neumorphism">
+                            <h3>Fluid Neumorphism</h3>
+                            <p>柔らかな影と微妙な3D効果による触感的なデザイン。エレガントで高級感のあるインターフェースに適しています。</p>
+                            <div class="preview-neumorphism" style="margin-top: 10px;">
+                                <div class="preview-title">プレビュー</div>
+                            </div>
+                        </div>
+
+                        <div class="concept-card" data-concept="colorscape">
+                            <h3>Dynamic Colorscape</h3>
+                            <p>鮮やかな色、グラデーション、空間的な奥行きを活用したエネルギッシュなデザイン。視覚的なインパクトが重要な場合に適しています。</p>
+                            <div class="preview-colorscape" style="margin-top: 10px;">
+                                <div class="preview-title">プレビュー</div>
+                            </div>
+                        </div>
+
+                        <div class="concept-card" data-concept="typographic">
+                            <h3>Typographic Grid</h3>
+                            <p>タイポグラフィ、空白、構造的なレイアウトに焦点を当てたミニマルなデザイン。読みやすさとコンテンツ構造が重要な場合に適しています。</p>
+                            <div class="preview-typographic" style="margin-top: 10px;">
+                                <div class="preview-title">プレビュー</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <div class="form-section-number">3</div>
+                        カラースキーム
+                    </div>
+
+                    <div class="color-option-toggle">
+                        <button class="color-option-btn active" data-option="theme">テーマから選択</button>
+                        <button class="color-option-btn" data-option="custom">カスタム</button>
+                    </div>
+
+                    <div id="theme-selector" class="color-theme-selector">
+                        <div class="color-theme selected" data-theme="modern">
+                            <div class="color-preview">
+                                <div class="color-primary" style="background-color: #4263EB;"></div>
+                                <div class="color-secondary" style="background-color: #12B981;"></div>
+                                <div class="color-accent" style="background-color: #F97316;"></div>
+                            </div>
+                            <div class="color-theme-name">モダン</div>
+                        </div>
+
+                        <div class="color-theme" data-theme="classic">
+                            <div class="color-preview">
+                                <div class="color-primary" style="background-color: #8B5A2B;"></div>
+                                <div class="color-secondary" style="background-color: #D4AF37;"></div>
+                                <div class="color-accent" style="background-color: #7D3C3C;"></div>
+                            </div>
+                            <div class="color-theme-name">クラシック</div>
+                        </div>
+
+                        <div class="color-theme" data-theme="vivid">
+                            <div class="color-preview">
+                                <div class="color-primary" style="background-color: #FF3366;"></div>
+                                <div class="color-secondary" style="background-color: #33CCFF;"></div>
+                                <div class="color-accent" style="background-color: #FFCC00;"></div>
+                            </div>
+                            <div class="color-theme-name">ビビッド</div>
+                        </div>
+
+                        <div class="color-theme" data-theme="monochrome">
+                            <div class="color-preview">
+                                <div class="color-primary" style="background-color: #333333;"></div>
+                                <div class="color-secondary" style="background-color: #666666;"></div>
+                                <div class="color-accent" style="background-color: #999999;"></div>
+                            </div>
+                            <div class="color-theme-name">モノクローム</div>
+                        </div>
+
+                        <div class="color-theme" data-theme="pastel">
+                            <div class="color-preview">
+                                <div class="color-primary" style="background-color: #FFAAA7;"></div>
+                                <div class="color-secondary" style="background-color: #A8E6CF;"></div>
+                                <div class="color-accent" style="background-color: #FFD3B6;"></div>
+                            </div>
+                            <div class="color-theme-name">パステル</div>
+                        </div>
+
+                        <div class="color-theme" data-theme="corporate">
+                            <div class="color-preview">
+                                <div class="color-primary" style="background-color: #0A2463;"></div>
+                                <div class="color-secondary" style="background-color: #3E92CC;"></div>
+                                <div class="color-accent" style="background-color: #D8315B;"></div>
+                            </div>
+                            <div class="color-theme-name">コーポレート</div>
+                        </div>
+                    </div>
+
+                    <div id="custom-colors" class="custom-colors hidden">
+                        <div class="form-group">
+                            <label for="primary-color">プライマリカラー</label>
+                            <input type="color" id="primary-color" value="#4263EB">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="secondary-color">セカンダリカラー</label>
+                            <input type="color" id="secondary-color" value="#12B981">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="accent-color">アクセントカラー</label>
+                            <input type="color" id="accent-color" value="#F97316">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <div class="form-section-number">4</div>
+                        スタイルとフォーマット
+                    </div>
+
+                    <div class="form-group">
+                        <label for="font-style">フォントスタイル</label>
+                        <select id="font-style">
+                            <option value="modern">モダン（Sans-serif）</option>
+                            <option value="classic">クラシック（Serif）</option>
+                            <option value="creative">クリエイティブ（ディスプレイ）</option>
+                            <option value="minimal">ミニマル（モノスペース）</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="output-format">出力フォーマット</label>
+                        <select id="output-format">
+                            <option value="html">HTML</option>
+                            <option value="markdown">Markdown</option>
+                            <option value="svg">SVG (図表向け)</option>
+                            <option value="react">React Component</option>
+                            <option value="drawio">Draw.io Diagram</option>
+                            <option value="mermaid">Mermaid Diagram</option>
+                        </select>
+                    </div>
+
+                    <div class="tabs-container">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-tab="infographic">インフォグラフィック</button>
+                            <button class="tab-btn" data-tab="recording">グラフィックレコーディング</button>
+                        </div>
+
+                        <div class="tab-content">
+                            <div id="infographic-tab" class="tab-pane active">
+                                <div class="form-group">
+                                    <label for="infographic-style">インフォグラフィック技法</label>
+                                    <select id="infographic-style">
+                                        <option value="comparative">比較分析型（データの比較・対照）</option>
+                                        <option value="hierarchical">階層型（情報の優先順位表示）</option>
+                                        <option value="process">プロセス型（ステップバイステップのフロー）</option>
+                                        <option value="statistical">統計型（数値データの視覚化）</option>
+                                        <option value="conceptual">概念図型（アイデアの関連性表示）</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="recording-tab" class="tab-pane hidden">
+                                <div class="form-group">
+                                    <label for="recording-style">グラフィックレコーディング技法</label>
+                                    <select id="recording-style">
+                                        <option value="timeline">タイムライン型（時間的進行の表現）</option>
+                                        <option value="mindmap">マインドマップ型（関連性の放射状表現）</option>
+                                        <option value="journey">ジャーニー型（体験プロセスの表現）</option>
+                                        <option value="quadrant">象限型（2軸での分類表現）</option>
+                                        <option value="modal">モーダル型（可能性・必然性の表現）</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="generate-container">
+                    <button id="generate-btn" class="btn btn-primary">プロンプトを生成する</button>
+                </div>
+            </div>
+
+            <div class="result-container">
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-title">生成されたプロンプト</div>
+                        <button id="copy-btn" class="btn btn-secondary">
+                            コピー
+                            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="result-content" class="result-content">
+                        ここに生成されたプロンプトが表示されます。左のフォームに必要事項を入力して「プロンプトを生成する」ボタンをクリックしてください。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 設計支援ツールポータル｜<a href="https://github.com/yuubae215/utility-tools" class="github-link">GitHub</a>
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // ダークモード切り替え機能
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+
+            themeToggle.addEventListener('click', function () {
+                document.body.classList.toggle('dark-mode');
+
+                if (document.body.classList.contains('dark-mode')) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                } else {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            });
+
+            // コンセプトカード選択機能
+            const conceptCards = document.querySelectorAll('.concept-card');
+            let selectedConcept = null;
+
+            conceptCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    conceptCards.forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    selectedConcept = card.dataset.concept;
+                });
+            });
+
+            // カラーオプション切り替え
+            const colorOptionBtns = document.querySelectorAll('.color-option-btn');
+            const themeSelector = document.getElementById('theme-selector');
+            const customColors = document.getElementById('custom-colors');
+
+            colorOptionBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    colorOptionBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const option = btn.dataset.option;
+                    if (option === 'theme') {
+                        themeSelector.classList.remove('hidden');
+                        customColors.classList.add('hidden');
+                    } else {
+                        themeSelector.classList.add('hidden');
+                        customColors.classList.remove('hidden');
+                    }
+                });
+            });
+
+            // カラーテーマ選択
+            const colorThemes = document.querySelectorAll('.color-theme');
+            let selectedTheme = 'modern';
+
+            colorThemes.forEach(theme => {
+                theme.addEventListener('click', () => {
+                    colorThemes.forEach(t => t.classList.remove('selected'));
+                    theme.classList.add('selected');
+                    selectedTheme = theme.dataset.theme;
+                });
+            });
+
+            // タブ切り替え
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const tab = btn.dataset.tab;
+                    tabPanes.forEach(pane => {
+                        pane.classList.add('hidden');
+                        if (pane.id === `${tab}-tab`) {
+                            pane.classList.remove('hidden');
+                        }
+                    });
+                });
+            });
+
+            // カラーテーマ定義
+            const colorThemeMap = {
+                modern: {
+                    primary: '#4263EB',
+                    secondary: '#12B981',
+                    accent: '#F97316'
+                },
+                classic: {
+                    primary: '#8B5A2B',
+                    secondary: '#D4AF37',
+                    accent: '#7D3C3C'
+                },
+                vivid: {
+                    primary: '#FF3366',
+                    secondary: '#33CCFF',
+                    accent: '#FFCC00'
+                },
+                monochrome: {
+                    primary: '#333333',
+                    secondary: '#666666',
+                    accent: '#999999'
+                },
+                pastel: {
+                    primary: '#FFAAA7',
+                    secondary: '#A8E6CF',
+                    accent: '#FFD3B6'
+                },
+                corporate: {
+                    primary: '#0A2463',
+                    secondary: '#3E92CC',
+                    accent: '#D8315B'
+                }
+            };
+
+            // プロンプト生成機能
+            const generateBtn = document.getElementById('generate-btn');
+            const resultContent = document.getElementById('result-content');
+
+            generateBtn.addEventListener('click', () => {
+                const topic = document.getElementById('topic').value.trim();
+                const contentDescription = document.getElementById('content-description').value.trim();
+                const contentFocus = document.getElementById('content-focus').value.trim();
+                const fontStyle = document.getElementById('font-style').value;
+                const outputFormat = document.getElementById('output-format').value;
+                const infographicStyle = document.getElementById('infographic-style').value;
+                const recordingStyle = document.getElementById('recording-style').value;
+
+                // カラー値を取得（テーマまたはカスタム）
+                let primaryColor, secondaryColor, accentColor;
+                const isCustomColor = document.querySelector('.color-option-btn[data-option="custom"]').classList.contains('active');
+
+                if (isCustomColor) {
+                    primaryColor = document.getElementById('primary-color').value;
+                    secondaryColor = document.getElementById('secondary-color').value;
+                    accentColor = document.getElementById('accent-color').value;
+                } else {
+                    const theme = colorThemeMap[selectedTheme];
+                    primaryColor = theme.primary;
+                    secondaryColor = theme.secondary;
+                    accentColor = theme.accent;
+                }
+
+                if (!topic || !contentDescription || !selectedConcept) {
+                    alert('メインテーマ、詳細説明、デザインコンセプトは必須項目です。');
+                    return;
+                }
+
+                // 各デザインコンセプトに応じたプロンプトテンプレート
+                let promptTemplate = '';
+                let fontFamily = '';
+
+                // フォントスタイルの設定
+                switch (fontStyle) {
+                    case 'modern':
+                        fontFamily = 'Inter, system-ui, sans-serif';
+                        break;
+                    case 'classic':
+                        fontFamily = 'Georgia, serif';
+                        break;
+                    case 'creative':
+                        fontFamily = 'Montserrat, Avenir, sans-serif';
+                        break;
+                    case 'minimal':
+                        fontFamily = 'SF Mono, Consolas, monospace';
+                        break;
+                }
+
+                // インフォグラフィックスタイルの設定
+                let infographicDesc = '';
+                switch (infographicStyle) {
+                    case 'comparative':
+                        infographicDesc = 'Use comparative analysis techniques to visually contrast different data points and highlight key differences.';
+                        break;
+                    case 'hierarchical':
+                        infographicDesc = 'Implement a clear hierarchical structure to show the relative importance of information through size, position, and visual weight.';
+                        break;
+                    case 'process':
+                        infographicDesc = 'Create a step-by-step flow visualization that clearly shows progression through stages and relationships between steps.';
+                        break;
+                    case 'statistical':
+                        infographicDesc = 'Utilize statistical visualization techniques like charts, graphs, and data representation to clearly communicate numerical information.';
+                        break;
+                    case 'conceptual':
+                        infographicDesc = 'Develop conceptual diagrams that illustrate relationships between ideas, showing connections and influences between different elements.';
+                        break;
+                }
+
+                // グラフィックレコーディングスタイルの設定
+                let recordingDesc = '';
+                switch (recordingStyle) {
+                    case 'timeline':
+                        recordingDesc = 'Use timeline-based visualization to show temporal progression and development of concepts over time.';
+                        break;
+                    case 'mindmap':
+                        recordingDesc = 'Implement a radial mind-mapping approach to show how concepts relate to a central theme and branch out into sub-topics.';
+                        break;
+                    case 'journey':
+                        recordingDesc = 'Create a journey-map style visual that depicts experiences, touchpoints, and emotional states through a process.';
+                        break;
+                    case 'quadrant':
+                        recordingDesc = 'Organize information into a quadrant-based system using two axes to create four distinct categories or zones.';
+                        break;
+                    case 'modal':
+                        recordingDesc = 'Apply modal logic visualization to distinguish between necessities, possibilities, and contingencies in the content.';
+                        break;
+                }
+
+                // デザインコンセプトに応じたスタイルと設定
+                let designStyle = '';
+                let colorApproach = '';
+                let interactions = '';
+
+                switch (selectedConcept) {
+                    case 'neumorphism':
+                        designStyle = 'Implement a Fluid Neumorphism design with soft shadows and subtle 3D effects for a tactile, premium feel.';
+                        colorApproach = `Use a light neutral background (#F0F2F9) with ${primaryColor} as the primary accent, ${secondaryColor} as the secondary accent, and ${accentColor} as tertiary accent. Apply soft shadows to create depth.`;
+                        interactions = 'Create subtle animations for interactive elements that provide feedback through a pressed/elevated feel.';
+                        break;
+
+                    case 'colorscape':
+                        designStyle = 'Apply a Dynamic Colorscape design with vibrant colors, gradients, and spatial depth to create visual energy.';
+                        colorApproach = `Use gradients combining ${primaryColor} with complementary colors. Add ${secondaryColor} as a contrasting accent and ${accentColor} for highlights. Maintain a clean white (#FFFFFF) background to make colors pop.`;
+                        interactions = 'Implement energetic feedback through color shifts, scaling effects, and smooth transitions on interactive elements.';
+                        break;
+
+                    case 'typographic':
+                        designStyle = 'Create a Typographic Grid design focusing on typography, whitespace, and structural layout for clarity and focus.';
+                        colorApproach = `Utilize a limited color palette with ${primaryColor} as the primary accent, ${secondaryColor} as a minimal secondary accent, and ${accentColor} used sparingly for highlights. Maintain high contrast with clean backgrounds.`;
+                        interactions = 'Keep interactions subtle and focused on readability, with minimal animations and clear state changes.';
+                        break;
+                }
+
+                // 出力フォーマットに応じた指示
+                let formatInstructions = '';
+                switch (outputFormat) {
+                    case 'html':
+                        formatInstructions = `
+## Output Format: HTML
+- Create a valid HTML5 document with proper semantic structure
+- Use CSS for styling, preferably with CSS variables for color themes
+- Ensure responsive design with appropriate media queries
+- Optimize for performance by minimizing unnecessary markup
+- Follow accessibility best practices (ARIA labels, semantic HTML, etc.)`;
+                        break;
+
+                    case 'markdown':
+                        formatInstructions = `
+## Output Format: Markdown
+- Use standard Markdown syntax for consistent rendering across platforms
+- Utilize headings, lists, tables, and code blocks appropriately
+- Include HTML where necessary for advanced formatting needs
+- Maintain a clean, readable document structure
+- Use proper linking and reference techniques`;
+                        break;
+
+                    case 'svg':
+                        formatInstructions = `
+## Output Format: SVG
+- Create a vector-based visualization with clear structure
+- Define viewBox for proper scaling across different screen sizes
+- Use appropriate SVG elements (paths, circles, rectangles, text, etc.)
+- Implement a consistent color palette and styling
+- Consider adding subtle animations where appropriate
+- Ensure text elements are readable and properly positioned`;
+                        break;
+
+                    case 'react':
+                        formatInstructions = `
+## Output Format: React Component
+- Create a functional React component with modern practices
+- Use React hooks for state management where needed
+- Implement styled-components or CSS modules for styling
+- Ensure responsive design principles are followed
+- Break down complex UI into smaller, reusable components
+- Add appropriate PropTypes or TypeScript interfaces
+- Consider performance optimization where applicable`;
+                        break;
+
+                    case 'drawio':
+                        formatInstructions = `
+## Output Format: Draw.io Diagram
+- Design a clear, structured diagram suitable for Draw.io
+- Organize elements in a logical flow with appropriate connectors
+- Use consistent shapes and styling for similar elements
+- Include color-coding for different categories or states
+- Add text labels that are concise and descriptive
+- Consider providing export-ready XML structure where possible`;
+                        break;
+
+                    case 'mermaid':
+                        formatInstructions = `
+## Output Format: Mermaid Diagram
+- Follow Mermaid syntax conventions for the appropriate diagram type
+- Choose the most suitable diagram type (flowchart, sequence, class, etc.)
+- Maintain a logical flow and clear relationships between nodes
+- Use concise labels that communicate essential information
+- Implement consistent styling and color-coding
+- Keep the diagram focused and avoid unnecessary complexity`;
+                        break;
+                }
+
+                // 最終的なプロンプトテンプレート生成
+                promptTemplate = `# Layout and Style Instructions for "${topic}"
+
+Create a comprehensive explanation about ${topic} with the following design approach:
+
+## Content Requirements
+${contentDescription}
+
+Focus especially on: ${contentFocus || "Clear, detailed explanations"}
+
+## Design Concept: ${selectedConcept === 'neumorphism' ? 'Fluid Neumorphism' : selectedConcept === 'colorscape' ? 'Dynamic Colorscape' : 'Typographic Grid'}
+${designStyle}
+
+## Visual Structure
+- Create a clean, organized layout with a multi-column grid (3-5 columns depending on content density)
+- Implement a compact header with in-page navigation links to major sections
+- Use clear section dividers and visual landmarks to guide the reader
+- Adapt layout responsively for different screen sizes
+
+## Typography
+- Use ${fontFamily} for consistent readability
+- Apply a clear typographic hierarchy with distinct heading and body text styles
+- Maintain optimal line length and spacing for comfortable reading
+- Highlight key concepts using the accent text treatment
+
+## Color Treatment
+${colorApproach}
+
+## Information Visualization
+- ${infographicDesc}
+- Ensure relationships between elements are visually clear through connecting lines and spatial organization
+- Use color coding consistently to differentiate categories of information
+- Add clear labels to explain relationships between connected elements
+
+## Conceptual Mapping
+- ${recordingDesc}
+- Make temporal progression and logical relationships easy to understand through visual organization
+- Use appropriate containers and connectors to show how concepts relate to each other
+- Implement visual metaphors where appropriate to simplify complex ideas
+
+## Interactive Considerations
+${interactions}
+${formatInstructions}
+
+Remember to prioritize clarity, readability, and information hierarchy throughout the entire explanation.`;
+
+                // 結果を表示 (アニメーション効果を追加)
+                resultContent.style.opacity = '0';
+                setTimeout(() => {
+                    resultContent.textContent = promptTemplate;
+                    resultContent.style.opacity = '1';
+                }, 300);
+            });
+
+            // コピー機能
+            const copyBtn = document.getElementById('copy-btn');
+
+            copyBtn.addEventListener('click', () => {
+                const resultText = resultContent.textContent;
+
+                navigator.clipboard.writeText(resultText)
+                    .then(() => {
+                        // コピー成功時の処理
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.textContent = 'コピーしました！';
+
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy text: ', err);
+                        alert('コピーに失敗しました。');
+                    });
+            });
+
+            // 初期選択設定
+            document.querySelector('.concept-card[data-concept="neumorphism"]').click();
+            document.querySelector('.color-theme[data-theme="modern"]').click();
+        });
+    </script>
+</body>
+
+</html>

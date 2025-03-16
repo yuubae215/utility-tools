@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8" />
+    <title>ファイル結合ツール - 設計支援ツール</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="複数のファイルを結合して整理するモダンなツール">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Mermaid for diagram generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.2.2/mermaid.min.js"></script>
+    <!-- FileSaver for downloading files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Highlight.js for syntax highlighting -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <!-- Additional highlight.js languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        /* 共通カラー変数 */
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --primary-light: #EEF2FF;
+            --accent-color: #e74c3c;
+            --secondary-color: #12B981;
+            --text-color: #2c3e50;
+            --text-light: #636e72;
+            --text-primary: #2c3e50;
+            --text-secondary: #636e72;
+            --text-tertiary: #9CA3AF;
+            --bg-color: #f8fafc;
+            --card-color: #fff;
+            --surface-color: #F9FAFB;
+            --border-color: #E5E7EB;
+            --border-radius: 12px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+            --transition-normal: 0.2s ease-in-out;
+            --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* 統一されたダークモード変数 */
+        body.dark-mode {
+            --primary-color: #5dade2;
+            --primary-dark: #3498db;
+            --primary-light: #2d3748;
+            --accent-color: #e76f51;
+            --text-color: #ecf0f1;
+            --text-light: #bdc3c7;
+            --text-primary: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --text-tertiary: #a0aec0;
+            --bg-color: #0f172a;
+            --card-color: #1e293b;
+            --surface-color: #2d3748;
+            --border-color: #4a5568;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Base styles */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            display: flex;
+            flex-direction: column;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark {
+            color: #e2e8f0;
+            background-color: #0f172a;
+        }
+
+        /* ホームリンク */
+        .home-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .home-link:hover {
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+
+        .home-link i {
+            margin-right: 5px;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(155, 155, 155, 0.5);
+            border-radius: 20px;
+            transition: background-color 0.2s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(155, 155, 155, 0.8);
+        }
+
+        /* Theme toggle switch styles */
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "🌞";
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 24px;
+            width: 24px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            font-size: 15px;
+        }
+
+        input:checked+.slider {
+            background-color: #3b82f6;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(30px);
+            content: "🌙";
+        }
+
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    rgba(255, 255, 255, 0) 100%);
+            animation: shimmer 1.5s infinite;
+            transform: translateX(-100%);
+        }
+
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* Drag and drop area */
+        .dropzone {
+            border: 2px dashed #94a3b8;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropzone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .dropzone:hover,
+        .dropzone.drag-active {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
+        }
+
+        .dropzone:hover::before,
+        .dropzone.drag-active::before {
+            opacity: 1;
+        }
+
+        .dropzone.drag-active {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        /* Animation for the arrow */
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        /* Button styles */
+        .btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(50, 50);
+                opacity: 0;
+            }
+        }
+
+        /* File list item hover effect */
+        .file-item {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .file-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+            transform: translateX(2px);
+        }
+
+        .file-item.active {
+            background-color: rgba(59, 130, 246, 0.15);
+            border-left-color: #3b82f6;
+        }
+
+        /* Card styles */
+        .card {
+            border-radius: 12px;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Loading dots animation */
+        .loading-dots:after {
+            content: '⠋';
+            animation: loading 1s steps(10, end) infinite;
+            display: inline-block;
+            width: 1em;
+            text-align: left;
+        }
+
+        @keyframes loading {
+            0% {
+                content: '⠋';
+            }
+
+            10% {
+                content: '⠙';
+            }
+
+            20% {
+                content: '⠹';
+            }
+
+            30% {
+                content: '⠸';
+            }
+
+            40% {
+                content: '⠼';
+            }
+
+            50% {
+                content: '⠴';
+            }
+
+            60% {
+                content: '⠦';
+            }
+
+            70% {
+                content: '⠧';
+            }
+
+            80% {
+                content: '⠇';
+            }
+
+            90% {
+                content: '⠏';
+            }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: #1e293b;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 10;
+            top: 100%;
+            left: 50%;
+            margin-left: -60px;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent #1e293b transparent;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Dark mode overrides */
+        .dark .progress-container {
+            background-color: #1e293b;
+        }
+
+        .dark .dropzone {
+            border-color: #475569;
+        }
+
+        .dark .dropzone:hover,
+        .dark .dropzone.drag-active {
+            border-color: #3b82f6;
+        }
+
+        .dark .file-item:hover {
+            background-color: rgba(59, 130, 246, 0.15);
+        }
+
+        .dark .file-item.active {
+            background-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .dark .tooltip .tooltip-text {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .dark .tooltip .tooltip-text::after {
+            border-color: transparent transparent #f1f5f9 transparent;
+        }
+
+        /* Empty state animation */
+        .empty-state-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* フッターのスタイル */
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-light);
+        }
+
+        .github-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .github-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body class="dark dark-mode">
+    <div class="flex flex-col h-screen">
+        <!-- ヘッダー - 修正済み -->
+        <header class="px-6 py-4 bg-primary-600 text-white flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 8v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8" />
+                    <path d="M21 2H3v6h18V2z" />
+                    <path d="M9 14v4" />
+                    <path d="M15 14v4" />
+                </svg>
+                <div>
+                    <h1 class="text-xl font-semibold tracking-tight text-white">ファイル結合ツール</h1>
+                    <p class="text-sm text-slate-100">複数のファイルをドラッグ＆ドロップで結合</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="clearButton"
+                    class="hidden text-sm text-slate-200 hover:text-white dark:hover:text-primary-400 transition-colors">
+                    ファイルをクリア
+                </button>
+                <a href="index.html" class="home-link"><i class="fas fa-arrow-left"></i> ホームに戻る</a>
+                <label class="theme-switch tooltip">
+                    <input type="checkbox" id="themeToggle" checked>
+                    <span class="slider"></span>
+                    <span class="tooltip-text">テーマ切替</span>
+                </label>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="flex-1 overflow-hidden p-6 bg-slate-50 dark:bg-slate-900">
+            <!-- Drop zone -->
+            <div id="dropZone"
+                class="dropzone rounded-xl p-8 text-center cursor-pointer mb-6 bg-white dark:bg-slate-800 shadow-sm">
+                <div id="loadingContainer" class="w-full hidden">
+                    <div class="progress-container">
+                        <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p class="mt-2 text-slate-600 dark:text-slate-400">ファイル処理中 <span class="loading-dots"></span> <span
+                            id="progressText">0</span>%</p>
+                </div>
+                <div id="dropContent" class="flex flex-col items-center justify-center py-4">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-16 w-16 text-slate-400 dark:text-slate-500 mb-4 empty-state-icon" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">ドラッグ＆ドロップでアップロード</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">ファイルやフォルダをここにドロップして整理します</p>
+                    <div class="flex space-x-2">
+                        <span
+                            class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/30">ファイル</span>
+                        <span
+                            class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-400 ring-1 ring-inset ring-indigo-700/10 dark:ring-indigo-400/30">フォルダ</span>
+                        <span
+                            class="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-900/30 px-2 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 ring-1 ring-inset ring-purple-700/10 dark:ring-purple-400/30">.loadignore
+                            サポート</span>
+                    </div>
+                    <div class="mt-4 flex flex-col">
+                        <button id="downloadSampleIgnore"
+                            class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            .loadignoreサンプルをダウンロード
+                        </button>
+                        <div class="text-xs text-slate-500 dark:text-slate-400 ml-6 mt-1">
+                            .loadignoreファイルでは # を使ってコメントができます
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error message -->
+            <div id="errorContainer"
+                class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg hidden">
+                <div class="flex">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <div>
+                        <strong class="font-medium">エラー:</strong>
+                        <span id="errorText" class="ml-1"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty state when no files are loaded -->
+            <div id="emptyState"
+                class="card flex flex-col items-center justify-center py-12 bg-white dark:bg-slate-800 rounded-xl shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-20 w-20 text-slate-300 dark:text-slate-600 mb-4 empty-state-icon" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="9" y1="15" x2="15" y2="15" />
+                    <line x1="9" y1="11" x2="15" y2="11" />
+                    <line x1="9" y1="19" x2="13" y2="19" />
+                </svg>
+                <h3 class="text-xl font-medium text-slate-900 dark:text-white mb-2">ファイルがありません</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-center max-w-md mb-6">
+                    ファイルやフォルダをドロップして、一つのマークダウンドキュメントにまとめましょう
+                </p>
+                <div class="text-sm text-slate-500 dark:text-slate-500 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl">
+                    <div class="flex items-start">
+                        <div
+                            class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mr-3">
+                            1</div>
+                        <div>
+                            <h4 class="font-medium text-slate-900 dark:text-white">アップロード</h4>
+                            <p class="mt-1">ファイルをドラッグ＆ドロップ</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div
+                            class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mr-3">
+                            2</div>
+                        <div>
+                            <h4 class="font-medium text-slate-900 dark:text-white">プレビュー</h4>
+                            <p class="mt-1">ファイル内容を確認</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div
+                            class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mr-3">
+                            3</div>
+                        <div>
+                            <h4 class="font-medium text-slate-900 dark:text-white">結合</h4>
+                            <p class="mt-1">生成してダウンロード</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card container when files are loaded -->
+            <div id="fileContainer" class="hidden">
+                <!-- Actions -->
+                <div id="actionsContainer" class="mb-6 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                        <div class="mb-4 sm:mb-0">
+                            <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-1">プロジェクトファイル</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">
+                                <span id="fileCount">0</span> ファイル処理準備完了 •
+                                <span id="totalSize">0 KB</span> 合計
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <button id="sizeAnalysisButton"
+                                class="btn bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-4 rounded-lg shadow-sm flex items-center tooltip">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="9" y1="9" x2="15" y2="9"></line>
+                                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                                    <line x1="9" y1="12" x2="15" y2="12"></line>
+                                </svg>
+                                サイズ分析
+                                <span class="tooltip-text">ファイルサイズ分析</span>
+                            </button>
+                            <button id="combineButton"
+                                class="btn bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-4 rounded-lg shadow-sm flex items-center tooltip">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M17 17H7V6m0 0v11m0-11H4m3 0 4-4 4 4m6 4v11m0 0H7m14 0h3m-3 0-4 4-4-4" />
+                                </svg>
+                                <span id="combineButtonText">ファイル結合</span>
+                                <span class="tooltip-text">マークダウンを生成</span>
+                            </button>
+                            <button id="downloadButton"
+                                class="btn bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-4 rounded-lg shadow-sm flex items-center hidden tooltip">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                ダウンロード
+                                <span class="tooltip-text">マークダウンとして保存</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Size Analysis Modal -->
+                <div id="sizeAnalysisModal"
+                    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+                    <div
+                        class="bg-white dark:bg-slate-800 rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] flex flex-col">
+                        <div
+                            class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                            <h3 class="text-lg font-medium text-slate-900 dark:text-white">ファイルサイズ分析</h3>
+                            <button id="closeSizeAnalysisModal"
+                                class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="p-4 overflow-auto flex-1">
+                            <div class="mb-4 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <button id="sortByName"
+                                        class="px-3 py-1 text-sm rounded-md border border-slate-300 dark:border-slate-600 mr-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                        名前で並び替え
+                                    </button>
+                                    <button id="sortBySize"
+                                        class="px-3 py-1 text-sm rounded-md border border-slate-300 dark:border-slate-600 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                        サイズで並び替え
+                                    </button>
+                                </div>
+                                <button id="excludeSelectedBtn"
+                                    class="px-3 py-1 text-sm rounded-md border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    選択したファイルを除外
+                                </button>
+                            </div>
+                            <div class="space-y-2">
+                                <div
+                                    class="flex items-center justify-between py-2 border-b border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-500 dark:text-slate-400">
+                                    <div class="w-8 text-center">
+                                        <input type="checkbox" id="selectAllFiles"
+                                            class="rounded border-slate-300 dark:border-slate-600 text-primary-600 focus:ring-primary-500">
+                                    </div>
+                                    <div class="flex-1">ファイル名</div>
+                                    <div class="w-24 text-right">サイズ</div>
+                                    <div class="w-24 text-right">割合</div>
+                                </div>
+                                <div id="sizeAnalysisList" class="max-h-[50vh] overflow-y-auto space-y-1">
+                                    <!-- File size items will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900 rounded-b-xl">
+                            <div class="text-sm text-slate-500 dark:text-slate-400">
+                                <span class="font-medium" id="selectedFileCount">0</span> ファイル選択中
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="cancelSizeAnalysis"
+                                    class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                                    キャンセル
+                                </button>
+                                <button id="applySizeAnalysis"
+                                    class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg">
+                                    変更を適用
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content area -->
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- File list -->
+                    <div id="fileListContainer"
+                        class="lg:w-1/3 card bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-200 dark:border-slate-700">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-lg font-medium text-slate-900 dark:text-white">ファイル一覧</h2>
+                                <div class="relative">
+                                    <input type="text" id="fileSearchInput" placeholder="ファイル検索..."
+                                        class="py-1 px-3 pr-8 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-slate-400 dark:placeholder-slate-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-4 w-4 absolute right-2.5 top-2 text-slate-400 dark:text-slate-500"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <ul id="fileList"
+                            class="divide-y divide-slate-200 dark:divide-slate-700 overflow-y-auto max-h-[calc(100vh-380px)]">
+                            <!-- File items will be inserted here -->
+                        </ul>
+                    </div>
+
+                    <!-- File content preview -->
+                    <div id="fileContentContainer"
+                        class="lg:w-2/3 card bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden">
+                        <div id="selectedFileContent" class="hidden h-full flex flex-col">
+                            <div
+                                class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                                <div class="flex items-center overflow-hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-5 w-5 text-slate-500 dark:text-slate-400 mr-2 flex-shrink-0"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <line x1="16" y1="13" x2="8" y2="13" />
+                                        <line x1="16" y1="17" x2="8" y2="17" />
+                                        <polyline points="10 9 9 9 8 9" />
+                                    </svg>
+                                    <h2 class="text-lg font-medium text-slate-900 dark:text-white truncate">
+                                        <span id="selectedFilePath" class="text-slate-500 dark:text-slate-400"></span>
+                                    </h2>
+                                </div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400">
+                                    <span id="fileSize"></span>
+                                </div>
+                            </div>
+                            <div class="flex-1 overflow-hidden">
+                                <pre id="fileContentView"
+                                    class="h-[calc(100vh-300px)] overflow-y-auto p-4 m-0 rounded-none text-sm bg-slate-50 dark:bg-slate-900 language-javascript"><code></code></pre>
+                            </div>
+                        </div>
+
+                        <div id="combinedContent" class="hidden h-full flex flex-col">
+                            <div
+                                class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-5 w-5 text-slate-500 dark:text-slate-400 mr-2" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path
+                                            d="M15.5 2H8.6c-.4 0-.8.2-1.1.5-.3.3-.5.7-.5 1.1v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8c.4 0 .8-.2 1.1-.5.3-.3.5-.7.5-1.1V6.5L15.5 2z" />
+                                        <path d="M3 7.6v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8" />
+                                        <path d="M15 2v5h5" />
+                                    </svg>
+                                    <h2 class="text-lg font-medium text-slate-900 dark:text-white">結合されたファイル</h2>
+                                </div>
+                            </div>
+                            <div class="flex-1 overflow-hidden">
+                                <pre id="combinedContentView"
+                                    class="h-[calc(100vh-300px)] overflow-y-auto p-4 m-0 rounded-none text-sm bg-slate-50 dark:bg-slate-900 language-markdown"><code></code></pre>
+                            </div>
+                        </div>
+
+                        <!-- Empty content state -->
+                        <div id="noFileSelected"
+                            class="flex flex-col items-center justify-center h-full p-8 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-16 w-16 text-slate-300 dark:text-slate-600 mb-4" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                            <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">ファイルが選択されていません</h3>
+                            <p class="text-slate-500 dark:text-slate-400">リストからファイルを選択してプレビューを表示します</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer with debug log - 修正済み -->
+        <footer class="px-6 py-3 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 text-sm">
+            <div class="flex items-center justify-between">
+                <div class="text-xs text-slate-500 dark:text-slate-400">
+                    &copy; 2025 設計支援ツールポータル｜<a href="https://github.com/yuubae215/utility-tools"
+                        class="github-link">GitHub</a>
+                </div>
+                <details class="cursor-pointer">
+                    <summary
+                        class="font-medium text-slate-700 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        デバッグログ</summary>
+                    <pre id="logContainer"
+                        class="mt-2 bg-slate-100 dark:bg-slate-900 p-2 rounded-lg overflow-y-auto h-24 text-xs text-slate-700 dark:text-slate-300"></pre>
+                </details>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: document.body.classList.contains('dark') ? 'dark' : 'default',
+            securityLevel: 'loose'
+        });
+
+        // DOM elements
+        const dropZone = document.getElementById('dropZone');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const dropContent = document.getElementById('dropContent');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const errorContainer = document.getElementById('errorContainer');
+        const errorText = document.getElementById('errorText');
+        const actionsContainer = document.getElementById('actionsContainer');
+        const combineButton = document.getElementById('combineButton');
+        const combineButtonText = document.getElementById('combineButtonText');
+        const downloadButton = document.getElementById('downloadButton');
+        const fileListContainer = document.getElementById('fileListContainer');
+        const fileList = document.getElementById('fileList');
+        const selectedFileContent = document.getElementById('selectedFileContent');
+        const selectedFilePath = document.getElementById('selectedFilePath');
+        const fileContentView = document.getElementById('fileContentView').querySelector('code');
+        const fileSize = document.getElementById('fileSize');
+        const combinedContent = document.getElementById('combinedContent');
+        const combinedContentView = document.getElementById('combinedContentView').querySelector('code');
+        const logContainer = document.getElementById('logContainer');
+        const themeToggle = document.getElementById('themeToggle');
+        const emptyState = document.getElementById('emptyState');
+        const fileContainer = document.getElementById('fileContainer');
+        const noFileSelected = document.getElementById('noFileSelected');
+        const fileSearchInput = document.getElementById('fileSearchInput');
+        const fileCount = document.getElementById('fileCount');
+        const clearButton = document.getElementById('clearButton');
+
+        // Global variables
+        let files = [];
+        let isLoading = false;
+        let progress = 0;
+        let estimatedTotalFiles = 0;
+        let processedFiles = 0;
+        let error = null;
+        let selectedFile = null;
+        let fileContentText = "";
+        let combinedContentText = "";
+        let isCombining = false;
+        let ignorePatterns = new Set();
+        let debugLog = [];
+        let activeFileItem = null;
+
+        // Theme toggle functionality - 修正済み
+        themeToggle.addEventListener('change', function () {
+            // dark クラスと dark-mode クラスを同時に切り替え
+            document.body.classList.toggle('dark-mode');
+            document.body.classList.toggle('dark');
+
+            // Update mermaid theme
+            if (document.body.classList.contains('dark')) {
+                mermaid.initialize({ theme: 'dark' });
+            } else {
+                mermaid.initialize({ theme: 'default' });
+            }
+
+            // Re-render any existing mermaid diagrams
+            if (combinedContentText && combinedContentText.includes('```mermaid')) {
+                mermaid.init(undefined, 'pre code.language-mermaid');
+            }
+        });
+
+        // Log function
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            console.log(logMessage);
+            debugLog.push(logMessage);
+            logContainer.textContent = debugLog.join('\n');
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Prevent default behavior for drag over
+        function preventDefault(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Add active class for visual feedback
+            if (e.type === 'dragover') {
+                dropZone.classList.add('drag-active');
+            } else if (e.type === 'dragleave' || e.type === 'drop') {
+                dropZone.classList.remove('drag-active');
+            }
+        }
+
+        // Parse .loadignore file
+        async function parseLoadIgnore(file) {
+            const content = await file.text();
+            const patterns = new Set(
+                content
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line && !line.startsWith('#')) // Skip empty lines and lines starting with #
+            );
+            log(`Parsed .loadignore file: ${file.name}, patterns: ${Array.from(patterns).join(', ')}`);
+            return patterns;
+        }
+
+        // Convert ignore pattern to RegExp
+        function convertPatternToRegExp(pattern) {
+            // Escape special regex characters
+            const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+
+            // **/ patterns to temporary token
+            let converted = escaped.replace(/\*\*/g, 'GLOBSTAR');
+
+            // Convert patterns to regex
+            converted = converted
+                // ? to any single character except /
+                .replace(/\?/g, '[^/]')
+                // * to any string (except /)
+                .replace(/\*/g, '[^/]*')
+                // GLOBSTAR back to any path (including /)
+                .replace(/GLOBSTAR/g, '.*');
+
+            // Convert {pattern1,pattern2} to (pattern1|pattern2)
+            converted = converted.replace(
+                /\{([^{}]*)\}/g,
+                (_, contents) => `(${contents.split(',').join('|')})`
+            );
+
+            // Consider path beginning and ending
+            return new RegExp(`^(.*\\/)?${converted}(\\/.*)?$`);
+        }
+
+        // Check if file should be ignored
+        function shouldIgnoreFile(filePath, ignorePatterns) {
+            log(`Checking if ${filePath} should be ignored`);
+
+            for (const pattern of ignorePatterns) {
+                if (pattern.startsWith('#') || pattern.trim() === '') continue;
+
+                const regex = convertPatternToRegExp(pattern.trim());
+                log(`  Checking against pattern: ${pattern} (regex: ${regex})`);
+
+                if (regex.test(filePath)) {
+                    log(`  Matched! File will be ignored.`);
+                    return true;
+                }
+            }
+
+            log(`  No match found. File will be included.`);
+            return false;
+        }
+
+        // Update progress
+        function updateProgress() {
+            estimatedTotalFiles = Math.max(estimatedTotalFiles, processedFiles * 1.1);
+            progress = Math.min(Math.round((processedFiles / estimatedTotalFiles) * 100), 100);
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = progress;
+        }
+
+        // Process a file entry
+        async function processEntry(entry, path = '', currentIgnorePatterns = new Set(), rootPath = '') {
+            const fullPath = rootPath + path + entry.name;
+            log(`Processing entry: ${fullPath}`);
+
+            if (entry.isFile) {
+                return new Promise((resolve) => {
+                    entry.file(async (file) => {
+                        processedFiles++;
+                        updateProgress();
+
+                        if (file.name === '.loadignore') {
+                            log(`Found .loadignore file: ${fullPath}`);
+                            const newIgnorePatterns = await parseLoadIgnore(file);
+                            currentIgnorePatterns = new Set([
+                                ...currentIgnorePatterns,
+                                ...newIgnorePatterns
+                            ]);
+                            ignorePatterns = new Set([
+                                ...ignorePatterns,
+                                ...currentIgnorePatterns
+                            ]);
+                            log(`Updated ignore patterns: ${Array.from(ignorePatterns).join(', ')}`);
+                            resolve(null);
+                        } else if (!shouldIgnoreFile(fullPath, ignorePatterns)) {
+                            log(`Including file: ${fullPath}`);
+                            resolve({ path: fullPath, file });
+                        } else {
+                            log(`Ignoring file: ${fullPath}`);
+                            resolve(null);
+                        }
+                    });
+                });
+            } else if (entry.isDirectory) {
+                // Estimate file count for directories
+                estimatedTotalFiles += 10;
+                updateProgress();
+
+                const dirPath = path + entry.name + '/';
+                log(`Processing directory: ${fullPath}/`);
+
+                if (shouldIgnoreFile(fullPath + '/', ignorePatterns)) {
+                    log(`Ignoring directory: ${fullPath}/`);
+                    return Promise.resolve([]);
+                }
+
+                const dirReader = entry.createReader();
+                return new Promise((resolve) => {
+                    const readEntries = async () => {
+                        dirReader.readEntries(async (entries) => {
+                            const loadIgnoreEntry = entries.find(e => e.name === '.loadignore');
+
+                            if (loadIgnoreEntry) {
+                                await processEntry(loadIgnoreEntry, dirPath, currentIgnorePatterns, rootPath);
+                            }
+
+                            if (entries.length === 0) {
+                                resolve([]);
+                            } else {
+                                const results = await Promise.all(
+                                    entries
+                                        .filter(e => e.name !== '.loadignore')
+                                        .map(e => processEntry(e, dirPath, currentIgnorePatterns, rootPath))
+                                );
+                                resolve(results.flat().filter(Boolean));
+                            }
+                        });
+                    };
+                    readEntries();
+                });
+            }
+        }
+
+        // Handle file drop
+        async function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Remove drag active class
+            dropZone.classList.remove('drag-active');
+
+            isLoading = true;
+            progress = 0;
+            processedFiles = 0;
+            estimatedTotalFiles = 0;
+            error = null;
+            ignorePatterns.clear();
+            debugLog = [];
+
+            // Show loading state
+            loadingContainer.classList.remove('hidden');
+            dropContent.classList.add('hidden');
+
+            log('Starting file processing');
+
+            const items = e.dataTransfer.items;
+
+            try {
+                const filePromises = [];
+
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    if (item.kind === 'file') {
+                        const entry = item.webkitGetAsEntry();
+                        if (entry) {
+                            estimatedTotalFiles += entry.isDirectory ? 10 : 1;
+                            filePromises.push(processEntry(entry, '', new Set(), ''));
+                        }
+                    }
+                }
+
+                updateProgress();
+
+                const fileArrays = await Promise.all(filePromises);
+                const allFiles = fileArrays.flat().filter(Boolean);
+
+                files = allFiles;
+                log(`Processed ${files.length} files`);
+
+                // Show the clear button
+                clearButton.classList.remove('hidden');
+
+                // Update UI with files
+                if (files.length > 0) {
+                    emptyState.classList.add('hidden');
+                    fileContainer.classList.remove('hidden');
+                    renderFileList();
+                    fileCount.textContent = files.length;
+
+                    // Initially show no file selected view
+                    selectedFileContent.classList.add('hidden');
+                    combinedContent.classList.add('hidden');
+                    noFileSelected.classList.remove('hidden');
+                }
+
+                progress = 100;
+                updateProgress();
+            } catch (err) {
+                error = 'Error processing files: ' + err.message;
+                log(`Error: ${error}`);
+                errorContainer.classList.remove('hidden');
+                errorText.textContent = error;
+            } finally {
+                isLoading = false;
+                loadingContainer.classList.add('hidden');
+                dropContent.classList.remove('hidden');
+            }
+        }
+
+        // Get file icon based on extension
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop()?.toLowerCase();
+
+            const iconMap = {
+                js: '<svg class="h-4 w-4 text-yellow-500" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3V3zm16.525 13.707c-.131-.821-.666-1.511-2.252-2.155-.552-.259-1.165-.438-1.349-.854-.068-.248-.078-.382-.034-.529.113-.484.687-.629 1.137-.495.293.09.563.315.732.676.775-.507.775-.507 1.316-.844-.203-.314-.304-.451-.439-.586-.473-.528-1.103-.798-2.126-.775l-.528.067c-.507.124-.991.395-1.283.754-.855.968-.608 2.655.427 3.354 1.023.765 2.521.933 2.712 1.653.18.878-.652 1.159-1.475 1.058-.607-.136-.945-.439-1.316-1.002l-1.372.788c.157.359.337.517.607.832 1.305 1.316 4.568 1.249 5.153-.754.021-.067.176-.528.056-1.237l.034.049zm-6.737-5.434h-1.686c0 1.453-.007 2.898-.007 4.354 0 .924.047 1.772-.104 2.033-.247.517-.886.451-1.175.359-.297-.146-.448-.349-.623-.641-.047-.078-.082-.146-.095-.146l-1.368.844c.229.473.563.879.994 1.137.641.383 1.502.507 2.404.305.588-.17 1.095-.519 1.358-1.059.384-.697.302-1.553.299-2.509.008-1.541 0-3.083 0-4.635l.003-.042z"/></svg>',
+                ts: '<svg class="h-4 w-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3V3zm10.169 12.37c.486.73 1.133 1.275 2.242 1.275 1.051 0 1.72-.596 1.72-1.418 0-.984-.68-1.325-1.82-1.891l-.627-.27c-1.804-.77-3.003-1.736-3.003-3.777 0-1.879 1.431-3.309 3.673-3.309 1.595 0 2.739.69 3.565 2.501l-1.95 1.25c-.429-.808-.893-1.124-1.615-1.124-.736 0-1.203.465-1.203 1.124 0 .786.489 1.104 1.618 1.59l.627.27c2.125.906 3.322 1.829 3.322 3.907 0 2.256-1.771 3.488-4.148 3.488-2.33 0-3.833-1.11-4.566-2.564l2.164-1.25zm-8.792-.37v-2.997h1.949v-4.999h2.753v4.999h1.947v2.997h-1.947v6h-2.753v-6H4.377z"/></svg>',
+                json: '<svg class="h-4 w-4 text-green-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm3.5 8.5C8.5 9.12 7.88 8.5 7 8.5s-1.5.62-1.5 1.5v4c0 .88.62 1.5 1.5 1.5s1.5-.62 1.5-1.5v-.5h-1v.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-4c0-.28.22-.5.5-.5s.5.22.5.5v.5h1v-.5zm5.5 4h-1v-4c0-.88-.62-1.5-1.5-1.5s-1.5.62-1.5 1.5v4h-1v-4c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v4zm3-1v1h-1.5v-1h1.5zm0-3v1h-1.5v-1h1.5zm0-3v1h-1.5v-1h1.5z"/></svg>',
+                md: '<svg class="h-4 w-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M20.553 18.15H3.447a.9.9 0 0 1-.9-.9V6.75a.9.9 0 0 1 .9-.9h17.106a.9.9 0 0 1 .9.9v10.5a.9.9 0 0 1-.9.9zM6.3 16.8l3.6-5.4 3.6 5.4h1.8l-5.4-8.1-5.4 8.1h1.8zm12.6-3.6h-1.8v3.6h-1.8v-3.6h-1.8l2.7-3.6 2.7 3.6z"/></svg>',
+                css: '<svg class="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l-.65 3.34h13.59L17.5 8.5H3.92l-.66 3.33h13.59l-.76 3.81-5.48 1.81-4.75-1.81.33-1.64H2.85l-.79 4 7.85 3 9.05-3 1.2-6.03.24-1.21L21.94 3H5z"/></svg>',
+                html: '<svg class="h-4 w-4 text-orange-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.56l4.07-1.13.55-6.1H9.38L9.2 8.3h7.6l.2-1.99H7l.56 6.01h6.89l-.23 2.58-2.22.6-2.22-.6-.14-1.66h-2l.29 3.19L12 17.56M4.07 3h15.86L18.5 19.2 12 21l-6.5-1.8L4.07 3z"/></svg>',
+                svg: '<svg class="h-4 w-4 text-pink-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5.13 10.71h3.74l-2.6 2.61 2.6 2.6H5.13l-2.6-2.6 2.6-2.61zm6.97-8.54l5.63 5.66-5.63 5.66-5.64-5.66 5.64-5.66zM15.1 19.39l3.73.01-2.6-2.6 2.6-2.61h-3.73l-2.6 2.61 2.6 2.6z"/></svg>',
+                yml: '<svg class="h-4 w-4 text-purple-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm2.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM12 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm5 2a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>',
+                default: '<svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+            };
+
+            return iconMap[ext] || iconMap.default;
+        }
+
+        // Get file type label based on extension
+        function getFileTypeLabel(fileName) {
+            const ext = fileName.split('.').pop()?.toLowerCase();
+
+            const labelMap = {
+                js: '<span class="inline-flex items-center rounded-md bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-400 ring-1 ring-inset ring-yellow-600/20 dark:ring-yellow-500/30">JS</span>',
+                ts: '<span class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/30">TS</span>',
+                json: '<span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/30 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/30">JSON</span>',
+                md: '<span class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/30">MD</span>',
+                css: '<span class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/30">CSS</span>',
+                html: '<span class="inline-flex items-center rounded-md bg-orange-50 dark:bg-orange-900/30 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-400 ring-1 ring-inset ring-orange-600/20 dark:ring-orange-500/30">HTML</span>',
+                svg: '<span class="inline-flex items-center rounded-md bg-pink-50 dark:bg-pink-900/30 px-2 py-1 text-xs font-medium text-pink-700 dark:text-pink-400 ring-1 ring-inset ring-pink-600/20 dark:ring-pink-500/30">SVG</span>',
+                yml: '<span class="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-900/30 px-2 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 ring-1 ring-inset ring-purple-700/10 dark:ring-purple-400/30">YML</span>',
+                svelte: '<span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/30 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-500/30">SVELTE</span>',
+            };
+
+            return labelMap[ext] || '';
+        }
+
+        // Organize files by folder
+        function organizeFilesByFolder(files) {
+            const filesByFolder = {};
+            let totalSize = 0;
+
+            files.forEach(file => {
+                totalSize += file.file.size;
+                const parts = file.path.split('/');
+                const fileName = parts.pop();
+                const folderPath = parts.join('/');
+
+                if (!filesByFolder[folderPath]) {
+                    filesByFolder[folderPath] = {
+                        files: [],
+                        totalSize: 0,
+                        path: folderPath
+                    };
+                }
+
+                filesByFolder[folderPath].files.push({
+                    ...file,
+                    displayName: fileName
+                });
+                filesByFolder[folderPath].totalSize += file.file.size;
+            });
+
+            return { filesByFolder, totalSize };
+        }
+
+        // Render file list
+        function renderFileList() {
+            if (files.length > 0) {
+                fileList.innerHTML = '';
+
+                // Generate an array of file path parts for better display
+                const filesWithParts = files.map(file => ({
+                    ...file,
+                    parts: file.path.split('/'),
+                    displayName: file.path.split('/').pop(),
+                    size: file.file.size
+                }));
+
+                // Sort files by path
+                filesWithParts.sort((a, b) => a.path.localeCompare(b.path));
+
+                // Update total size
+                const totalBytes = filesWithParts.reduce((sum, file) => sum + file.size, 0);
+                document.getElementById('totalSize').textContent = formatFileSize(totalBytes);
+
+                // Add new file items
+                filesWithParts.forEach((file, index) => {
+                    const li = document.createElement('li');
+                    const button = document.createElement('button');
+                    button.className = 'file-item flex items-center justify-between w-full px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-left transition-colors';
+                    button.dataset.path = file.path;
+                    button.dataset.size = file.size;
+                    button.dataset.index = index;
+
+                    // Create content section with icon and name
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'flex items-center space-x-3 overflow-hidden';
+
+                    // Icon based on file type
+                    const iconSpan = document.createElement('span');
+                    iconSpan.className = 'flex-shrink-0';
+                    iconSpan.innerHTML = getFileIcon(file.displayName);
+
+                    // File name with truncation
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'truncate';
+                    nameDiv.textContent = file.displayName;
+
+                    contentDiv.appendChild(iconSpan);
+                    contentDiv.appendChild(nameDiv);
+
+                    // Create meta section with type badge and size
+                    const metaDiv = document.createElement('div');
+                    metaDiv.className = 'flex-shrink-0 ml-2 flex items-center space-x-2';
+
+                    const sizeSpan = document.createElement('span');
+                    sizeSpan.className = 'text-xs text-slate-500 dark:text-slate-400';
+                    sizeSpan.textContent = formatFileSize(file.size);
+
+                    metaDiv.innerHTML = getFileTypeLabel(file.displayName);
+                    metaDiv.appendChild(sizeSpan);
+
+                    // Append content and meta to button
+                    button.appendChild(contentDiv);
+                    button.appendChild(metaDiv);
+
+                    // Add click handler
+                    button.addEventListener('click', () => {
+                        // Remove active class from previously selected file
+                        if (activeFileItem) {
+                            activeFileItem.classList.remove('active');
+                        }
+
+                        // Add active class to clicked file
+                        button.classList.add('active');
+                        activeFileItem = button;
+
+                        handleFileSelect(file);
+                    });
+
+                    li.appendChild(button);
+                    fileList.appendChild(li);
+                });
+
+                // Add search functionality
+                fileSearchInput.addEventListener('input', function () {
+                    const searchTerm = this.value.toLowerCase();
+                    const items = fileList.querySelectorAll('li button');
+
+                    items.forEach(item => {
+                        const filePath = item.dataset.path.toLowerCase();
+                        if (filePath.includes(searchTerm)) {
+                            item.parentElement.style.display = '';
+                        } else {
+                            item.parentElement.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        }
+
+        // Render size analysis list
+        function renderSizeAnalysis(sortBy = 'size') {
+            const sizeAnalysisList = document.getElementById('sizeAnalysisList');
+            sizeAnalysisList.innerHTML = '';
+
+            // Get all files with size info
+            const filesWithSize = files.map((file, index) => ({
+                ...file,
+                displayName: file.path.split('/').pop(),
+                folderPath: file.path.split('/').slice(0, -1).join('/'),
+                size: file.file.size,
+                index
+            }));
+
+            // Sort files based on the sortBy parameter
+            if (sortBy === 'size') {
+                filesWithSize.sort((a, b) => b.size - a.size);
+            } else {
+                filesWithSize.sort((a, b) => a.path.localeCompare(b.path));
+            }
+
+            // Get total size
+            const totalSize = filesWithSize.reduce((sum, file) => sum + file.size, 0);
+
+            // Group by folder for collapsible folders
+            const filesByFolder = {};
+            filesWithSize.forEach(file => {
+                if (!filesByFolder[file.folderPath]) {
+                    filesByFolder[file.folderPath] = {
+                        files: [],
+                        totalSize: 0,
+                        path: file.folderPath || '/'
+                    };
+                }
+                filesByFolder[file.folderPath].files.push(file);
+                filesByFolder[file.folderPath].totalSize += file.size;
+            });
+
+            // Sort folders by total size if sorting by size
+            const sortedFolders = Object.values(filesByFolder);
+            if (sortBy === 'size') {
+                sortedFolders.sort((a, b) => b.totalSize - a.totalSize);
+            } else {
+                sortedFolders.sort((a, b) => a.path.localeCompare(b.path));
+            }
+
+            // Create folder groups with files
+            sortedFolders.forEach(folder => {
+                // Create folder header if there are multiple folders
+                if (sortedFolders.length > 1 && folder.path) {
+                    const folderItem = document.createElement('div');
+                    folderItem.className = 'mb-2 mt-4 first:mt-0';
+
+                    const folderHeader = document.createElement('div');
+                    folderHeader.className = 'flex items-center justify-between p-2 bg-slate-100 dark:bg-slate-700 rounded-md cursor-pointer group';
+
+                    const folderLeft = document.createElement('div');
+                    folderLeft.className = 'flex items-center space-x-2';
+
+                    const folderCheckbox = document.createElement('input');
+                    folderCheckbox.type = 'checkbox';
+                    folderCheckbox.className = 'folder-checkbox rounded border-slate-300 dark:border-slate-600 text-primary-600 focus:ring-primary-500';
+                    folderCheckbox.dataset.folder = folder.path;
+
+                    const folderToggle = document.createElement('button');
+                    folderToggle.className = 'text-slate-500 dark:text-slate-400';
+                    folderToggle.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 folder-toggle-icon transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          `;
+
+                    const folderName = document.createElement('span');
+                    folderName.className = 'font-medium text-slate-700 dark:text-slate-300';
+                    folderName.textContent = folder.path || 'Root';
+
+                    const folderSize = document.createElement('div');
+                    folderSize.className = 'flex items-center space-x-2';
+
+                    const size = document.createElement('span');
+                    size.className = 'text-sm text-slate-600 dark:text-slate-400';
+                    size.textContent = formatFileSize(folder.totalSize);
+
+                    const percentage = document.createElement('span');
+                    percentage.className = 'text-xs text-slate-500 dark:text-slate-500 px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded-full';
+                    percentage.textContent = `${Math.round((folder.totalSize / totalSize) * 100)}%`;
+
+                    folderLeft.appendChild(folderCheckbox);
+                    folderLeft.appendChild(folderToggle);
+                    folderLeft.appendChild(folderName);
+
+                    folderSize.appendChild(size);
+                    folderSize.appendChild(percentage);
+
+                    folderHeader.appendChild(folderLeft);
+                    folderHeader.appendChild(folderSize);
+                    folderItem.appendChild(folderHeader);
+
+                    // Add folder files container
+                    const folderFiles = document.createElement('div');
+                    folderFiles.className = 'pl-8 space-y-1 mt-1 folder-files';
+
+                    // Folder checkbox event
+                    folderCheckbox.addEventListener('change', () => {
+                        const isChecked = folderCheckbox.checked;
+                        const fileCheckboxes = folderFiles.querySelectorAll('input[type="checkbox"]');
+                        fileCheckboxes.forEach(cb => {
+                            cb.checked = isChecked;
+                        });
+                        updateSelectedCount();
+                    });
+
+                    // Folder toggle event
+                    folderHeader.addEventListener('click', (e) => {
+                        // Don't toggle when clicking on checkbox
+                        if (e.target === folderCheckbox) return;
+
+                        folderFiles.classList.toggle('hidden');
+                        const icon = folderToggle.querySelector('.folder-toggle-icon');
+                        if (folderFiles.classList.contains('hidden')) {
+                            icon.style.transform = 'rotate(-90deg)';
+                        } else {
+                            icon.style.transform = 'rotate(0)';
+                        }
+                    });
+
+                    // Add files to folder
+                    folder.files.forEach(file => {
+                        const fileItem = createSizeAnalysisFileItem(file, totalSize);
+                        folderFiles.appendChild(fileItem);
+                    });
+
+                    folderItem.appendChild(folderFiles);
+                    sizeAnalysisList.appendChild(folderItem);
+                } else {
+                    // Just add files without folder grouping
+                    folder.files.forEach(file => {
+                        const fileItem = createSizeAnalysisFileItem(file, totalSize);
+                        sizeAnalysisList.appendChild(fileItem);
+                    });
+                }
+            });
+
+            // Update selected count
+            updateSelectedCount();
+        }
+
+        // Create a file item for size analysis
+        function createSizeAnalysisFileItem(file, totalSize) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'flex items-center justify-between p-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-sm';
+
+            const fileLeft = document.createElement('div');
+            fileLeft.className = 'flex items-center space-x-3 flex-1 min-w-0';
+
+            const fileCheckbox = document.createElement('input');
+            fileCheckbox.type = 'checkbox';
+            fileCheckbox.className = 'file-checkbox rounded border-slate-300 dark:border-slate-600 text-primary-600 focus:ring-primary-500';
+            fileCheckbox.dataset.index = file.index;
+
+            const fileIcon = document.createElement('span');
+            fileIcon.className = 'flex-shrink-0';
+            fileIcon.innerHTML = getFileIcon(file.displayName);
+
+            const fileName = document.createElement('span');
+            fileName.className = 'truncate';
+            fileName.textContent = file.path;
+
+            const fileSize = document.createElement('div');
+            fileSize.className = 'w-24 text-right text-slate-600 dark:text-slate-400';
+            fileSize.textContent = formatFileSize(file.size);
+
+            const percentage = document.createElement('div');
+            percentage.className = 'w-24 text-right';
+
+            const percentageValue = document.createElement('span');
+            percentageValue.className = 'text-xs text-slate-500 dark:text-slate-500 px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded-full';
+            percentageValue.textContent = `${Math.round((file.size / totalSize) * 100) || '<1'}%`;
+
+            percentage.appendChild(percentageValue);
+
+            fileLeft.appendChild(fileCheckbox);
+            fileLeft.appendChild(fileIcon);
+            fileLeft.appendChild(fileName);
+
+            fileItem.appendChild(fileLeft);
+            fileItem.appendChild(fileSize);
+            fileItem.appendChild(percentage);
+
+            // Add event listener
+            fileCheckbox.addEventListener('change', () => {
+                updateSelectedCount();
+            });
+
+            return fileItem;
+        }
+
+        // Update selected files count
+        function updateSelectedCount() {
+            const selectedCheckboxes = document.querySelectorAll('#sizeAnalysisList .file-checkbox:checked');
+            document.getElementById('selectedFileCount').textContent = selectedCheckboxes.length;
+        }
+
+        // Handle file selection
+        async function handleFileSelect(file) {
+            selectedFile = file;
+            try {
+                const text = await file.file.text();
+                fileContentText = text;
+                selectedFilePath.textContent = file.path;
+                fileContentView.textContent = text;
+                fileSize.textContent = formatFileSize(file.file.size);
+
+                // Set language class for syntax highlighting
+                fileContentView.className = `language-${getFileExtension(file.path)}`;
+
+                // Apply syntax highlighting
+                hljs.highlightElement(fileContentView);
+
+                // Show the file content
+                selectedFileContent.classList.remove('hidden');
+                combinedContent.classList.add('hidden');
+                noFileSelected.classList.add('hidden');
+            } catch (err) {
+                console.error('File processing error:', err);
+                fileContentText = 'Error loading file: ' + err.message;
+                fileContentView.textContent = fileContentText;
+                fileContentView.className = '';
+                selectedFilePath.textContent = file.path;
+                fileSize.textContent = 'Error';
+                selectedFileContent.classList.remove('hidden');
+                combinedContent.classList.add('hidden');
+                noFileSelected.classList.add('hidden');
+            }
+        }
+
+        // Build file tree structure
+        function buildFileTree(files) {
+            const tree = {};
+
+            for (const file of files) {
+                const parts = file.path.split('/');
+                let current = tree;
+
+                for (const part of parts.slice(0, -1)) {
+                    if (!current[part]) {
+                        current[part] = {};
+                    }
+                    current = current[part];
+                }
+
+                const fileName = parts[parts.length - 1];
+                current[fileName] = null;
+            }
+
+            return tree;
+        }
+
+        // Generate Mermaid diagram
+        function generateMermaidDiagram(tree, parentId = 'root') {
+            let mermaidCode = '';
+            let nodeId = 0;
+
+            const generateNodes = (tree, parentId = 'root') => {
+                let code = '';
+
+                for (const [name, subtree] of Object.entries(tree)) {
+                    const currentId = `node${nodeId++}`;
+                    const isDirectory = subtree !== null;
+
+                    if (isDirectory) {
+                        code += `  ${currentId}[/${name}/]\n`;
+                    } else {
+                        code += `  ${currentId}[${name}]\n`;
+                    }
+
+                    code += `  ${parentId} --> ${currentId}\n`;
+
+                    if (isDirectory) {
+                        code += generateNodes(subtree, currentId);
+                    }
+                }
+
+                return code;
+            };
+
+            mermaidCode = 'graph TD\n';
+            mermaidCode += '  root[/Project Root/]\n';
+            mermaidCode += generateNodes(tree);
+
+            return mermaidCode;
+        }
+
+        // Get file extension for syntax highlighting
+        function getFileExtension(fileName) {
+            const ext = fileName.split('.').pop()?.toLowerCase();
+            const extensionMap = {
+                js: 'javascript',
+                ts: 'typescript',
+                jsx: 'javascript',
+                tsx: 'typescript',
+                yml: 'yaml',
+                yaml: 'yaml',
+                json: 'json',
+                md: 'markdown',
+                css: 'css',
+                html: 'html',
+                svelte: 'html',
+                svg: 'xml',
+            };
+            return extensionMap[ext] || '';
+        }
+
+        // Combine files
+        async function combineFiles() {
+            isCombining = true;
+            combineButtonText.textContent = '結合中...';
+            combineButton.disabled = true;
+
+            // Add loading animation
+            combineButtonText.classList.add('loading-dots');
+
+            // Header and file structure diagram
+            combinedContentText = '# Combined Files\n\n';
+            combinedContentText += '## File Structure\n\n';
+            combinedContentText += '```mermaid\n';
+
+            // Build tree and generate diagram
+            const tree = buildFileTree(files);
+            combinedContentText += generateMermaidDiagram(tree);
+            combinedContentText += '```\n\n';
+
+            // Add each file's content
+            combinedContentText += '## File Contents\n\n';
+            for (const file of files) {
+                try {
+                    const text = await file.file.text();
+                    const fileName = file.path;
+                    const extension = getFileExtension(fileName);
+                    combinedContentText += `### ${fileName}\n\`\`\`${extension}\n${text}\n\`\`\`\n\n`;
+                } catch (err) {
+                    console.error(`Error processing file ${file.path}:`, err);
+                    combinedContentText += `### Error: ${file.path}\n\`\`\`\nError: ${err.message}\n\`\`\`\n\n`;
+                }
+            }
+
+            // Update UI
+            combinedContentView.textContent = combinedContentText;
+            combinedContentView.className = 'language-markdown';
+
+            // Apply syntax highlighting
+            hljs.highlightElement(combinedContentView);
+
+            // Try to render Mermaid diagrams
+            setTimeout(() => {
+                mermaid.init(undefined, '.language-mermaid');
+            }, 100);
+
+            selectedFileContent.classList.add('hidden');
+            combinedContent.classList.remove('hidden');
+            noFileSelected.classList.add('hidden');
+            downloadButton.classList.remove('hidden');
+
+            // Re-enable combine button
+            combineButtonText.textContent = 'ファイル結合';
+            combineButtonText.classList.remove('loading-dots');
+            combineButton.disabled = false;
+            isCombining = false;
+        }
+
+        // Download combined file
+        function downloadCombinedFile() {
+            const blob = new Blob([combinedContentText], {
+                type: 'text/markdown;charset=utf-8'
+            });
+            saveAs(blob, 'base-code.md');
+        }
+
+        // Clear all files
+        function clearAllFiles() {
+            files = [];
+            selectedFile = null;
+            fileContentText = "";
+            combinedContentText = "";
+
+            // Reset UI
+            fileList.innerHTML = '';
+            fileContainer.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+            clearButton.classList.add('hidden');
+
+            // Clear log
+            debugLog = [];
+            logContainer.textContent = '';
+
+            log('All files cleared');
+        }
+
+        // Exclude selected files
+        function excludeSelectedFiles() {
+            const selectedCheckboxes = document.querySelectorAll('#sizeAnalysisList .file-checkbox:checked');
+            const selectedIndices = Array.from(selectedCheckboxes).map(cb => parseInt(cb.dataset.index));
+
+            // Sort indices in descending order to avoid index shifting when removing
+            selectedIndices.sort((a, b) => b - a);
+
+            // Remove files
+            selectedIndices.forEach(index => {
+                if (index >= 0 && index < files.length) {
+                    const fileName = files[index].path;
+                    log(`Excluding file: ${fileName}`);
+                    files.splice(index, 1);
+                }
+            });
+
+            // Close modal
+            document.getElementById('sizeAnalysisModal').classList.add('hidden');
+
+            // Re-render the file list
+            if (files.length > 0) {
+                renderFileList();
+                fileCount.textContent = files.length;
+            } else {
+                // If no files left, show empty state
+                emptyState.classList.remove('hidden');
+                fileContainer.classList.add('hidden');
+                clearButton.classList.add('hidden');
+            }
+        }
+
+        // Open size analysis modal
+        function openSizeAnalysisModal() {
+            document.getElementById('sizeAnalysisModal').classList.remove('hidden');
+            renderSizeAnalysis('size'); // Default sort by size
+        }
+
+        // Close size analysis modal
+        function closeSizeAnalysisModal() {
+            document.getElementById('sizeAnalysisModal').classList.add('hidden');
+        }
+
+        // Create and download .loadignore sample
+        function downloadLoadIgnoreSample() {
+            const sampleContent = `# .loadignore - Sample ignore pattern file
+# Lines starting with # are comments and will be ignored
+
+# --------------------------------------------------
+# Node.js npm related 
+# --------------------------------------------------
+# Node modules directory (dependency files)
+node_modules/
+# Package lock files
+package-lock.json
+# Debug logs
+npm-debug.log
+yarn-error.log
+# Lock files
+yarn.lock
+# Cache directories
+.npm/
+.yarn/
+
+# --------------------------------------------------
+# Python uv related
+# --------------------------------------------------
+# Virtual environment directories
+.venv/
+.uv/
+# Cached Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+# C extensions
+*.so
+# Distribution / packaging directories
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+# Python package metadata
+*.egg-info/
+.installed.cfg
+*.egg
+# Test cache
+.pytest_cache/
+
+# --------------------------------------------------
+# Common development files to ignore
+# --------------------------------------------------
+# Version control
+.git/
+.github/
+# OS generated files
+.DS_Store
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Caches
+.cache/
+# Testing
+.coverage
+coverage/
+# IDE settings
+.idea/
+.vscode/
+# Temporary files
+*.swp
+*.swo
+*~
+.tmp/
+tmp/
+temp/
+# Log files
+logs/
+*.log
+
+# --------------------------------------------------
+# Additional platform-specific files
+# --------------------------------------------------
+# Node.js specific configuration
+.npmrc
+.yarnrc
+# Python specific files
+.python-version
+pyrightconfig.json
+pyproject.toml
+setup.py
+setup.cfg
+poetry.lock
+`;
+
+            const blob = new Blob([sampleContent], { type: 'text/plain' });
+            try {
+                saveAs(blob, '.loadignore');
+                log('Downloaded .loadignore sample file');
+            } catch (error) {
+                log('Error downloading .loadignore file: ' + error.message);
+                // Fallback method if direct download fails
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = '.loadignore';
+                link.click();
+                URL.revokeObjectURL(link.href);
+            }
+        }
+
+        // Setup event listeners
+        dropZone.addEventListener('dragover', preventDefault);
+        dropZone.addEventListener('dragleave', preventDefault);
+        dropZone.addEventListener('drop', handleDrop);
+        combineButton.addEventListener('click', combineFiles);
+        downloadButton.addEventListener('click', downloadCombinedFile);
+        clearButton.addEventListener('click', clearAllFiles);
+        document.getElementById('downloadSampleIgnore').addEventListener('click', downloadLoadIgnoreSample);
+
+        // Size analysis modal listeners
+        document.getElementById('sizeAnalysisButton').addEventListener('click', openSizeAnalysisModal);
+        document.getElementById('closeSizeAnalysisModal').addEventListener('click', closeSizeAnalysisModal);
+        document.getElementById('cancelSizeAnalysis').addEventListener('click', closeSizeAnalysisModal);
+        document.getElementById('sortBySize').addEventListener('click', function () {
+            this.classList.add('bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-400');
+            document.getElementById('sortByName').classList.remove('bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-400');
+            renderSizeAnalysis('size');
+        });
+        document.getElementById('sortByName').addEventListener('click', function () {
+            this.classList.add('bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-400');
+            document.getElementById('sortBySize').classList.remove('bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-400');
+            renderSizeAnalysis('name');
+        });
+        document.getElementById('selectAllFiles').addEventListener('change', function () {
+            const allCheckboxes = document.querySelectorAll('#sizeAnalysisList .file-checkbox');
+            allCheckboxes.forEach(cb => {
+                cb.checked = this.checked;
+            });
+            updateSelectedCount();
+        });
+        document.getElementById('excludeSelectedBtn').addEventListener('click', excludeSelectedFiles);
+        document.getElementById('applySizeAnalysis').addEventListener('click', excludeSelectedFiles);
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + D to download combined file
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd' && !downloadButton.classList.contains('hidden')) {
+                e.preventDefault();
+                downloadCombinedFile();
+            }
+
+            // Ctrl/Cmd + C to combine files
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c' && files.length > 0 && !isCombining) {
+                e.preventDefault();
+                combineFiles();
+            }
+
+            // Escape to close modal
+            if (e.key === 'Escape') {
+                closeSizeAnalysisModal();
+            }
+        });
+
+        // Initial log entry
+        log('Binder initialized. Drag and drop files to begin.');
+    </script>
+</body>
+
+</html>

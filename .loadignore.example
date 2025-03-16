@@ -1,0 +1,13 @@
+.git
+.vscode
+node_modules
+__pycache__
+
+*.toml
+uv.lock
+.gitignore
+.loadignore
+
+*.jpg
+*.svg
+*.png
