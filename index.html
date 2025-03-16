@@ -9,20 +9,58 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         :root {
+            /* 共通カラー変数 */
             --primary-color: #3498db;
             --primary-dark: #2980b9;
+            --primary-light: #EEF2FF;
             --accent-color: #e74c3c;
+            --secondary-color: #12B981;
             --text-color: #2c3e50;
             --text-light: #636e72;
+            --text-primary: #2c3e50;
+            --text-secondary: #636e72;
+            --text-tertiary: #9CA3AF;
             --bg-color: #f8f9fa;
             --card-color: #fff;
+            --surface-color: #F9FAFB;
+            --border-color: #E5E7EB;
+            --border-radius: 12px;
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             --transition: all 0.3s ease;
+            --transition-normal: 0.2s ease-in-out;
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+        }
+
+        /* 統一されたダークモード変数 */
+        body.dark-mode {
+            --primary-color: #5dade2;
+            --primary-dark: #3498db;
+            --primary-light: #2d3748;
+            --accent-color: #e76f51;
+            --text-color: #ecf0f1;
+            --text-light: #bdc3c7;
+            --text-primary: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --text-tertiary: #a0aec0;
+            --bg-color: #1a202c;
+            --card-color: #2d3748;
+            --surface-color: #2d3748;
+            --border-color: #4a5568;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: var(--font-sans);
             line-height: 1.6;
             color: var(--text-color);
             max-width: 1200px;
@@ -32,23 +70,11 @@
             transition: var(--transition);
         }
 
-        body.dark-mode {
-            --primary-color: #5dade2;
-            --primary-dark: #3498db;
-            --accent-color: #e76f51;
-            --text-color: #ecf0f1;
-            --text-light: #bdc3c7;
-            --bg-color: #1a202c;
-            --card-color: #2d3748;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-        }
-
         header {
             text-align: center;
             padding: 30px 0;
             background-color: var(--card-color);
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             margin-bottom: 40px;
             position: relative;
@@ -149,7 +175,7 @@
 
         .tool-card {
             background-color: var(--card-color);
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             transition: var(--transition);
             overflow: hidden;
@@ -247,14 +273,6 @@
             background: linear-gradient(135deg, #9b59b6, #8e44ad);
         }
 
-        .tool-card:nth-child(5) .tool-icon {
-            background: linear-gradient(135deg, #f1c40f, #f39c12);
-        }
-
-        .tool-card:nth-child(6) .tool-icon {
-            background: linear-gradient(135deg, #1abc9c, #16a085);
-        }
-
         .recommended {
             margin-top: 60px;
         }
@@ -315,22 +333,6 @@
         .tool-card:nth-child(3) {
             animation-delay: 0.3s;
         }
-
-        .tool-card:nth-child(4) {
-            animation-delay: 0.4s;
-        }
-
-        .tool-card:nth-child(5) {
-            animation-delay: 0.5s;
-        }
-
-        .tool-card:nth-child(6) {
-            animation-delay: 0.6s;
-        }
-
-        .tool-card:nth-child(7) .tool-icon {
-            background: linear-gradient(135deg, #6366F1, #4F46E5);
-        }
     </style>
 </head>
 
@@ -349,97 +351,36 @@
 
         <div class="categories">
             <button class="category-btn active" data-category="all">すべて</button>
-            <button class="category-btn" data-category="color">カラー</button>
+            <button class="category-btn" data-category="utility">ユーティリティ</button>
             <button class="category-btn" data-category="layout">レイアウト</button>
             <button class="category-btn" data-category="typography">タイポグラフィ</button>
-            <button class="category-btn" data-category="measure">測定</button>
         </div>
     </header>
 
     <main>
         <div class="tools-grid" id="tools-grid">
-            <!-- ツールカード1: レイアウト設計 -->
-            <div class="tool-card" data-category="layout">
+            <!-- ファイル管理ツール -->
+            <div class="tool-card" data-category="utility">
                 <div class="tool-icon">
-                    <i class="fas fa-th-large"></i>
+                    <i class="fas fa-folder-open"></i>
                 </div>
                 <div class="tool-content">
-                    <h3>レイアウト設計ツール</h3>
-                    <p>空間や部屋のレイアウトを効率的に設計するためのツールです。ドラッグ＆ドロップで簡単に配置できます。</p>
-                    <a href="layout-tool.html" class="button">ツールを使用する</a>
+                    <h3>ファイル結合ツール</h3>
+                    <p>複数のファイルを1つにまとめるツールです。ファイル構造を保ちながらMarkdownドキュメントを生成します。</p>
+                    <a href="file-binder.html" class="button">ツールを使用する</a>
                 </div>
             </div>
 
-            <!-- ツールカード2: カラーパレット -->
-            <div class="tool-card" data-category="color">
-                <div class="tool-icon">
-                    <i class="fas fa-palette"></i>
-                </div>
-                <div class="tool-content">
-                    <h3>カラーパレット生成</h3>
-                    <p>デザインに最適な配色を提案します。ベースカラーを選ぶだけで調和のとれたパレットを生成します。</p>
-                    <a href="color-palette.html" class="button">ツールを使用する</a>
-                </div>
-            </div>
-
-            <!-- ツールカード3: サイズ計算 -->
-            <div class="tool-card" data-category="measure">
-                <div class="tool-icon">
-                    <i class="fas fa-ruler-combined"></i>
-                </div>
-                <div class="tool-content">
-                    <h3>サイズ計算ツール</h3>
-                    <p>様々な測定単位間の変換や、比率に基づいたサイズ計算を行います。レスポンシブデザインに最適です。</p>
-                    <a href="size-calculator.html" class="button">ツールを使用する</a>
-                </div>
-            </div>
-
-            <!-- ツールカード4: フォント組み合わせ -->
+            <!-- プロンプトジェネレーター -->
             <div class="tool-card" data-category="typography">
                 <div class="tool-icon">
-                    <i class="fas fa-font"></i>
+                    <i class="fas fa-pencil-alt"></i>
                 </div>
                 <div class="tool-content">
-                    <h3>フォント組み合わせ</h3>
-                    <p>見出しと本文に最適なフォントの組み合わせを提案します。読みやすさとデザイン性を両立させます。</p>
-                    <a href="font-pairing.html" class="button">ツールを使用する</a>
+                    <h3>レイアウト・スタイル プロンプトジェネレーター</h3>
+                    <p>デザイン指示プロンプトを簡単に作成できるツールです。効果的なレイアウトとスタイル指示を自動生成します。</p>
+                    <a href="prompt-generator.html" class="button">ツールを使用する</a>
                 </div>
-            </div>
-
-            <!-- ツールカード5: カラーアクセシビリティ -->
-            <div class="tool-card" data-category="color">
-                <div class="tool-icon">
-                    <i class="fas fa-universal-access"></i>
-                </div>
-                <div class="tool-content">
-                    <h3>カラーアクセシビリティ</h3>
-                    <p>WCAGガイドラインに基づいて、色のコントラスト比をチェックし、アクセシブルな配色を提案します。</p>
-                    <a href="color-accessibility.html" class="button">ツールを使用する</a>
-                </div>
-            </div>
-
-            <!-- ツールカード6: グリッド計算機 -->
-            <div class="tool-card" data-category="layout">
-                <div class="tool-icon">
-                    <i class="fas fa-border-all"></i>
-                </div>
-                <div class="tool-content">
-                    <h3>グリッド計算機</h3>
-                    <p>レスポンシブデザイン用のグリッドシステムを簡単に計算。列数やガターサイズを調整して最適なレイアウトを設計。</p>
-                    <a href="grid-calculator.html" class="button">ツールを使用する</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- ツールカード: プロンプトジェネレーター -->
-        <div class="tool-card" data-category="typography">
-            <div class="tool-icon">
-                <i class="fas fa-pencil-alt"></i>
-            </div>
-            <div class="tool-content">
-                <h3>レイアウト・スタイル プロンプトジェネレーター</h3>
-                <p>デザイン指示プロンプトを簡単に作成できるツールです。効果的なレイアウトとスタイル指示を自動生成します。</p>
-                <a href="prompt-generator.html" class="button">ツールを使用する</a>
             </div>
         </div>
 
@@ -447,27 +388,15 @@
         <div class="recommended">
             <h2 class="section-title">おすすめツール</h2>
             <div class="tools-grid">
-                <!-- おすすめツール: カラーパレット -->
-                <div class="tool-card" data-category="color">
+                <!-- おすすめツール: ファイル結合ツール -->
+                <div class="tool-card" data-category="utility">
                     <div class="tool-icon">
-                        <i class="fas fa-palette"></i>
+                        <i class="fas fa-folder-open"></i>
                     </div>
                     <div class="tool-content">
-                        <h3>カラーパレット生成</h3>
-                        <p>デザインに最適な配色を提案します。ベースカラーを選ぶだけで調和のとれたパレットを生成します。</p>
-                        <a href="color-palette.html" class="button">ツールを使用する</a>
-                    </div>
-                </div>
-
-                <!-- おすすめツール: レイアウト設計 -->
-                <div class="tool-card" data-category="layout">
-                    <div class="tool-icon">
-                        <i class="fas fa-th-large"></i>
-                    </div>
-                    <div class="tool-content">
-                        <h3>レイアウト設計ツール</h3>
-                        <p>空間や部屋のレイアウトを効率的に設計するためのツールです。ドラッグ＆ドロップで簡単に配置できます。</p>
-                        <a href="layout-tool.html" class="button">ツールを使用する</a>
+                        <h3>ファイル結合ツール</h3>
+                        <p>複数のファイルを1つにまとめるツールです。ファイル構造を保ちながらMarkdownドキュメントを生成します。</p>
+                        <a href="file-binder.html" class="button">ツールを使用する</a>
                     </div>
                 </div>
             </div>
@@ -475,13 +404,13 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 設計支援ツールポータル｜<a href="https://github.com/yourusername/your-repo" class="github-link">GitHub</a>
+        <p>&copy; 2025 設計支援ツールポータル｜<a href="https://github.com/yuubae215/utility-tools" class="github-link">GitHub</a>
         </p>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // ダークモード切り替え（localStorage不使用）
+            // ダークモード切り替え
             const themeToggle = document.getElementById('theme-toggle');
             const themeIcon = themeToggle.querySelector('i');
 

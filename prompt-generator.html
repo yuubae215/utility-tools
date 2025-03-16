@@ -9,40 +9,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         :root {
-            /* ポータル共通のカラー変数 */
+            /* 共通カラー変数 */
             --primary-color: #3498db;
             --primary-dark: #2980b9;
+            --primary-light: #EEF2FF;
             --accent-color: #e74c3c;
+            --secondary-color: #12B981;
             --text-color: #2c3e50;
             --text-light: #636e72;
+            --text-primary: #2c3e50;
+            --text-secondary: #636e72;
+            --text-tertiary: #9CA3AF;
             --bg-color: #f8f9fa;
             --card-color: #fff;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --surface-color: #F9FAFB;
             --border-color: #E5E7EB;
             --border-radius: 12px;
-            --transition: all 0.3s ease;
-
-            /* プロンプトジェネレーター独自の変数 */
-            --primary-light: #EEF2FF;
-            --secondary-color: #12B981;
-            --surface-color: #F9FAFB;
-            --text-primary: #111827;
-            --text-secondary: #4B5563;
-            --text-tertiary: #9CA3AF;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+            --transition-normal: 0.2s ease-in-out;
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             --space-xs: 0.25rem;
             --space-sm: 0.5rem;
             --space-md: 1rem;
             --space-lg: 1.5rem;
             --space-xl: 2rem;
             --space-2xl: 3rem;
-            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            --transition-normal: 0.2s ease-in-out;
         }
 
-        /* ダークモード用の変数 */
+        /* 統一されたダークモード変数 */
         body.dark-mode {
             --primary-color: #5dade2;
             --primary-dark: #3498db;
@@ -50,12 +48,12 @@
             --accent-color: #e76f51;
             --text-color: #ecf0f1;
             --text-light: #bdc3c7;
-            --bg-color: #1a202c;
-            --card-color: #2d3748;
-            --surface-color: #2d3748;
             --text-primary: #ecf0f1;
             --text-secondary: #bdc3c7;
             --text-tertiary: #a0aec0;
+            --bg-color: #1a202c;
+            --card-color: #2d3748;
+            --surface-color: #2d3748;
             --border-color: #4a5568;
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
@@ -1030,263 +1028,264 @@
     </footer>
 
     <script>
-        // ダークモード切り替え機能
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
+        document.addEventListener('DOMContentLoaded', function () {
+            // ダークモード切り替え機能
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
 
-        themeToggle.addEventListener('click', function () {
-            document.body.classList.toggle('dark-mode');
+            themeToggle.addEventListener('click', function () {
+                document.body.classList.toggle('dark-mode');
 
-            if (document.body.classList.contains('dark-mode')) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
-        });
-
-        // コンセプトカード選択機能
-        const conceptCards = document.querySelectorAll('.concept-card');
-        let selectedConcept = null;
-
-        conceptCards.forEach(card => {
-            card.addEventListener('click', () => {
-                conceptCards.forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                selectedConcept = card.dataset.concept;
-            });
-        });
-
-        // カラーオプション切り替え
-        const colorOptionBtns = document.querySelectorAll('.color-option-btn');
-        const themeSelector = document.getElementById('theme-selector');
-        const customColors = document.getElementById('custom-colors');
-
-        colorOptionBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                colorOptionBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                const option = btn.dataset.option;
-                if (option === 'theme') {
-                    themeSelector.classList.remove('hidden');
-                    customColors.classList.add('hidden');
+                if (document.body.classList.contains('dark-mode')) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
                 } else {
-                    themeSelector.classList.add('hidden');
-                    customColors.classList.remove('hidden');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
                 }
             });
-        });
 
-        // カラーテーマ選択
-        const colorThemes = document.querySelectorAll('.color-theme');
-        let selectedTheme = 'modern';
+            // コンセプトカード選択機能
+            const conceptCards = document.querySelectorAll('.concept-card');
+            let selectedConcept = null;
 
-        colorThemes.forEach(theme => {
-            theme.addEventListener('click', () => {
-                colorThemes.forEach(t => t.classList.remove('selected'));
-                theme.classList.add('selected');
-                selectedTheme = theme.dataset.theme;
+            conceptCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    conceptCards.forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    selectedConcept = card.dataset.concept;
+                });
             });
-        });
 
-        // タブ切り替え
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const tabPanes = document.querySelectorAll('.tab-pane');
+            // カラーオプション切り替え
+            const colorOptionBtns = document.querySelectorAll('.color-option-btn');
+            const themeSelector = document.getElementById('theme-selector');
+            const customColors = document.getElementById('custom-colors');
 
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                tabBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+            colorOptionBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    colorOptionBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
 
-                const tab = btn.dataset.tab;
-                tabPanes.forEach(pane => {
-                    pane.classList.add('hidden');
-                    if (pane.id === `${tab}-tab`) {
-                        pane.classList.remove('hidden');
+                    const option = btn.dataset.option;
+                    if (option === 'theme') {
+                        themeSelector.classList.remove('hidden');
+                        customColors.classList.add('hidden');
+                    } else {
+                        themeSelector.classList.add('hidden');
+                        customColors.classList.remove('hidden');
                     }
                 });
             });
-        });
 
-        // カラーテーマ定義
-        const colorThemeMap = {
-            modern: {
-                primary: '#4263EB',
-                secondary: '#12B981',
-                accent: '#F97316'
-            },
-            classic: {
-                primary: '#8B5A2B',
-                secondary: '#D4AF37',
-                accent: '#7D3C3C'
-            },
-            vivid: {
-                primary: '#FF3366',
-                secondary: '#33CCFF',
-                accent: '#FFCC00'
-            },
-            monochrome: {
-                primary: '#333333',
-                secondary: '#666666',
-                accent: '#999999'
-            },
-            pastel: {
-                primary: '#FFAAA7',
-                secondary: '#A8E6CF',
-                accent: '#FFD3B6'
-            },
-            corporate: {
-                primary: '#0A2463',
-                secondary: '#3E92CC',
-                accent: '#D8315B'
-            }
-        };
+            // カラーテーマ選択
+            const colorThemes = document.querySelectorAll('.color-theme');
+            let selectedTheme = 'modern';
 
-        // プロンプト生成機能
-        const generateBtn = document.getElementById('generate-btn');
-        const resultContent = document.getElementById('result-content');
+            colorThemes.forEach(theme => {
+                theme.addEventListener('click', () => {
+                    colorThemes.forEach(t => t.classList.remove('selected'));
+                    theme.classList.add('selected');
+                    selectedTheme = theme.dataset.theme;
+                });
+            });
 
-        generateBtn.addEventListener('click', () => {
-            const topic = document.getElementById('topic').value.trim();
-            const contentDescription = document.getElementById('content-description').value.trim();
-            const contentFocus = document.getElementById('content-focus').value.trim();
-            const fontStyle = document.getElementById('font-style').value;
-            const outputFormat = document.getElementById('output-format').value;
-            const infographicStyle = document.getElementById('infographic-style').value;
-            const recordingStyle = document.getElementById('recording-style').value;
+            // タブ切り替え
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabPanes = document.querySelectorAll('.tab-pane');
 
-            // カラー値を取得（テーマまたはカスタム）
-            let primaryColor, secondaryColor, accentColor;
-            const isCustomColor = document.querySelector('.color-option-btn[data-option="custom"]').classList.contains('active');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
 
-            if (isCustomColor) {
-                primaryColor = document.getElementById('primary-color').value;
-                secondaryColor = document.getElementById('secondary-color').value;
-                accentColor = document.getElementById('accent-color').value;
-            } else {
-                const theme = colorThemeMap[selectedTheme];
-                primaryColor = theme.primary;
-                secondaryColor = theme.secondary;
-                accentColor = theme.accent;
-            }
+                    const tab = btn.dataset.tab;
+                    tabPanes.forEach(pane => {
+                        pane.classList.add('hidden');
+                        if (pane.id === `${tab}-tab`) {
+                            pane.classList.remove('hidden');
+                        }
+                    });
+                });
+            });
 
-            if (!topic || !contentDescription || !selectedConcept) {
-                alert('メインテーマ、詳細説明、デザインコンセプトは必須項目です。');
-                return;
-            }
+            // カラーテーマ定義
+            const colorThemeMap = {
+                modern: {
+                    primary: '#4263EB',
+                    secondary: '#12B981',
+                    accent: '#F97316'
+                },
+                classic: {
+                    primary: '#8B5A2B',
+                    secondary: '#D4AF37',
+                    accent: '#7D3C3C'
+                },
+                vivid: {
+                    primary: '#FF3366',
+                    secondary: '#33CCFF',
+                    accent: '#FFCC00'
+                },
+                monochrome: {
+                    primary: '#333333',
+                    secondary: '#666666',
+                    accent: '#999999'
+                },
+                pastel: {
+                    primary: '#FFAAA7',
+                    secondary: '#A8E6CF',
+                    accent: '#FFD3B6'
+                },
+                corporate: {
+                    primary: '#0A2463',
+                    secondary: '#3E92CC',
+                    accent: '#D8315B'
+                }
+            };
 
-            // 各デザインコンセプトに応じたプロンプトテンプレート
-            let promptTemplate = '';
-            let fontFamily = '';
+            // プロンプト生成機能
+            const generateBtn = document.getElementById('generate-btn');
+            const resultContent = document.getElementById('result-content');
 
-            // フォントスタイルの設定
-            switch (fontStyle) {
-                case 'modern':
-                    fontFamily = 'Inter, system-ui, sans-serif';
-                    break;
-                case 'classic':
-                    fontFamily = 'Georgia, serif';
-                    break;
-                case 'creative':
-                    fontFamily = 'Montserrat, Avenir, sans-serif';
-                    break;
-                case 'minimal':
-                    fontFamily = 'SF Mono, Consolas, monospace';
-                    break;
-            }
+            generateBtn.addEventListener('click', () => {
+                const topic = document.getElementById('topic').value.trim();
+                const contentDescription = document.getElementById('content-description').value.trim();
+                const contentFocus = document.getElementById('content-focus').value.trim();
+                const fontStyle = document.getElementById('font-style').value;
+                const outputFormat = document.getElementById('output-format').value;
+                const infographicStyle = document.getElementById('infographic-style').value;
+                const recordingStyle = document.getElementById('recording-style').value;
 
-            // インフォグラフィックスタイルの設定
-            let infographicDesc = '';
-            switch (infographicStyle) {
-                case 'comparative':
-                    infographicDesc = 'Use comparative analysis techniques to visually contrast different data points and highlight key differences.';
-                    break;
-                case 'hierarchical':
-                    infographicDesc = 'Implement a clear hierarchical structure to show the relative importance of information through size, position, and visual weight.';
-                    break;
-                case 'process':
-                    infographicDesc = 'Create a step-by-step flow visualization that clearly shows progression through stages and relationships between steps.';
-                    break;
-                case 'statistical':
-                    infographicDesc = 'Utilize statistical visualization techniques like charts, graphs, and data representation to clearly communicate numerical information.';
-                    break;
-                case 'conceptual':
-                    infographicDesc = 'Develop conceptual diagrams that illustrate relationships between ideas, showing connections and influences between different elements.';
-                    break;
-            }
+                // カラー値を取得（テーマまたはカスタム）
+                let primaryColor, secondaryColor, accentColor;
+                const isCustomColor = document.querySelector('.color-option-btn[data-option="custom"]').classList.contains('active');
 
-            // グラフィックレコーディングスタイルの設定
-            let recordingDesc = '';
-            switch (recordingStyle) {
-                case 'timeline':
-                    recordingDesc = 'Use timeline-based visualization to show temporal progression and development of concepts over time.';
-                    break;
-                case 'mindmap':
-                    recordingDesc = 'Implement a radial mind-mapping approach to show how concepts relate to a central theme and branch out into sub-topics.';
-                    break;
-                case 'journey':
-                    recordingDesc = 'Create a journey-map style visual that depicts experiences, touchpoints, and emotional states through a process.';
-                    break;
-                case 'quadrant':
-                    recordingDesc = 'Organize information into a quadrant-based system using two axes to create four distinct categories or zones.';
-                    break;
-                case 'modal':
-                    recordingDesc = 'Apply modal logic visualization to distinguish between necessities, possibilities, and contingencies in the content.';
-                    break;
-            }
+                if (isCustomColor) {
+                    primaryColor = document.getElementById('primary-color').value;
+                    secondaryColor = document.getElementById('secondary-color').value;
+                    accentColor = document.getElementById('accent-color').value;
+                } else {
+                    const theme = colorThemeMap[selectedTheme];
+                    primaryColor = theme.primary;
+                    secondaryColor = theme.secondary;
+                    accentColor = theme.accent;
+                }
 
-            // デザインコンセプトに応じたスタイルと設定
-            let designStyle = '';
-            let colorApproach = '';
-            let interactions = '';
+                if (!topic || !contentDescription || !selectedConcept) {
+                    alert('メインテーマ、詳細説明、デザインコンセプトは必須項目です。');
+                    return;
+                }
 
-            switch (selectedConcept) {
-                case 'neumorphism':
-                    designStyle = 'Implement a Fluid Neumorphism design with soft shadows and subtle 3D effects for a tactile, premium feel.';
-                    colorApproach = `Use a light neutral background (#F0F2F9) with ${primaryColor} as the primary accent, ${secondaryColor} as the secondary accent, and ${accentColor} as tertiary accent. Apply soft shadows to create depth.`;
-                    interactions = 'Create subtle animations for interactive elements that provide feedback through a pressed/elevated feel.';
-                    break;
+                // 各デザインコンセプトに応じたプロンプトテンプレート
+                let promptTemplate = '';
+                let fontFamily = '';
 
-                case 'colorscape':
-                    designStyle = 'Apply a Dynamic Colorscape design with vibrant colors, gradients, and spatial depth to create visual energy.';
-                    colorApproach = `Use gradients combining ${primaryColor} with complementary colors. Add ${secondaryColor} as a contrasting accent and ${accentColor} for highlights. Maintain a clean white (#FFFFFF) background to make colors pop.`;
-                    interactions = 'Implement energetic feedback through color shifts, scaling effects, and smooth transitions on interactive elements.';
-                    break;
+                // フォントスタイルの設定
+                switch (fontStyle) {
+                    case 'modern':
+                        fontFamily = 'Inter, system-ui, sans-serif';
+                        break;
+                    case 'classic':
+                        fontFamily = 'Georgia, serif';
+                        break;
+                    case 'creative':
+                        fontFamily = 'Montserrat, Avenir, sans-serif';
+                        break;
+                    case 'minimal':
+                        fontFamily = 'SF Mono, Consolas, monospace';
+                        break;
+                }
 
-                case 'typographic':
-                    designStyle = 'Create a Typographic Grid design focusing on typography, whitespace, and structural layout for clarity and focus.';
-                    colorApproach = `Utilize a limited color palette with ${primaryColor} as the primary accent, ${secondaryColor} as a minimal secondary accent, and ${accentColor} used sparingly for highlights. Maintain high contrast with clean backgrounds.`;
-                    interactions = 'Keep interactions subtle and focused on readability, with minimal animations and clear state changes.';
-                    break;
-            }
+                // インフォグラフィックスタイルの設定
+                let infographicDesc = '';
+                switch (infographicStyle) {
+                    case 'comparative':
+                        infographicDesc = 'Use comparative analysis techniques to visually contrast different data points and highlight key differences.';
+                        break;
+                    case 'hierarchical':
+                        infographicDesc = 'Implement a clear hierarchical structure to show the relative importance of information through size, position, and visual weight.';
+                        break;
+                    case 'process':
+                        infographicDesc = 'Create a step-by-step flow visualization that clearly shows progression through stages and relationships between steps.';
+                        break;
+                    case 'statistical':
+                        infographicDesc = 'Utilize statistical visualization techniques like charts, graphs, and data representation to clearly communicate numerical information.';
+                        break;
+                    case 'conceptual':
+                        infographicDesc = 'Develop conceptual diagrams that illustrate relationships between ideas, showing connections and influences between different elements.';
+                        break;
+                }
 
-            // 出力フォーマットに応じた指示
-            let formatInstructions = '';
-            switch (outputFormat) {
-                case 'html':
-                    formatInstructions = `
+                // グラフィックレコーディングスタイルの設定
+                let recordingDesc = '';
+                switch (recordingStyle) {
+                    case 'timeline':
+                        recordingDesc = 'Use timeline-based visualization to show temporal progression and development of concepts over time.';
+                        break;
+                    case 'mindmap':
+                        recordingDesc = 'Implement a radial mind-mapping approach to show how concepts relate to a central theme and branch out into sub-topics.';
+                        break;
+                    case 'journey':
+                        recordingDesc = 'Create a journey-map style visual that depicts experiences, touchpoints, and emotional states through a process.';
+                        break;
+                    case 'quadrant':
+                        recordingDesc = 'Organize information into a quadrant-based system using two axes to create four distinct categories or zones.';
+                        break;
+                    case 'modal':
+                        recordingDesc = 'Apply modal logic visualization to distinguish between necessities, possibilities, and contingencies in the content.';
+                        break;
+                }
+
+                // デザインコンセプトに応じたスタイルと設定
+                let designStyle = '';
+                let colorApproach = '';
+                let interactions = '';
+
+                switch (selectedConcept) {
+                    case 'neumorphism':
+                        designStyle = 'Implement a Fluid Neumorphism design with soft shadows and subtle 3D effects for a tactile, premium feel.';
+                        colorApproach = `Use a light neutral background (#F0F2F9) with ${primaryColor} as the primary accent, ${secondaryColor} as the secondary accent, and ${accentColor} as tertiary accent. Apply soft shadows to create depth.`;
+                        interactions = 'Create subtle animations for interactive elements that provide feedback through a pressed/elevated feel.';
+                        break;
+
+                    case 'colorscape':
+                        designStyle = 'Apply a Dynamic Colorscape design with vibrant colors, gradients, and spatial depth to create visual energy.';
+                        colorApproach = `Use gradients combining ${primaryColor} with complementary colors. Add ${secondaryColor} as a contrasting accent and ${accentColor} for highlights. Maintain a clean white (#FFFFFF) background to make colors pop.`;
+                        interactions = 'Implement energetic feedback through color shifts, scaling effects, and smooth transitions on interactive elements.';
+                        break;
+
+                    case 'typographic':
+                        designStyle = 'Create a Typographic Grid design focusing on typography, whitespace, and structural layout for clarity and focus.';
+                        colorApproach = `Utilize a limited color palette with ${primaryColor} as the primary accent, ${secondaryColor} as a minimal secondary accent, and ${accentColor} used sparingly for highlights. Maintain high contrast with clean backgrounds.`;
+                        interactions = 'Keep interactions subtle and focused on readability, with minimal animations and clear state changes.';
+                        break;
+                }
+
+                // 出力フォーマットに応じた指示
+                let formatInstructions = '';
+                switch (outputFormat) {
+                    case 'html':
+                        formatInstructions = `
 ## Output Format: HTML
 - Create a valid HTML5 document with proper semantic structure
 - Use CSS for styling, preferably with CSS variables for color themes
 - Ensure responsive design with appropriate media queries
 - Optimize for performance by minimizing unnecessary markup
 - Follow accessibility best practices (ARIA labels, semantic HTML, etc.)`;
-                    break;
+                        break;
 
-                case 'markdown':
-                    formatInstructions = `
+                    case 'markdown':
+                        formatInstructions = `
 ## Output Format: Markdown
 - Use standard Markdown syntax for consistent rendering across platforms
 - Utilize headings, lists, tables, and code blocks appropriately
 - Include HTML where necessary for advanced formatting needs
 - Maintain a clean, readable document structure
 - Use proper linking and reference techniques`;
-                    break;
+                        break;
 
-                case 'svg':
-                    formatInstructions = `
+                    case 'svg':
+                        formatInstructions = `
 ## Output Format: SVG
 - Create a vector-based visualization with clear structure
 - Define viewBox for proper scaling across different screen sizes
@@ -1294,10 +1293,10 @@
 - Implement a consistent color palette and styling
 - Consider adding subtle animations where appropriate
 - Ensure text elements are readable and properly positioned`;
-                    break;
+                        break;
 
-                case 'react':
-                    formatInstructions = `
+                    case 'react':
+                        formatInstructions = `
 ## Output Format: React Component
 - Create a functional React component with modern practices
 - Use React hooks for state management where needed
@@ -1306,10 +1305,10 @@
 - Break down complex UI into smaller, reusable components
 - Add appropriate PropTypes or TypeScript interfaces
 - Consider performance optimization where applicable`;
-                    break;
+                        break;
 
-                case 'drawio':
-                    formatInstructions = `
+                    case 'drawio':
+                        formatInstructions = `
 ## Output Format: Draw.io Diagram
 - Design a clear, structured diagram suitable for Draw.io
 - Organize elements in a logical flow with appropriate connectors
@@ -1317,10 +1316,10 @@
 - Include color-coding for different categories or states
 - Add text labels that are concise and descriptive
 - Consider providing export-ready XML structure where possible`;
-                    break;
+                        break;
 
-                case 'mermaid':
-                    formatInstructions = `
+                    case 'mermaid':
+                        formatInstructions = `
 ## Output Format: Mermaid Diagram
 - Follow Mermaid syntax conventions for the appropriate diagram type
 - Choose the most suitable diagram type (flowchart, sequence, class, etc.)
@@ -1328,11 +1327,11 @@
 - Use concise labels that communicate essential information
 - Implement consistent styling and color-coding
 - Keep the diagram focused and avoid unnecessary complexity`;
-                    break;
-            }
+                        break;
+                }
 
-            // 最終的なプロンプトテンプレート生成
-            promptTemplate = `# Layout and Style Instructions for "${topic}"
+                // 最終的なプロンプトテンプレート生成
+                promptTemplate = `# Layout and Style Instructions for "${topic}"
 
 Create a comprehensive explanation about ${topic} with the following design approach:
 
@@ -1377,39 +1376,40 @@ ${formatInstructions}
 
 Remember to prioritize clarity, readability, and information hierarchy throughout the entire explanation.`;
 
-            // 結果を表示 (アニメーション効果を追加)
-            resultContent.style.opacity = '0';
-            setTimeout(() => {
-                resultContent.textContent = promptTemplate;
-                resultContent.style.opacity = '1';
-            }, 300);
+                // 結果を表示 (アニメーション効果を追加)
+                resultContent.style.opacity = '0';
+                setTimeout(() => {
+                    resultContent.textContent = promptTemplate;
+                    resultContent.style.opacity = '1';
+                }, 300);
+            });
+
+            // コピー機能
+            const copyBtn = document.getElementById('copy-btn');
+
+            copyBtn.addEventListener('click', () => {
+                const resultText = resultContent.textContent;
+
+                navigator.clipboard.writeText(resultText)
+                    .then(() => {
+                        // コピー成功時の処理
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.textContent = 'コピーしました！';
+
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy text: ', err);
+                        alert('コピーに失敗しました。');
+                    });
+            });
+
+            // 初期選択設定
+            document.querySelector('.concept-card[data-concept="neumorphism"]').click();
+            document.querySelector('.color-theme[data-theme="modern"]').click();
         });
-
-        // コピー機能
-        const copyBtn = document.getElementById('copy-btn');
-
-        copyBtn.addEventListener('click', () => {
-            const resultText = resultContent.textContent;
-
-            navigator.clipboard.writeText(resultText)
-                .then(() => {
-                    // コピー成功時の処理
-                    const originalText = copyBtn.innerHTML;
-                    copyBtn.textContent = 'コピーしました！';
-
-                    setTimeout(() => {
-                        copyBtn.innerHTML = originalText;
-                    }, 2000);
-                })
-                .catch(err => {
-                    console.error('Failed to copy text: ', err);
-                    alert('コピーに失敗しました。');
-                });
-        });
-
-        // 初期選択設定
-        document.querySelector('.concept-card[data-concept="neumorphism"]').click();
-        document.querySelector('.color-theme[data-theme="modern"]').click();
     </script>
 </body>
 
