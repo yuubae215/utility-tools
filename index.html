@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設計支援ツールポータル</title>
+    <!-- Font Awesome CDNを追加 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --accent-color: #e74c3c;
+            --text-color: #2c3e50;
+            --text-light: #636e72;
+            --bg-color: #f8f9fa;
+            --card-color: #fff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            transition: var(--transition);
+        }
+
+        body.dark-mode {
+            --primary-color: #5dade2;
+            --primary-dark: #3498db;
+            --accent-color: #e76f51;
+            --text-color: #ecf0f1;
+            --text-light: #bdc3c7;
+            --bg-color: #1a202c;
+            --card-color: #2d3748;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            background-color: var(--card-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(30deg);
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+        }
+
+        .description {
+            max-width: 800px;
+            margin: 20px auto;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 30px auto 20px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 15px 20px 15px 45px;
+            border: none;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+            font-size: 1rem;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            box-shadow: var(--hover-shadow);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 50px;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .tool-card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .tool-icon {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-icon::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            left: -100%;
+            top: -100%;
+            transition: var(--transition);
+        }
+
+        .tool-card:hover .tool-icon::before {
+            left: 100%;
+            top: 100%;
+        }
+
+        .tool-content {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .tool-content h3 {
+            margin-top: 0;
+            color: var(--text-color);
+            font-size: 1.4rem;
+        }
+
+        .tool-content p {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: var(--transition);
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ツールカードごとに異なる色を設定 */
+        .tool-card:nth-child(1) .tool-icon {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .tool-card:nth-child(2) .tool-icon {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .tool-card:nth-child(3) .tool-icon {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .tool-card:nth-child(4) .tool-icon {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+
+        .tool-card:nth-child(5) .tool-icon {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+        }
+
+        .tool-card:nth-child(6) .tool-icon {
+            background: linear-gradient(135deg, #1abc9c, #16a085);
+        }
+
+        .recommended {
+            margin-top: 60px;
+        }
+
+        .section-title {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+            font-size: 1.6rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 70px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(99, 110, 114, 0.2);
+            color: var(--text-light);
+        }
+
+        .github-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .github-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* ツールカードのアニメーション */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tool-card {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .tool-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .tool-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .tool-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .tool-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .tool-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .tool-card:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .tool-card:nth-child(7) .tool-icon {
+            background: linear-gradient(135deg, #6366F1, #4F46E5);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <button class="theme-toggle" id="theme-toggle" title="ダークモード切替">
+            <i class="fas fa-moon"></i>
+        </button>
+        <h1>設計支援ツールポータル</h1>
+        <p class="description">様々な設計作業をサポートするツールを提供しています。必要なツールを選択してください。</p>
+
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-tools" placeholder="ツールを検索...">
+        </div>
+
+        <div class="categories">
+            <button class="category-btn active" data-category="all">すべて</button>
+            <button class="category-btn" data-category="color">カラー</button>
+            <button class="category-btn" data-category="layout">レイアウト</button>
+            <button class="category-btn" data-category="typography">タイポグラフィ</button>
+            <button class="category-btn" data-category="measure">測定</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="tools-grid" id="tools-grid">
+            <!-- ツールカード1: レイアウト設計 -->
+            <div class="tool-card" data-category="layout">
+                <div class="tool-icon">
+                    <i class="fas fa-th-large"></i>
+                </div>
+                <div class="tool-content">
+                    <h3>レイアウト設計ツール</h3>
+                    <p>空間や部屋のレイアウトを効率的に設計するためのツールです。ドラッグ＆ドロップで簡単に配置できます。</p>
+                    <a href="layout-tool.html" class="button">ツールを使用する</a>
+                </div>
+            </div>
+
+            <!-- ツールカード2: カラーパレット -->
+            <div class="tool-card" data-category="color">
+                <div class="tool-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <div class="tool-content">
+                    <h3>カラーパレット生成</h3>
+                    <p>デザインに最適な配色を提案します。ベースカラーを選ぶだけで調和のとれたパレットを生成します。</p>
+                    <a href="color-palette.html" class="button">ツールを使用する</a>
+                </div>
+            </div>
+
+            <!-- ツールカード3: サイズ計算 -->
+            <div class="tool-card" data-category="measure">
+                <div class="tool-icon">
+                    <i class="fas fa-ruler-combined"></i>
+                </div>
+                <div class="tool-content">
+                    <h3>サイズ計算ツール</h3>
+                    <p>様々な測定単位間の変換や、比率に基づいたサイズ計算を行います。レスポンシブデザインに最適です。</p>
+                    <a href="size-calculator.html" class="button">ツールを使用する</a>
+                </div>
+            </div>
+
+            <!-- ツールカード4: フォント組み合わせ -->
+            <div class="tool-card" data-category="typography">
+                <div class="tool-icon">
+                    <i class="fas fa-font"></i>
+                </div>
+                <div class="tool-content">
+                    <h3>フォント組み合わせ</h3>
+                    <p>見出しと本文に最適なフォントの組み合わせを提案します。読みやすさとデザイン性を両立させます。</p>
+                    <a href="font-pairing.html" class="button">ツールを使用する</a>
+                </div>
+            </div>
+
+            <!-- ツールカード5: カラーアクセシビリティ -->
+            <div class="tool-card" data-category="color">
+                <div class="tool-icon">
+                    <i class="fas fa-universal-access"></i>
+                </div>
+                <div class="tool-content">
+                    <h3>カラーアクセシビリティ</h3>
+                    <p>WCAGガイドラインに基づいて、色のコントラスト比をチェックし、アクセシブルな配色を提案します。</p>
+                    <a href="color-accessibility.html" class="button">ツールを使用する</a>
+                </div>
+            </div>
+
+            <!-- ツールカード6: グリッド計算機 -->
+            <div class="tool-card" data-category="layout">
+                <div class="tool-icon">
+                    <i class="fas fa-border-all"></i>
+                </div>
+                <div class="tool-content">
+                    <h3>グリッド計算機</h3>
+                    <p>レスポンシブデザイン用のグリッドシステムを簡単に計算。列数やガターサイズを調整して最適なレイアウトを設計。</p>
+                    <a href="grid-calculator.html" class="button">ツールを使用する</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ツールカード: プロンプトジェネレーター -->
+        <div class="tool-card" data-category="typography">
+            <div class="tool-icon">
+                <i class="fas fa-pencil-alt"></i>
+            </div>
+            <div class="tool-content">
+                <h3>レイアウト・スタイル プロンプトジェネレーター</h3>
+                <p>デザイン指示プロンプトを簡単に作成できるツールです。効果的なレイアウトとスタイル指示を自動生成します。</p>
+                <a href="prompt-generator.html" class="button">ツールを使用する</a>
+            </div>
+        </div>
+
+        <!-- おすすめツール（静的に表示） -->
+        <div class="recommended">
+            <h2 class="section-title">おすすめツール</h2>
+            <div class="tools-grid">
+                <!-- おすすめツール: カラーパレット -->
+                <div class="tool-card" data-category="color">
+                    <div class="tool-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>カラーパレット生成</h3>
+                        <p>デザインに最適な配色を提案します。ベースカラーを選ぶだけで調和のとれたパレットを生成します。</p>
+                        <a href="color-palette.html" class="button">ツールを使用する</a>
+                    </div>
+                </div>
+
+                <!-- おすすめツール: レイアウト設計 -->
+                <div class="tool-card" data-category="layout">
+                    <div class="tool-icon">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>レイアウト設計ツール</h3>
+                        <p>空間や部屋のレイアウトを効率的に設計するためのツールです。ドラッグ＆ドロップで簡単に配置できます。</p>
+                        <a href="layout-tool.html" class="button">ツールを使用する</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 設計支援ツールポータル｜<a href="https://github.com/yourusername/your-repo" class="github-link">GitHub</a>
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // ダークモード切り替え（localStorage不使用）
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+
+            themeToggle.addEventListener('click', function () {
+                document.body.classList.toggle('dark-mode');
+
+                if (document.body.classList.contains('dark-mode')) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                } else {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            });
+
+            // ツール検索機能
+            const searchInput = document.getElementById('search-tools');
+            const toolCards = document.querySelectorAll('.tool-card');
+
+            searchInput.addEventListener('input', function () {
+                const searchTerm = this.value.toLowerCase();
+
+                toolCards.forEach(card => {
+                    const title = card.querySelector('h3').textContent.toLowerCase();
+                    const description = card.querySelector('p').textContent.toLowerCase();
+
+                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+
+            // カテゴリーフィルター
+            const categoryButtons = document.querySelectorAll('.category-btn');
+
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    // アクティブクラスを切り替え
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const category = this.dataset.category;
+
+                    toolCards.forEach(card => {
+                        if (category === 'all' || card.dataset.category === category) {
+                            card.style.display = '';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
