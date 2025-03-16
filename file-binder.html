@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
-    <title>ファイル結合ツール - 設計支援ツール</title>
+    <title>File Binder - Design Support Tools</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="複数のファイルを結合して整理するモダンなツール">
+    <meta name="description" content="A modern tool for combining and organizing multiple files">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,7 +75,7 @@
     </script>
 
     <style>
-        /* 共通カラー変数 */
+        /* Common color variables */
         :root {
             --primary-color: #3498db;
             --primary-dark: #2980b9;
@@ -101,7 +101,7 @@
             --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }
 
-        /* 統一されたダークモード変数 */
+        /* Dark mode variables */
         body.dark-mode {
             --primary-color: #5dade2;
             --primary-dark: #3498db;
@@ -142,7 +142,7 @@
             background-color: #0f172a;
         }
 
-        /* ホームリンク */
+        /* Home link */
         .home-link {
             display: inline-block;
             margin-top: 15px;
@@ -529,7 +529,7 @@
             }
         }
 
-        /* フッターのスタイル */
+        /* Footer styles */
         footer {
             text-align: center;
             padding: 20px 0;
@@ -547,12 +547,99 @@
             color: var(--primary-dark);
             text-decoration: underline;
         }
+
+        /* Mobile responsiveness improvements */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column !important;
+            }
+
+            .lg\:w-1\/3,
+            .lg\:w-2\/3 {
+                width: 100% !important;
+            }
+
+            .dropzone {
+                padding: 15px !important;
+            }
+
+            .card {
+                margin-bottom: 15px;
+            }
+
+            header {
+                padding: 15px !important;
+            }
+
+            header h1 {
+                font-size: 1.2rem !important;
+            }
+
+            .home-link {
+                margin-top: 5px;
+                font-size: 0.85rem;
+            }
+
+            .theme-switch {
+                width: 50px;
+                height: 25px;
+            }
+
+            .slider:before {
+                height: 19px;
+                width: 19px;
+            }
+
+            input:checked+.slider:before {
+                transform: translateX(25px);
+            }
+
+            .btn {
+                padding: 8px 16px !important;
+                font-size: 0.9rem !important;
+            }
+
+            .tool-card:nth-child(n+2) {
+                margin-top: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .p-6 {
+                padding: 1rem !important;
+            }
+
+            .px-6 {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            .h-8,
+            .w-8 {
+                height: 1.5rem !important;
+                width: 1.5rem !important;
+            }
+
+            .flex-col,
+            .flex-row {
+                gap: 0.5rem !important;
+            }
+
+            .text-lg {
+                font-size: 1rem !important;
+            }
+
+            .empty-state-icon {
+                height: 3rem !important;
+                width: 3rem !important;
+            }
+        }
     </style>
 </head>
 
 <body class="dark dark-mode">
     <div class="flex flex-col h-screen">
-        <!-- ヘッダー - 修正済み -->
+        <!-- Header - Modified -->
         <header class="px-6 py-4 bg-primary-600 text-white flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 24 24" fill="none"
@@ -563,20 +650,20 @@
                     <path d="M15 14v4" />
                 </svg>
                 <div>
-                    <h1 class="text-xl font-semibold tracking-tight text-white">ファイル結合ツール</h1>
-                    <p class="text-sm text-slate-100">複数のファイルをドラッグ＆ドロップで結合</p>
+                    <h1 class="text-xl font-semibold tracking-tight text-white">File Binder</h1>
+                    <p class="text-sm text-slate-100">Combine multiple files using drag & drop</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
                 <button id="clearButton"
                     class="hidden text-sm text-slate-200 hover:text-white dark:hover:text-primary-400 transition-colors">
-                    ファイルをクリア
+                    Clear files
                 </button>
-                <a href="index.html" class="home-link"><i class="fas fa-arrow-left"></i> ホームに戻る</a>
+                <a href="index.html" class="home-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
                 <label class="theme-switch tooltip">
                     <input type="checkbox" id="themeToggle" checked>
                     <span class="slider"></span>
-                    <span class="tooltip-text">テーマ切替</span>
+                    <span class="tooltip-text">Toggle theme</span>
                 </label>
             </div>
         </header>
@@ -590,8 +677,8 @@
                     <div class="progress-container">
                         <div id="progressBar" class="progress-bar" style="width: 0%"></div>
                     </div>
-                    <p class="mt-2 text-slate-600 dark:text-slate-400">ファイル処理中 <span class="loading-dots"></span> <span
-                            id="progressText">0</span>%</p>
+                    <p class="mt-2 text-slate-600 dark:text-slate-400">Processing files <span
+                            class="loading-dots"></span> <span id="progressText">0</span>%</p>
                 </div>
                 <div id="dropContent" class="flex flex-col items-center justify-center py-4">
                     <svg xmlns="http://www.w3.org/2000/svg"
@@ -602,16 +689,17 @@
                         <polyline points="17 8 12 3 7 8" />
                         <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
-                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">ドラッグ＆ドロップでアップロード</h3>
-                    <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">ファイルやフォルダをここにドロップして整理します</p>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">Drag & Drop to Upload</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Drop files or folders here to organize
+                    </p>
                     <div class="flex space-x-2">
                         <span
-                            class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/30">ファイル</span>
+                            class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/30">Files</span>
                         <span
-                            class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-400 ring-1 ring-inset ring-indigo-700/10 dark:ring-indigo-400/30">フォルダ</span>
+                            class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-400 ring-1 ring-inset ring-indigo-700/10 dark:ring-indigo-400/30">Folders</span>
                         <span
                             class="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-900/30 px-2 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 ring-1 ring-inset ring-purple-700/10 dark:ring-purple-400/30">.loadignore
-                            サポート</span>
+                            support</span>
                     </div>
                     <div class="mt-4 flex flex-col">
                         <button id="downloadSampleIgnore"
@@ -622,10 +710,10 @@
                                 <polyline points="7 10 12 15 17 10" />
                                 <line x1="12" y1="15" x2="12" y2="3" />
                             </svg>
-                            .loadignoreサンプルをダウンロード
+                            Download .loadignore sample
                         </button>
                         <div class="text-xs text-slate-500 dark:text-slate-400 ml-6 mt-1">
-                            .loadignoreファイルでは # を使ってコメントができます
+                            Use # for comments in .loadignore files
                         </div>
                     </div>
                 </div>
@@ -643,7 +731,7 @@
                         <line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
                     <div>
-                        <strong class="font-medium">エラー:</strong>
+                        <strong class="font-medium">Error:</strong>
                         <span id="errorText" class="ml-1"></span>
                     </div>
                 </div>
@@ -661,9 +749,9 @@
                     <line x1="9" y1="11" x2="15" y2="11" />
                     <line x1="9" y1="19" x2="13" y2="19" />
                 </svg>
-                <h3 class="text-xl font-medium text-slate-900 dark:text-white mb-2">ファイルがありません</h3>
+                <h3 class="text-xl font-medium text-slate-900 dark:text-white mb-2">No files yet</h3>
                 <p class="text-slate-600 dark:text-slate-400 text-center max-w-md mb-6">
-                    ファイルやフォルダをドロップして、一つのマークダウンドキュメントにまとめましょう
+                    Drop files or folders to combine and organize them into a single markdown document
                 </p>
                 <div class="text-sm text-slate-500 dark:text-slate-500 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl">
                     <div class="flex items-start">
@@ -671,8 +759,8 @@
                             class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mr-3">
                             1</div>
                         <div>
-                            <h4 class="font-medium text-slate-900 dark:text-white">アップロード</h4>
-                            <p class="mt-1">ファイルをドラッグ＆ドロップ</p>
+                            <h4 class="font-medium text-slate-900 dark:text-white">Upload</h4>
+                            <p class="mt-1">Drag & drop files</p>
                         </div>
                     </div>
                     <div class="flex items-start">
@@ -680,8 +768,8 @@
                             class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mr-3">
                             2</div>
                         <div>
-                            <h4 class="font-medium text-slate-900 dark:text-white">プレビュー</h4>
-                            <p class="mt-1">ファイル内容を確認</p>
+                            <h4 class="font-medium text-slate-900 dark:text-white">Preview</h4>
+                            <p class="mt-1">Review file contents</p>
                         </div>
                     </div>
                     <div class="flex items-start">
@@ -689,8 +777,8 @@
                             class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mr-3">
                             3</div>
                         <div>
-                            <h4 class="font-medium text-slate-900 dark:text-white">結合</h4>
-                            <p class="mt-1">生成してダウンロード</p>
+                            <h4 class="font-medium text-slate-900 dark:text-white">Combine</h4>
+                            <p class="mt-1">Generate & download</p>
                         </div>
                     </div>
                 </div>
@@ -702,10 +790,10 @@
                 <div id="actionsContainer" class="mb-6 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                         <div class="mb-4 sm:mb-0">
-                            <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-1">プロジェクトファイル</h3>
+                            <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-1">Project Files</h3>
                             <p class="text-sm text-slate-600 dark:text-slate-400">
-                                <span id="fileCount">0</span> ファイル処理準備完了 •
-                                <span id="totalSize">0 KB</span> 合計
+                                <span id="fileCount">0</span> files ready to process •
+                                <span id="totalSize">0 KB</span> total
                             </p>
                         </div>
                         <div class="flex flex-wrap gap-3">
@@ -719,8 +807,8 @@
                                     <line x1="9" y1="15" x2="15" y2="15"></line>
                                     <line x1="9" y1="12" x2="15" y2="12"></line>
                                 </svg>
-                                サイズ分析
-                                <span class="tooltip-text">ファイルサイズ分析</span>
+                                Size Analysis
+                                <span class="tooltip-text">Analyze file sizes</span>
                             </button>
                             <button id="combineButton"
                                 class="btn bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-4 rounded-lg shadow-sm flex items-center tooltip">
@@ -729,8 +817,8 @@
                                     stroke-linejoin="round">
                                     <path d="M17 17H7V6m0 0v11m0-11H4m3 0 4-4 4 4m6 4v11m0 0H7m14 0h3m-3 0-4 4-4-4" />
                                 </svg>
-                                <span id="combineButtonText">ファイル結合</span>
-                                <span class="tooltip-text">マークダウンを生成</span>
+                                <span id="combineButtonText">Combine Files</span>
+                                <span class="tooltip-text">Generate markdown document</span>
                             </button>
                             <button id="downloadButton"
                                 class="btn bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-4 rounded-lg shadow-sm flex items-center hidden tooltip">
@@ -741,8 +829,8 @@
                                     <polyline points="7 10 12 15 17 10" />
                                     <line x1="12" y1="15" x2="12" y2="3" />
                                 </svg>
-                                ダウンロード
-                                <span class="tooltip-text">マークダウンとして保存</span>
+                                Download
+                                <span class="tooltip-text">Save as markdown file</span>
                             </button>
                         </div>
                     </div>
@@ -755,7 +843,7 @@
                         class="bg-white dark:bg-slate-800 rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] flex flex-col">
                         <div
                             class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                            <h3 class="text-lg font-medium text-slate-900 dark:text-white">ファイルサイズ分析</h3>
+                            <h3 class="text-lg font-medium text-slate-900 dark:text-white">File Size Analysis</h3>
                             <button id="closeSizeAnalysisModal"
                                 class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -770,16 +858,16 @@
                                 <div class="flex items-center">
                                     <button id="sortByName"
                                         class="px-3 py-1 text-sm rounded-md border border-slate-300 dark:border-slate-600 mr-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                        名前で並び替え
+                                        Sort by Name
                                     </button>
                                     <button id="sortBySize"
                                         class="px-3 py-1 text-sm rounded-md border border-slate-300 dark:border-slate-600 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                        サイズで並び替え
+                                        Sort by Size
                                     </button>
                                 </div>
                                 <button id="excludeSelectedBtn"
                                     class="px-3 py-1 text-sm rounded-md border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    選択したファイルを除外
+                                    Exclude Selected
                                 </button>
                             </div>
                             <div class="space-y-2">
@@ -789,9 +877,9 @@
                                         <input type="checkbox" id="selectAllFiles"
                                             class="rounded border-slate-300 dark:border-slate-600 text-primary-600 focus:ring-primary-500">
                                     </div>
-                                    <div class="flex-1">ファイル名</div>
-                                    <div class="w-24 text-right">サイズ</div>
-                                    <div class="w-24 text-right">割合</div>
+                                    <div class="flex-1">Filename</div>
+                                    <div class="w-24 text-right">Size</div>
+                                    <div class="w-24 text-right">Percentage</div>
                                 </div>
                                 <div id="sizeAnalysisList" class="max-h-[50vh] overflow-y-auto space-y-1">
                                     <!-- File size items will be populated here -->
@@ -801,16 +889,16 @@
                         <div
                             class="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900 rounded-b-xl">
                             <div class="text-sm text-slate-500 dark:text-slate-400">
-                                <span class="font-medium" id="selectedFileCount">0</span> ファイル選択中
+                                <span class="font-medium" id="selectedFileCount">0</span> files selected
                             </div>
                             <div class="flex space-x-2">
                                 <button id="cancelSizeAnalysis"
                                     class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-                                    キャンセル
+                                    Cancel
                                 </button>
                                 <button id="applySizeAnalysis"
                                     class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg">
-                                    変更を適用
+                                    Apply Changes
                                 </button>
                             </div>
                         </div>
@@ -824,9 +912,9 @@
                         class="lg:w-1/3 card bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden">
                         <div class="p-4 border-b border-slate-200 dark:border-slate-700">
                             <div class="flex items-center justify-between">
-                                <h2 class="text-lg font-medium text-slate-900 dark:text-white">ファイル一覧</h2>
+                                <h2 class="text-lg font-medium text-slate-900 dark:text-white">File List</h2>
                                 <div class="relative">
-                                    <input type="text" id="fileSearchInput" placeholder="ファイル検索..."
+                                    <input type="text" id="fileSearchInput" placeholder="Search files..."
                                         class="py-1 px-3 pr-8 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-slate-400 dark:placeholder-slate-500">
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         class="h-4 w-4 absolute right-2.5 top-2 text-slate-400 dark:text-slate-500"
@@ -888,7 +976,7 @@
                                         <path d="M3 7.6v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8" />
                                         <path d="M15 2v5h5" />
                                     </svg>
-                                    <h2 class="text-lg font-medium text-slate-900 dark:text-white">結合されたファイル</h2>
+                                    <h2 class="text-lg font-medium text-slate-900 dark:text-white">Combined Files</h2>
                                 </div>
                             </div>
                             <div class="flex-1 overflow-hidden">
@@ -910,25 +998,26 @@
                                 <line x1="16" y1="17" x2="8" y2="17" />
                                 <polyline points="10 9 9 9 8 9" />
                             </svg>
-                            <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">ファイルが選択されていません</h3>
-                            <p class="text-slate-500 dark:text-slate-400">リストからファイルを選択してプレビューを表示します</p>
+                            <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">No file selected</h3>
+                            <p class="text-slate-500 dark:text-slate-400">Select a file from the list to preview its
+                                contents</p>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <!-- Footer with debug log - 修正済み -->
+        <!-- Footer with debug log -->
         <footer class="px-6 py-3 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 text-sm">
             <div class="flex items-center justify-between">
                 <div class="text-xs text-slate-500 dark:text-slate-400">
-                    &copy; 2025 設計支援ツールポータル｜<a href="https://github.com/yuubae215/utility-tools"
+                    &copy; 2025 Design Support Tools Portal｜<a href="https://github.com/yuubae215/utility-tools"
                         class="github-link">GitHub</a>
                 </div>
                 <details class="cursor-pointer">
                     <summary
                         class="font-medium text-slate-700 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                        デバッグログ</summary>
+                        Debug Log</summary>
                     <pre id="logContainer"
                         class="mt-2 bg-slate-100 dark:bg-slate-900 p-2 rounded-lg overflow-y-auto h-24 text-xs text-slate-700 dark:text-slate-300"></pre>
                 </details>

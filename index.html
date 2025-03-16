@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>設計支援ツールポータル</title>
-    <!-- Font Awesome CDNを追加 -->
+    <title>Design Support Tools Portal</title>
+    <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         :root {
-            /* 共通カラー変数 */
+            /* Common color variables */
             --primary-color: #3498db;
             --primary-dark: #2980b9;
             --primary-light: #EEF2FF;
@@ -20,7 +20,7 @@
             --text-primary: #2c3e50;
             --text-secondary: #636e72;
             --text-tertiary: #9CA3AF;
-            --bg-color: #f8f9fa;
+            --bg-color: #f8fafc;
             --card-color: #fff;
             --surface-color: #F9FAFB;
             --border-color: #E5E7EB;
@@ -40,7 +40,7 @@
             --space-2xl: 3rem;
         }
 
-        /* 統一されたダークモード変数 */
+        /* Dark mode variables */
         body.dark-mode {
             --primary-color: #5dade2;
             --primary-dark: #3498db;
@@ -256,7 +256,7 @@
             transform: translateY(-2px);
         }
 
-        /* ツールカードごとに異なる色を設定 */
+        /* Tool card colors */
         .tool-card:nth-child(1) .tool-icon {
             background: linear-gradient(135deg, #3498db, #2980b9);
         }
@@ -267,14 +267,6 @@
 
         .tool-card:nth-child(3) .tool-icon {
             background: linear-gradient(135deg, #2ecc71, #27ae60);
-        }
-
-        .tool-card:nth-child(4) .tool-icon {
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-        }
-
-        .recommended {
-            margin-top: 60px;
         }
 
         .section-title {
@@ -304,7 +296,7 @@
             text-decoration: underline;
         }
 
-        /* ツールカードのアニメーション */
+        /* Card animations */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -333,84 +325,150 @@
         .tool-card:nth-child(3) {
             animation-delay: 0.3s;
         }
+
+        /* Mobile responsiveness improvements */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .description {
+                font-size: 1rem;
+                padding: 0 15px;
+            }
+
+            .search-bar {
+                width: 90%;
+            }
+
+            .categories {
+                gap: 10px;
+            }
+
+            .category-btn {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .tool-icon {
+                height: 120px;
+                font-size: 3rem;
+            }
+
+            .tool-content {
+                padding: 20px;
+            }
+
+            .tool-content h3 {
+                font-size: 1.2rem;
+            }
+
+            .button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            header {
+                padding: 20px 0;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .description {
+                font-size: 0.9rem;
+            }
+
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+                font-size: 1.2rem;
+            }
+
+            .search-bar input {
+                padding: 12px 20px 12px 40px;
+            }
+
+            .search-bar i {
+                left: 15px;
+            }
+
+            .tool-icon {
+                height: 100px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <button class="theme-toggle" id="theme-toggle" title="ダークモード切替">
+        <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">
             <i class="fas fa-moon"></i>
         </button>
-        <h1>設計支援ツールポータル</h1>
-        <p class="description">様々な設計作業をサポートするツールを提供しています。必要なツールを選択してください。</p>
+        <h1>Design Support Tools Portal</h1>
+        <p class="description">We provide various tools to support your design work. Please select the tool you need.</p>
 
         <div class="search-bar">
             <i class="fas fa-search"></i>
-            <input type="text" id="search-tools" placeholder="ツールを検索...">
+            <input type="text" id="search-tools" placeholder="Search tools...">
         </div>
 
         <div class="categories">
-            <button class="category-btn active" data-category="all">すべて</button>
-            <button class="category-btn" data-category="utility">ユーティリティ</button>
-            <button class="category-btn" data-category="layout">レイアウト</button>
-            <button class="category-btn" data-category="typography">タイポグラフィ</button>
+            <button class="category-btn active" data-category="all">All</button>
+            <button class="category-btn" data-category="utility">Utility</button>
+            <button class="category-btn" data-category="layout">Layout</button>
+            <button class="category-btn" data-category="typography">Typography</button>
         </div>
     </header>
 
     <main>
         <div class="tools-grid" id="tools-grid">
-            <!-- ファイル管理ツール -->
+            <!-- File Management Tool -->
             <div class="tool-card" data-category="utility">
                 <div class="tool-icon">
                     <i class="fas fa-folder-open"></i>
                 </div>
                 <div class="tool-content">
-                    <h3>ファイル結合ツール</h3>
-                    <p>複数のファイルを1つにまとめるツールです。ファイル構造を保ちながらMarkdownドキュメントを生成します。</p>
-                    <a href="file-binder.html" class="button">ツールを使用する</a>
+                    <h3>File Binder</h3>
+                    <p>A tool to combine multiple files. Generate a Markdown document while preserving file structure.</p>
+                    <a href="file-binder.html" class="button">Use Tool</a>
                 </div>
             </div>
 
-            <!-- プロンプトジェネレーター -->
+            <!-- Prompt Generator -->
             <div class="tool-card" data-category="typography">
                 <div class="tool-icon">
                     <i class="fas fa-pencil-alt"></i>
                 </div>
                 <div class="tool-content">
-                    <h3>レイアウト・スタイル プロンプトジェネレーター</h3>
-                    <p>デザイン指示プロンプトを簡単に作成できるツールです。効果的なレイアウトとスタイル指示を自動生成します。</p>
-                    <a href="prompt-generator.html" class="button">ツールを使用する</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- おすすめツール（静的に表示） -->
-        <div class="recommended">
-            <h2 class="section-title">おすすめツール</h2>
-            <div class="tools-grid">
-                <!-- おすすめツール: ファイル結合ツール -->
-                <div class="tool-card" data-category="utility">
-                    <div class="tool-icon">
-                        <i class="fas fa-folder-open"></i>
-                    </div>
-                    <div class="tool-content">
-                        <h3>ファイル結合ツール</h3>
-                        <p>複数のファイルを1つにまとめるツールです。ファイル構造を保ちながらMarkdownドキュメントを生成します。</p>
-                        <a href="file-binder.html" class="button">ツールを使用する</a>
-                    </div>
+                    <h3>Layout & Style Prompt Generator</h3>
+                    <p>A tool to easily create design instruction prompts. Automatically generates effective layout and style instructions.</p>
+                    <a href="prompt-generator.html" class="button">Use Tool</a>
                 </div>
             </div>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 設計支援ツールポータル｜<a href="https://github.com/yuubae215/utility-tools" class="github-link">GitHub</a>
+        <p>&copy; 2025 Design Support Tools Portal｜<a href="https://github.com/yuubae215/utility-tools" class="github-link">GitHub</a>
         </p>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // ダークモード切り替え
+            // Dark mode toggle
             const themeToggle = document.getElementById('theme-toggle');
             const themeIcon = themeToggle.querySelector('i');
 
@@ -426,7 +484,7 @@
                 }
             });
 
-            // ツール検索機能
+            // Tool search functionality
             const searchInput = document.getElementById('search-tools');
             const toolCards = document.querySelectorAll('.tool-card');
 
@@ -445,12 +503,12 @@
                 });
             });
 
-            // カテゴリーフィルター
+            // Category filter
             const categoryButtons = document.querySelectorAll('.category-btn');
 
             categoryButtons.forEach(button => {
                 button.addEventListener('click', function () {
-                    // アクティブクラスを切り替え
+                    // Toggle active class
                     categoryButtons.forEach(btn => btn.classList.remove('active'));
                     this.classList.add('active');
 
