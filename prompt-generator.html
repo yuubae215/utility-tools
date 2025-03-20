@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Layout & Style Prompt Generator - Design Support Tools</title>
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <title>Layout & Style Prompt Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             /* Common color variables */
@@ -230,32 +228,40 @@
             resize: vertical;
         }
 
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: var(--space-md);
-            margin-bottom: var(--space-md);
-        }
-
-        .color-input-group {
+        /* Tags */
+        .tags-container {
             display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-top: var(--space-sm);
+        }
+        
+        .tag {
+            display: inline-flex;
             align-items: center;
-        }
-
-        .color-input-group label {
-            margin-bottom: 0;
-            margin-right: var(--space-sm);
-        }
-
-        .color-input-group input[type="color"] {
-            width: 40px;
-            height: 24px;
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            background-color: var(--surface-color);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 0;
-            background-color: transparent;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            user-select: none;
+        }
+        
+        .tag.selected {
+            color: white;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .tag:hover:not(.selected) {
+            background-color: var(--primary-light);
         }
 
+        /* Concept Cards */
         .concept-cards {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -270,7 +276,6 @@
             cursor: pointer;
             transition: all var(--transition-normal);
             position: relative;
-            background-color: var(--card-color);
         }
 
         .concept-card.selected {
@@ -309,6 +314,234 @@
             font-size: 0.875rem;
             color: var(--text-secondary);
             margin-bottom: 0;
+        }
+
+        /* Preview styles */
+        .preview-container {
+            margin-top: var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) var(--space-md);
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .preview-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .preview-content {
+            padding: var(--space-md);
+            background-color: var(--card-color);
+            overflow: hidden;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        /* Mermaid preview */
+        .mermaid-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-md);
+        }
+        
+        .mermaid-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Neumorphism Preview */
+        .neumorphism-preview {
+            background-color: #F0F2F9;
+            border-radius: 12px;
+            padding: var(--space-sm);
+            box-shadow:
+                6px 6px 12px rgba(210, 215, 230, 0.6),
+                -6px -6px 12px rgba(255, 255, 255, 0.8);
+        }
+
+        body.dark-mode .neumorphism-preview {
+            background-color: #2d3748;
+            box-shadow:
+                6px 6px 12px rgba(0, 0, 0, 0.4),
+                -6px -6px 12px rgba(71, 85, 105, 0.3);
+        }
+
+        /* Colorscape Preview */
+        .colorscape-preview {
+            background: linear-gradient(135deg, #5F43B2 0%, #9659FF 100%);
+            border-radius: 12px;
+            padding: var(--space-sm);
+            color: white;
+        }
+
+        /* Typographic Preview */
+        .typographic-preview {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-sm);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--card-color);
+            color: var(--text-color);
+        }
+
+        .typographic-preview .preview-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: var(--space-sm);
+        }
+
+        .typographic-preview .preview-title::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 2px;
+            background-color: var(--text-color);
+            bottom: -4px;
+            left: 0;
+        }
+
+        .color-option-toggle {
+            display: flex;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: var(--space-md);
+        }
+
+        .color-option-btn {
+            flex: 1;
+            padding: var(--space-xs) var(--space-sm);
+            background: none;
+            border: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            color: var(--text-color);
+        }
+
+        .color-option-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .color-theme-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .color-theme {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            position: relative;
+            background-color: var(--card-color);
+        }
+
+        .color-theme:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .color-theme.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(66, 99, 235, 0.3);
+        }
+
+        .color-theme.selected::after {
+            content: "✓";
+            position: absolute;
+            top: var(--space-xs);
+            right: var(--space-xs);
+            width: 16px;
+            height: 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+        }
+
+        .color-preview {
+            height: 24px;
+            display: flex;
+        }
+
+        .color-primary,
+        .color-secondary,
+        .color-accent {
+            flex: 1;
+            height: 100%;
+        }
+
+        .color-theme-name {
+            padding: var(--space-xs);
+            font-size: 0.75rem;
+            text-align: center;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .custom-colors {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: var(--space-md);
+        }
+        
+        .tab {
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition-normal);
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: var(--space-sm) 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .btn {
@@ -392,147 +625,30 @@
             overflow-y: auto;
             color: var(--text-primary);
         }
-
-        .prompt-preview {
-            margin-top: var(--space-md);
-            padding: var(--space-md);
-            background-color: var(--primary-light);
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: var(--space-sm) var(--space-md);
+            background-color: var(--text-color);
+            color: white;
             border-radius: var(--border-radius);
             font-size: 0.875rem;
-            color: var(--text-secondary);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .toast.active {
+            transform: translateY(0);
+            opacity: 1;
         }
 
-        .progress-indicator {
-            display: flex;
-            margin-bottom: var(--space-xl);
-        }
-
-        .progress-step {
-            flex: 1;
-            text-align: center;
-            position: relative;
-        }
-
-        .progress-step::after {
-            content: "";
-            position: absolute;
-            top: 12px;
-            left: 50%;
-            width: 100%;
-            height: 2px;
-            background-color: var(--border-color);
-            z-index: 1;
-        }
-
-        .progress-step:last-child::after {
-            display: none;
-        }
-
-        .step-indicator {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: var(--border-color);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: var(--space-xs);
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            position: relative;
-            z-index: 2;
-        }
-
-        .progress-step.active .step-indicator {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .progress-step.completed .step-indicator {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-
-        .step-label {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--text-tertiary);
-        }
-
-        .progress-step.active .step-label {
-            color: var(--text-primary);
-        }
-
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: var(--space-md);
-        }
-
-        .tab {
-            padding: var(--space-sm) var(--space-md);
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            font-weight: 500;
-        }
-
-        .tab.active {
-            border-bottom-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        /* Neumorphism Preview */
-        .preview-neumorphism {
-            background-color: #F0F2F9;
-            border-radius: 12px;
-            padding: var(--space-sm);
-            box-shadow:
-                6px 6px 12px rgba(210, 215, 230, 0.6),
-                -6px -6px 12px rgba(255, 255, 255, 0.8);
-        }
-
-        body.dark-mode .preview-neumorphism {
-            background-color: #2d3748;
-            box-shadow:
-                6px 6px 12px rgba(0, 0, 0, 0.4),
-                -6px -6px 12px rgba(71, 85, 105, 0.3);
-        }
-
-        /* Colorscape Preview */
-        .preview-colorscape {
-            background: linear-gradient(135deg, #5F43B2 0%, #9659FF 100%);
-            border-radius: 12px;
-            padding: var(--space-sm);
-            color: white;
-        }
-
-        /* Typographic Preview */
-        .preview-typographic {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: var(--space-sm);
-            font-family: 'Inter', sans-serif;
-            background-color: var(--card-color);
-            color: var(--text-color);
-        }
-
-        .preview-typographic .preview-title {
-            position: relative;
-            display: inline-block;
-            margin-bottom: var(--space-sm);
-        }
-
-        .preview-typographic .preview-title::after {
-            content: '';
-            position: absolute;
-            width: 30px;
-            height: 2px;
-            background-color: var(--text-color);
-            bottom: -4px;
-            left: 0;
-        }
-
+        /* Tooltip */
         .tooltip {
             position: relative;
             display: inline-block;
@@ -577,155 +693,6 @@
             opacity: 1;
         }
 
-        .error-message {
-            color: var(--accent-color);
-            font-size: 0.875rem;
-            margin-top: var(--space-xs);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .responsive-hint {
-            display: none;
-            padding: var(--space-md);
-            background-color: var(--primary-light);
-            border-radius: var(--border-radius);
-            margin-bottom: var(--space-md);
-            color: var(--primary-color);
-            text-align: center;
-        }
-
-        @media (max-width: 1023px) {
-            .responsive-hint {
-                display: block;
-            }
-        }
-
-        /* Color theme selector */
-        .color-theme-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: var(--space-md);
-            margin-bottom: var(--space-md);
-        }
-
-        .color-theme {
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            cursor: pointer;
-            transition: all var(--transition-normal);
-            position: relative;
-            background-color: var(--card-color);
-        }
-
-        .color-theme:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .color-theme.selected {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(66, 99, 235, 0.3);
-        }
-
-        .color-theme.selected::after {
-            content: "✓";
-            position: absolute;
-            top: var(--space-xs);
-            right: var(--space-xs);
-            width: 16px;
-            height: 16px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.6rem;
-        }
-
-        .color-preview {
-            height: 24px;
-            display: flex;
-        }
-
-        .color-primary,
-        .color-secondary,
-        .color-accent {
-            flex: 1;
-            height: 100%;
-        }
-
-        .color-theme-name {
-            padding: var(--space-xs);
-            font-size: 0.75rem;
-            text-align: center;
-            font-weight: 500;
-            color: var(--text-color);
-        }
-
-        .color-option-toggle {
-            display: flex;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            margin-bottom: var(--space-md);
-        }
-
-        .color-option-btn {
-            flex: 1;
-            padding: var(--space-xs) var(--space-sm);
-            background: none;
-            border: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all var(--transition-normal);
-            color: var(--text-color);
-        }
-
-        .color-option-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .custom-colors {
-            margin-top: var(--space-md);
-        }
-
-        .tabs-container {
-            margin-bottom: var(--space-md);
-        }
-
-        .tab-buttons {
-            display: flex;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .tab-btn {
-            padding: var(--space-sm) var(--space-md);
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all var(--transition-normal);
-            color: var(--text-color);
-        }
-
-        .tab-btn.active {
-            border-bottom-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .tab-content {
-            padding: var(--space-md) 0;
-        }
-
         /* Footer */
         footer {
             text-align: center;
@@ -751,7 +718,6 @@
             from {
                 opacity: 0;
             }
-
             to {
                 opacity: 1;
             }
@@ -775,6 +741,25 @@
 
         .form-section:nth-child(4) {
             animation-delay: 0.4s;
+        }
+        
+        /* Copy status */
+        .copy-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: var(--space-xs) var(--space-sm);
+            background-color: var(--text-color);
+            color: white;
+            border-radius: var(--border-radius);
+            font-size: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .copy-status.visible {
+            opacity: 1;
         }
 
         /* Mobile optimization */
@@ -818,11 +803,11 @@
                 font-size: 0.9rem;
             }
 
-            .tab-buttons {
+            .tabs {
                 flex-wrap: wrap;
             }
 
-            .tab-btn {
+            .tab {
                 padding: var(--space-xs) var(--space-sm);
             }
         }
@@ -857,6 +842,26 @@
                 min-height: 250px;
             }
         }
+
+        .hidden {
+            display: none;
+        }
+
+        .responsive-hint {
+            display: none;
+            padding: var(--space-md);
+            background-color: var(--primary-light);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--space-md);
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        @media (max-width: 1023px) {
+            .responsive-hint {
+                display: block;
+            }
+        }
     </style>
 </head>
 
@@ -877,6 +882,7 @@
 
         <div class="app-container">
             <div class="form-container">
+                <!-- Section 1: Content Information -->
                 <div class="form-section">
                     <div class="form-section-title">
                         <div class="form-section-number">1</div>
@@ -896,12 +902,29 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="content-focus">Key Focus Areas</label>
-                        <input type="text" id="content-focus"
-                            placeholder="E.g., Data analysis, visual representation, simplified explanation, etc.">
+                        <label>Key Focus Areas</label>
+                        <div class="tags-container" id="focus-tags">
+                            <div class="tag" data-tag="data">Data Analysis</div>
+                            <div class="tag" data-tag="visual">Visual Representation</div>
+                            <div class="tag" data-tag="simple">Simplified Explanation</div>
+                            <div class="tag" data-tag="comparison">Comparison</div>
+                            <div class="tag" data-tag="process">Process Flow</div>
+                            <div class="tag" data-tag="hierarchy">Hierarchy</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="output-language">Output Language</label>
+                        <select id="output-language">
+                            <option value="en">English</option>
+                            <option value="ja">Japanese</option>
+                            <option value="zh">Chinese</option>
+                            <option value="ko">Korean</option>
+                        </select>
                     </div>
                 </div>
 
+                <!-- Section 2: Design Concept -->
                 <div class="form-section">
                     <div class="form-section-title">
                         <div class="form-section-number">2</div>
@@ -909,11 +932,11 @@
                     </div>
 
                     <div class="concept-cards">
-                        <div class="concept-card" data-concept="neumorphism">
+                        <div class="concept-card selected" data-concept="neumorphism">
                             <h3>Fluid Neumorphism</h3>
                             <p>A tactile design with soft shadows and subtle 3D effects. Suitable for elegant, premium
                                 interfaces.</p>
-                            <div class="preview-neumorphism" style="margin-top: 10px;">
+                            <div class="neumorphism-preview" style="margin-top: 10px;">
                                 <div class="preview-title">Preview</div>
                             </div>
                         </div>
@@ -922,7 +945,7 @@
                             <h3>Dynamic Colorscape</h3>
                             <p>Energetic design using vibrant colors, gradients, and spatial depth. Ideal when visual
                                 impact is important.</p>
-                            <div class="preview-colorscape" style="margin-top: 10px;">
+                            <div class="colorscape-preview" style="margin-top: 10px;">
                                 <div class="preview-title">Preview</div>
                             </div>
                         </div>
@@ -931,13 +954,14 @@
                             <h3>Typographic Grid</h3>
                             <p>Minimal design focusing on typography, whitespace, and structural layout. Perfect when
                                 readability and content structure matter.</p>
-                            <div class="preview-typographic" style="margin-top: 10px;">
+                            <div class="typographic-preview" style="margin-top: 10px;">
                                 <div class="preview-title">Preview</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Section 3: Color Scheme -->
                 <div class="form-section">
                     <div class="form-section-title">
                         <div class="form-section-number">3</div>
@@ -1023,6 +1047,7 @@
                     </div>
                 </div>
 
+                <!-- Section 4: Style and Format -->
                 <div class="form-section">
                     <div class="form-section-title">
                         <div class="form-section-number">4</div>
@@ -1042,47 +1067,60 @@
                     <div class="form-group">
                         <label for="output-format">Output Format</label>
                         <select id="output-format">
-                            <option value="html">HTML</option>
-                            <option value="markdown">Markdown</option>
-                            <option value="svg">SVG (for diagrams)</option>
-                            <option value="react">React Component</option>
-                            <option value="drawio">Draw.io Diagram</option>
                             <option value="mermaid">Mermaid Diagram</option>
+                            <option value="html">HTML (with Mermaid)</option>
+                            <option value="markdown">Markdown (with Mermaid)</option>
+                            <option value="markdown-plain">Markdown (Plain)</option>
+                            <option value="react">React Component (with Mermaid)</option>
+                            <option value="svg">SVG (for diagrams)</option>
                         </select>
                     </div>
 
-                    <div class="tabs-container">
-                        <div class="tab-buttons">
-                            <button class="tab-btn active" data-tab="infographic">Infographic</button>
-                            <button class="tab-btn" data-tab="recording">Graphic Recording</button>
+                    <div class="tabs">
+                        <div class="tab active" data-tab="infographic">Infographic</div>
+                        <div class="tab" data-tab="recording">Graphic Recording</div>
+                    </div>
+
+                    <div id="infographic-tab" class="tab-content active">
+                        <div class="form-group">
+                            <label for="infographic-style">Infographic Technique</label>
+                            <select id="infographic-style">
+                                <option value="comparative">Comparative (Data comparison/contrast)</option>
+                                <option value="hierarchical">Hierarchical (Information priority display)</option>
+                                <option value="process">Process (Step-by-step flow)</option>
+                                <option value="statistical">Statistical (Numerical data visualization)</option>
+                                <option value="conceptual">Conceptual (Displaying idea relationships)</option>
+                            </select>
                         </div>
 
-                        <div class="tab-content">
-                            <div id="infographic-tab" class="tab-pane active">
-                                <div class="form-group">
-                                    <label for="infographic-style">Infographic Technique</label>
-                                    <select id="infographic-style">
-                                        <option value="comparative">Comparative (Data comparison/contrast)</option>
-                                        <option value="hierarchical">Hierarchical (Information priority display)
-                                        </option>
-                                        <option value="process">Process (Step-by-step flow)</option>
-                                        <option value="statistical">Statistical (Numerical data visualization)</option>
-                                        <option value="conceptual">Conceptual (Displaying idea relationships)</option>
-                                    </select>
-                                </div>
+                        <div class="preview-container">
+                            <div class="preview-header">
+                                <div class="preview-title">Preview</div>
                             </div>
+                            <div class="preview-content">
+                                <div class="mermaid-container" id="infographic-preview"></div>
+                            </div>
+                        </div>
+                    </div>
 
-                            <div id="recording-tab" class="tab-pane hidden">
-                                <div class="form-group">
-                                    <label for="recording-style">Graphic Recording Technique</label>
-                                    <select id="recording-style">
-                                        <option value="timeline">Timeline (Temporal progression)</option>
-                                        <option value="mindmap">Mind Map (Radial relationship)</option>
-                                        <option value="journey">Journey (Experience process)</option>
-                                        <option value="quadrant">Quadrant (Classification on 2 axes)</option>
-                                        <option value="modal">Modal (Possibility/necessity expression)</option>
-                                    </select>
-                                </div>
+                    <div id="recording-tab" class="tab-content">
+                        <div class="form-group">
+                            <label for="recording-style">Graphic Recording Technique</label>
+                            <select id="recording-style">
+                                <option value="timeline">Timeline (Temporal progression)</option>
+                                <option value="mindmap">Mind Map (Radial relationship)</option>
+                                <option value="journey">Journey (Experience process)</option>
+                                <option value="quadrant">Quadrant (Classification on 2 axes)</option>
+                                <option value="modal">Modal (Possibility/necessity expression)</option>
+                            </select>
+                        </div>
+
+                        <div class="preview-container">
+                            <div class="preview-header">
+                                <div class="preview-title">Preview</div>
+                            </div>
+                            <div class="preview-content">
+                                <div class="mermaid-container" id="recording-preview"></div>
                             </div>
                         </div>
                     </div>
@@ -1106,8 +1144,8 @@
                             </svg>
                         </button>
                     </div>
-                    <div id="result-content" class="result-content">The generated prompt will appear here. Fill out the form on the left and click "Generate Prompt" button.
-                    </div>
+                    <div id="result" class="result-content">The generated prompt will appear here. Fill out the form on the left and click "Generate Prompt" button.</div>
+                    <div id="copy-status" class="copy-status">Copied!</div>
                 </div>
             </div>
         </div>
@@ -1119,178 +1157,409 @@
         </p>
     </footer>
 
+    <div id="toast" class="toast">Prompt copied to clipboard!</div>
+
+    <!-- Mermaid JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Dark mode toggle
-            const themeToggle = document.getElementById('theme-toggle');
-            const themeIcon = themeToggle.querySelector('i');
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
+            securityLevel: 'loose',
+            fontFamily: 'var(--font-sans)'
+        });
 
-            themeToggle.addEventListener('click', function () {
-                document.body.classList.toggle('dark-mode');
+        // Color themes
+        const colorThemes = {
+            modern: {
+                primary: '#4263EB',
+                secondary: '#12B981',
+                accent: '#F97316'
+            },
+            classic: {
+                primary: '#8B5A2B',
+                secondary: '#D4AF37',
+                accent: '#7D3C3C'
+            },
+            vivid: {
+                primary: '#FF3366',
+                secondary: '#33CCFF',
+                accent: '#FFCC00'
+            },
+            monochrome: {
+                primary: '#333333',
+                secondary: '#666666',
+                accent: '#999999'
+            },
+            pastel: {
+                primary: '#FFAAA7',
+                secondary: '#A8E6CF',
+                accent: '#FFD3B6'
+            },
+            corporate: {
+                primary: '#0A2463',
+                secondary: '#3E92CC',
+                accent: '#D8315B'
+            }
+        };
 
-                if (document.body.classList.contains('dark-mode')) {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
+        // App state
+        let state = {
+            selectedTags: [],
+            selectedConcept: 'neumorphism',
+            selectedColorOption: 'theme',
+            selectedTheme: 'modern',
+            activeTab: 'infographic',
+            primaryColor: '#4263EB',
+            secondaryColor: '#12B981',
+            accentColor: '#F97316'
+        };
+
+        // DOM Elements
+        const themeToggle = document.getElementById('theme-toggle');
+        const colorOptions = document.querySelectorAll('.color-option-btn');
+        const themeSelector = document.getElementById('theme-selector');
+        const customColors = document.getElementById('custom-colors');
+        const themeItems = document.querySelectorAll('.color-theme');
+        const focusTags = document.querySelectorAll('#focus-tags .tag');
+        const conceptCards = document.querySelectorAll('.concept-card');
+        const tabs = document.querySelectorAll('.tab');
+        const generateBtn = document.getElementById('generate-btn');
+        const result = document.getElementById('result');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyStatus = document.getElementById('copy-status');
+        const toast = document.getElementById('toast');
+        const infographicPreview = document.getElementById('infographic-preview');
+        const recordingPreview = document.getElementById('recording-preview');
+        const infographicStyle = document.getElementById('infographic-style');
+        const recordingStyle = document.getElementById('recording-style');
+
+        // Theme toggle
+        themeToggle.addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+            
+            // Update Mermaid theme
+            mermaid.initialize({
+                theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default'
+            });
+            
+            // Re-render previews
+            updateMermaidPreviews();
+        });
+
+        // Color option toggle
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                colorOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                
+                state.selectedColorOption = option.dataset.option;
+                
+                if (state.selectedColorOption === 'theme') {
+                    themeSelector.classList.remove('hidden');
+                    customColors.classList.add('hidden');
+                    
+                    // Update colors from theme
+                    updateColorsFromTheme(state.selectedTheme);
                 } else {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
+                    themeSelector.classList.add('hidden');
+                    customColors.classList.remove('hidden');
+                    
+                    // Update colors from custom inputs
+                    state.primaryColor = document.getElementById('primary-color').value;
+                    state.secondaryColor = document.getElementById('secondary-color').value;
+                    state.accentColor = document.getElementById('accent-color').value;
                 }
+                
+                updateMermaidPreviews();
             });
+        });
 
-            // Concept card selection
-            const conceptCards = document.querySelectorAll('.concept-card');
-            let selectedConcept = null;
-
-            conceptCards.forEach(card => {
-                card.addEventListener('click', () => {
-                    conceptCards.forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    selectedConcept = card.dataset.concept;
-                });
+        // Theme selection
+        themeItems.forEach(theme => {
+            theme.addEventListener('click', () => {
+                themeItems.forEach(t => t.classList.remove('selected'));
+                theme.classList.add('selected');
+                
+                state.selectedTheme = theme.dataset.theme;
+                updateColorsFromTheme(state.selectedTheme);
+                updateMermaidPreviews();
             });
+        });
 
-            // Color option toggle
-            const colorOptionBtns = document.querySelectorAll('.color-option-btn');
-            const themeSelector = document.getElementById('theme-selector');
-            const customColors = document.getElementById('custom-colors');
+        // Update colors from theme
+        function updateColorsFromTheme(themeName) {
+            const theme = colorThemes[themeName];
+            if (theme) {
+                state.primaryColor = theme.primary;
+                state.secondaryColor = theme.secondary;
+                state.accentColor = theme.accent;
+                
+                // Update custom color inputs as well
+                document.getElementById('primary-color').value = theme.primary;
+                document.getElementById('secondary-color').value = theme.secondary;
+                document.getElementById('accent-color').value = theme.accent;
+            }
+        }
 
-            colorOptionBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    colorOptionBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
+        // Custom color inputs
+        document.getElementById('primary-color').addEventListener('input', (e) => {
+            state.primaryColor = e.target.value;
+            updateMermaidPreviews();
+        });
+        
+        document.getElementById('secondary-color').addEventListener('input', (e) => {
+            state.secondaryColor = e.target.value;
+            updateMermaidPreviews();
+        });
+        
+        document.getElementById('accent-color').addEventListener('input', (e) => {
+            state.accentColor = e.target.value;
+            updateMermaidPreviews();
+        });
 
-                    const option = btn.dataset.option;
-                    if (option === 'theme') {
-                        themeSelector.classList.remove('hidden');
-                        customColors.classList.add('hidden');
-                    } else {
-                        themeSelector.classList.add('hidden');
-                        customColors.classList.remove('hidden');
+        // Focus tags
+        focusTags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                tag.classList.toggle('selected');
+                const tagId = tag.dataset.tag;
+                
+                if (tag.classList.contains('selected')) {
+                    if (!state.selectedTags.includes(tagId)) {
+                        state.selectedTags.push(tagId);
                     }
-                });
-            });
-
-            // Color theme selection
-            const colorThemes = document.querySelectorAll('.color-theme');
-            let selectedTheme = 'modern';
-
-            colorThemes.forEach(theme => {
-                theme.addEventListener('click', () => {
-                    colorThemes.forEach(t => t.classList.remove('selected'));
-                    theme.classList.add('selected');
-                    selectedTheme = theme.dataset.theme;
-                });
-            });
-
-            // Tab switching
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            const tabPanes = document.querySelectorAll('.tab-pane');
-
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-
-                    const tab = btn.dataset.tab;
-                    tabPanes.forEach(pane => {
-                        pane.classList.add('hidden');
-                        if (pane.id === `${tab}-tab`) {
-                            pane.classList.remove('hidden');
-                        }
-                    });
-                });
-            });
-
-            // Color theme definitions
-            const colorThemeMap = {
-                modern: {
-                    primary: '#4263EB',
-                    secondary: '#12B981',
-                    accent: '#F97316'
-                },
-                classic: {
-                    primary: '#8B5A2B',
-                    secondary: '#D4AF37',
-                    accent: '#7D3C3C'
-                },
-                vivid: {
-                    primary: '#FF3366',
-                    secondary: '#33CCFF',
-                    accent: '#FFCC00'
-                },
-                monochrome: {
-                    primary: '#333333',
-                    secondary: '#666666',
-                    accent: '#999999'
-                },
-                pastel: {
-                    primary: '#FFAAA7',
-                    secondary: '#A8E6CF',
-                    accent: '#FFD3B6'
-                },
-                corporate: {
-                    primary: '#0A2463',
-                    secondary: '#3E92CC',
-                    accent: '#D8315B'
-                }
-            };
-
-            // Prompt generation functionality
-            const generateBtn = document.getElementById('generate-btn');
-            const resultContent = document.getElementById('result-content');
-
-            generateBtn.addEventListener('click', () => {
-                const topic = document.getElementById('topic').value.trim();
-                const contentDescription = document.getElementById('content-description').value.trim();
-                const contentFocus = document.getElementById('content-focus').value.trim();
-                const fontStyle = document.getElementById('font-style').value;
-                const outputFormat = document.getElementById('output-format').value;
-                const infographicStyle = document.getElementById('infographic-style').value;
-                const recordingStyle = document.getElementById('recording-style').value;
-
-                // Get color values (themes or custom)
-                let primaryColor, secondaryColor, accentColor;
-                const isCustomColor = document.querySelector('.color-option-btn[data-option="custom"]').classList.contains('active');
-
-                if (isCustomColor) {
-                    primaryColor = document.getElementById('primary-color').value;
-                    secondaryColor = document.getElementById('secondary-color').value;
-                    accentColor = document.getElementById('accent-color').value;
                 } else {
-                    const theme = colorThemeMap[selectedTheme];
-                    primaryColor = theme.primary;
-                    secondaryColor = theme.secondary;
-                    accentColor = theme.accent;
+                    state.selectedTags = state.selectedTags.filter(id => id !== tagId);
                 }
+            });
+        });
 
-                if (!topic || !contentDescription || !selectedConcept) {
-                    alert('Main theme, detailed description, and design concept are required fields.');
-                    return;
+        // Concept cards
+        conceptCards.forEach(card => {
+            card.addEventListener('click', () => {
+                conceptCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                state.selectedConcept = card.dataset.concept;
+            });
+        });
+
+        // Tabs
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const tabId = tab.dataset.tab;
+                state.activeTab = tabId;
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                updateMermaidPreviews();
+            });
+        });
+
+        // Infographic and recording style changes
+        infographicStyle.addEventListener('change', updateMermaidPreviews);
+        recordingStyle.addEventListener('change', updateMermaidPreviews);
+
+        // Generate Mermaid diagram code
+        function getMermaidDiagram() {
+            if (state.activeTab === 'infographic') {
+                const style = infographicStyle.value;
+                
+                switch (style) {
+                    case 'comparative':
+                        return `graph LR
+    A[Option A] --> C{Comparison}
+    B[Option B] --> C
+    C --> D[Pros/Cons]
+    C --> E[Features]
+    style A fill:${state.primaryColor},color:white
+    style B fill:${state.secondaryColor},color:white
+    style C fill:${state.accentColor},color:white`;
+                    case 'hierarchical':
+                        return `graph TD
+    A[Main Concept] --> B[Sub-Concept 1]
+    A --> C[Sub-Concept 2]
+    A --> D[Sub-Concept 3]
+    B --> E[Detail 1.1]
+    B --> F[Detail 1.2]
+    style A fill:${state.primaryColor},color:white
+    style B fill:${state.secondaryColor},color:white
+    style C fill:${state.secondaryColor},color:white
+    style D fill:${state.secondaryColor},color:white`;
+                    case 'process':
+                        return `graph LR
+    A[Start] --> B[Process 1]
+    B --> C[Process 2]
+    C --> D[Process 3]
+    D --> E[End]
+    style A fill:${state.primaryColor},color:white
+    style E fill:${state.accentColor},color:white`;
+                    case 'statistical':
+                        return `pie
+    title Key Distribution
+    "Category A" : 25
+    "Category B" : 40
+    "Category C" : 35`;
+                    case 'conceptual':
+                        return `graph TD
+    A[Central Concept] --- B[Related Concept 1]
+    A --- C[Related Concept 2]
+    A --- D[Related Concept 3]
+    B --- E[Sub-concept 1.1]
+    C --- F[Sub-concept 2.1]
+    style A fill:${state.primaryColor},color:white`;
+                    default:
+                        return `graph TD
+    A[Concept] --> B[Details]`;
                 }
-
-                // Prompt templates based on design concept
-                let promptTemplate = '';
-                let fontFamily = '';
-
-                // Font style settings
-                switch (fontStyle) {
-                    case 'modern':
-                        fontFamily = 'Inter, system-ui, sans-serif';
-                        break;
-                    case 'classic':
-                        fontFamily = 'Georgia, serif';
-                        break;
-                    case 'creative':
-                        fontFamily = 'Montserrat, Avenir, sans-serif';
-                        break;
-                    case 'minimal':
-                        fontFamily = 'SF Mono, Consolas, monospace';
-                        break;
+            } else {
+                const style = recordingStyle.value;
+                
+                switch (style) {
+                    case 'timeline':
+                        return `gantt
+    title Timeline
+    dateFormat YYYY-MM-DD
+    section Phase 1
+    Task 1 :a1, 2023-01-01, 30d
+    Task 2 :a2, after a1, 20d
+    section Phase 2
+    Task 3 :a3, after a2, 25d
+    Task 4 :a4, after a3, 15d`;
+                    case 'mindmap':
+                        return `mindmap
+    root((Central Topic))
+      Idea 1
+        Sub-idea 1.1
+        Sub-idea 1.2
+      Idea 2
+        Sub-idea 2.1
+      Idea 3
+        Sub-idea 3.1
+        Sub-idea 3.2`;
+                    case 'journey':
+                        return `graph LR
+    A[Starting Point] --> B[Checkpoint 1]
+    B --> C[Checkpoint 2]
+    C --> D[Checkpoint 3]
+    D --> E[Destination]
+    style A fill:${state.primaryColor},color:white
+    style E fill:${state.accentColor},color:white`;
+                    case 'quadrant':
+                        return `quadrantChart
+    title Quadrant Chart
+    x-axis Low Impact --> High Impact
+    y-axis Low Effort --> High Effort
+    quadrant-1 Strategic
+    quadrant-2 Quick Wins
+    quadrant-3 Time Sinks
+    quadrant-4 Thankless Tasks
+    Item 1: [0.6, 0.7]
+    Item 2: [0.4, 0.3]
+    Item 3: [0.8, 0.2]
+    Item 4: [0.2, 0.8]`;
+                    case 'modal':
+                        return `graph TD
+    A[Start] --> B{Decision Point}
+    B -->|Option 1| C[Outcome 1]
+    B -->|Option 2| D[Outcome 2]
+    B -->|Option 3| E[Outcome 3]
+    style B fill:${state.accentColor},color:white`;
+                    default:
+                        return `graph TD
+    A[Start] --> B[End]`;
                 }
+            }
+        }
 
-                // Infographic style settings
-                let infographicDesc = '';
-                switch (infographicStyle) {
+        // Update Mermaid previews
+        function updateMermaidPreviews() {
+            const mermaidCode = getMermaidDiagram();
+            const container = state.activeTab === 'infographic' ? infographicPreview : recordingPreview;
+            
+            try {
+                // Clear previous content
+                container.innerHTML = '';
+                
+                // Render Mermaid diagram
+                mermaid.render(`mermaid-${Date.now()}`, mermaidCode)
+                    .then(result => {
+                        container.innerHTML = result.svg;
+                    })
+                    .catch(error => {
+                        container.innerHTML = `
+                            <div style="color: #e53e3e; padding: 1rem; background-color: #fee2e2; border-radius: 0.5rem;">
+                                Error: Failed to render diagram
+                            </div>
+                            <pre style="margin-top: 1rem; padding: 1rem; background-color: #f8f8f8; border-radius: 0.5rem; overflow-x: auto;">${mermaidCode}</pre>
+                        `;
+                        console.error('Mermaid rendering error:', error);
+                    });
+            } catch (error) {
+                container.innerHTML = `
+                    <div style="color: #e53e3e; padding: 1rem; background-color: #fee2e2; border-radius: 0.5rem;">
+                        Error: Failed to render diagram
+                    </div>
+                    <pre style="margin-top: 1rem; padding: 1rem; background-color: #f8f8f8; border-radius: 0.5rem; overflow-x: auto;">${mermaidCode}</pre>
+                `;
+                console.error('Mermaid rendering error:', error);
+            }
+        }
+
+        // Initialize previews
+        updateMermaidPreviews();
+
+        // Generate prompt
+        generateBtn.addEventListener('click', () => {
+            const topic = document.getElementById('topic').value.trim();
+            const contentDescription = document.getElementById('content-description').value.trim();
+            const fontStyle = document.getElementById('font-style').value;
+            const outputFormat = document.getElementById('output-format').value;
+            const outputLanguage = document.getElementById('output-language').value;
+            
+            if (!topic || !contentDescription) {
+                showToast('Main theme and detailed description are required fields');
+                return;
+            }
+            
+            // Get selected focus tags text
+            const selectedTagLabels = Array.from(document.querySelectorAll('#focus-tags .tag.selected'))
+                .map(tag => tag.textContent)
+                .join(', ');
+            
+            // Font style settings
+            let fontFamily = '';
+            switch (fontStyle) {
+                case 'modern':
+                    fontFamily = 'Inter, system-ui, sans-serif';
+                    break;
+                case 'classic':
+                    fontFamily = 'Georgia, serif';
+                    break;
+                case 'creative':
+                    fontFamily = 'Montserrat, Avenir, sans-serif';
+                    break;
+                case 'minimal':
+                    fontFamily = 'SF Mono, Consolas, monospace';
+                    break;
+            }
+            
+            // Infographic style settings
+            let infographicDesc = '';
+            if (state.activeTab === 'infographic') {
+                switch (infographicStyle.value) {
                     case 'comparative':
                         infographicDesc = 'Use comparative analysis techniques to visually contrast different data points and highlight key differences.';
                         break;
@@ -1307,10 +1576,12 @@
                         infographicDesc = 'Develop conceptual diagrams that illustrate relationships between ideas, showing connections and influences between different elements.';
                         break;
                 }
-
-                // Graphic recording style settings
-                let recordingDesc = '';
-                switch (recordingStyle) {
+            }
+            
+            // Graphic recording style settings
+            let recordingDesc = '';
+            if (state.activeTab === 'recording') {
+                switch (recordingStyle.value) {
                     case 'timeline':
                         recordingDesc = 'Use timeline-based visualization to show temporal progression and development of concepts over time.';
                         break;
@@ -1327,119 +1598,155 @@
                         recordingDesc = 'Apply modal logic visualization to distinguish between necessities, possibilities, and contingencies in the content.';
                         break;
                 }
+            }
+            
+            // Design concept specific styles and settings
+            let designStyle = '';
+            let colorApproach = '';
+            let interactions = '';
+            
+            switch (state.selectedConcept) {
+                case 'neumorphism':
+                    designStyle = 'Implement a Fluid Neumorphism design with soft shadows and subtle 3D effects for a tactile, premium feel.';
+                    colorApproach = `Use a light neutral background (#F0F2F9) with ${state.primaryColor} as the primary accent, ${state.secondaryColor} as the secondary accent, and ${state.accentColor} as tertiary accent. Apply soft shadows to create depth.`;
+                    interactions = 'Create subtle animations for interactive elements that provide feedback through a pressed/elevated feel.';
+                    break;
+                case 'colorscape':
+                    designStyle = 'Apply a Dynamic Colorscape design with vibrant colors, gradients, and spatial depth to create visual energy.';
+                    colorApproach = `Use gradients combining ${state.primaryColor} with complementary colors. Add ${state.secondaryColor} as a contrasting accent and ${state.accentColor} for highlights. Maintain a clean white (#FFFFFF) background to make colors pop.`;
+                    interactions = 'Implement energetic feedback through color shifts, scaling effects, and smooth transitions on interactive elements.';
+                    break;
+                case 'typographic':
+                    designStyle = 'Create a Typographic Grid design focusing on typography, whitespace, and structural layout for clarity and focus.';
+                    colorApproach = `Utilize a limited color palette with ${state.primaryColor} as the primary accent, ${state.secondaryColor} as a minimal secondary accent, and ${state.accentColor} used sparingly for highlights. Maintain high contrast with clean backgrounds.`;
+                    interactions = 'Keep interactions subtle and focused on readability, with minimal animations and clear state changes.';
+                    break;
+            }
+            
+            // Output format specific instructions with enhanced Mermaid support
+            let formatInstructions = '';
+            switch (outputFormat) {
+                case 'mermaid':
+                    formatInstructions = `
+## Output Format: Mermaid Diagram
+- Create a diagram that fits well within a card-style UI component (ideal dimensions: 600px width, 400px height)
+- Use Mermaid syntax to create clear, concise diagrams with proper node spacing
+- Use ${state.primaryColor} for primary elements, ${state.secondaryColor} for secondary elements, and ${state.accentColor} for highlights
+- Keep labels brief and focused - aim for 1-3 words per node where possible
+- Ensure the diagram is not too dense - 5-15 nodes is optimal for readability
+- Add styling to nodes for better visual hierarchy
+- Use the following recommended Mermaid diagram type: ${state.activeTab === 'infographic' ? 
+                    (infographicStyle.value === 'process' ? 'flowchart LR (left-to-right flowchart)' : 
+                    infographicStyle.value === 'hierarchical' ? 'flowchart TD (top-down flowchart)' : 
+                    infographicStyle.value === 'statistical' ? 'pie chart or bar chart' : 
+                    infographicStyle.value === 'comparative' ? 'flowchart LR with comparisons' : 
+                    'flowchart TD with relationship links') : 
+                    (recordingStyle.value === 'timeline' ? 'gantt or timeline' : 
+                    recordingStyle.value === 'mindmap' ? 'mindmap' : 
+                    recordingStyle.value === 'journey' ? 'flowchart LR with journey points' : 
+                    recordingStyle.value === 'quadrant' ? 'quadrant chart' : 
+                    'flowchart TD with decision points')}
+- Example diagram structure based on selected style:
 
-                // Design concept specific styles and settings
-                let designStyle = '';
-                let colorApproach = '';
-                let interactions = '';
-
-                switch (selectedConcept) {
-                    case 'neumorphism':
-                        designStyle = 'Implement a Fluid Neumorphism design with soft shadows and subtle 3D effects for a tactile, premium feel.';
-                        colorApproach = `Use a light neutral background (#F0F2F9) with ${primaryColor} as the primary accent, ${secondaryColor} as the secondary accent, and ${accentColor} as tertiary accent. Apply soft shadows to create depth.`;
-                        interactions = 'Create subtle animations for interactive elements that provide feedback through a pressed/elevated feel.';
-                        break;
-
-                    case 'colorscape':
-                        designStyle = 'Apply a Dynamic Colorscape design with vibrant colors, gradients, and spatial depth to create visual energy.';
-                        colorApproach = `Use gradients combining ${primaryColor} with complementary colors. Add ${secondaryColor} as a contrasting accent and ${accentColor} for highlights. Maintain a clean white (#FFFFFF) background to make colors pop.`;
-                        interactions = 'Implement energetic feedback through color shifts, scaling effects, and smooth transitions on interactive elements.';
-                        break;
-
-                    case 'typographic':
-                        designStyle = 'Create a Typographic Grid design focusing on typography, whitespace, and structural layout for clarity and focus.';
-                        colorApproach = `Utilize a limited color palette with ${primaryColor} as the primary accent, ${secondaryColor} as a minimal secondary accent, and ${accentColor} used sparingly for highlights. Maintain high contrast with clean backgrounds.`;
-                        interactions = 'Keep interactions subtle and focused on readability, with minimal animations and clear state changes.';
-                        break;
-                }
-
-                // Output format specific instructions
-                let formatInstructions = '';
-                switch (outputFormat) {
-                    case 'html':
-                        formatInstructions = `
-## Output Format: HTML
+\`\`\`mermaid
+${getMermaidDiagram()}
+\`\`\``;
+                    break;
+                case 'html':
+                    formatInstructions = `
+## Output Format: HTML with Embedded Mermaid
 - Create a valid HTML5 document with proper semantic structure
 - Use CSS for styling, preferably with CSS variables for color themes
-- Ensure responsive design with appropriate media queries
-- Optimize for performance by minimizing unnecessary markup
-- Follow accessibility best practices (ARIA labels, semantic HTML, etc.)`;
-                        break;
+- Include Mermaid.js library (version 10.6.1 or newer) to render diagrams
+- Structure the content in card-based components with responsive design
+- Use the following Mermaid diagram in a "mermaid" class div:
 
-                    case 'markdown':
-                        formatInstructions = `
-## Output Format: Markdown
+\`\`\`mermaid
+${getMermaidDiagram()}
+\`\`\``;
+                    break;
+                case 'markdown':
+                    formatInstructions = `
+## Output Format: Markdown with Mermaid
 - Use standard Markdown syntax for consistent rendering across platforms
-- Utilize headings, lists, tables, and code blocks appropriately
-- Include HTML where necessary for advanced formatting needs
-- Maintain a clean, readable document structure
-- Use proper linking and reference techniques`;
-                        break;
+- Include Mermaid diagram code blocks for visualization
+- Structure content with clear hierarchy and card-like sections
+- Keep diagram dimensions appropriate for card UI components
+- Example Mermaid diagram to include:
 
-                    case 'svg':
-                        formatInstructions = `
-## Output Format: SVG
-- Create a vector-based visualization with clear structure
-- Define viewBox for proper scaling across different screen sizes
-- Use appropriate SVG elements (paths, circles, rectangles, text, etc.)
-- Implement a consistent color palette and styling
-- Consider adding subtle animations where appropriate
-- Ensure text elements are readable and properly positioned`;
-                        break;
+\`\`\`mermaid
+${getMermaidDiagram()}
+\`\`\``;
+                    break;
+                case 'markdown-plain':
+                    formatInstructions = `
+## Output Format: Markdown (Plain)
+- Use clean, standard Markdown syntax for consistent rendering across platforms
+- Create a well-structured document with proper heading hierarchy (h1, h2, h3)
+- Utilize lists, tables, blockquotes, and code blocks appropriately
+- Include emphasis and strong formatting for key concepts
+- Create clear section divisions with horizontal rules where appropriate
+- Use links to connect related concepts within the document
+- Structure content for optimal readability with appropriate whitespace
+- Focus on creating a document that's easy to navigate and scan`;
+                    break;
+                case 'react':
+                    formatInstructions = `
+## Output Format: React Component with Mermaid
+- Create a functional React component that renders a card-based UI
+- Use a Mermaid rendering library like mermaid-react
+- Implement styled components for consistent visual styling
+- Ensure responsive design for different viewport sizes
+- Include the following Mermaid diagram definition:
 
-                    case 'react':
-                        formatInstructions = `
-## Output Format: React Component
-- Create a functional React component with modern practices
-- Use React hooks for state management where needed
-- Implement styled-components or CSS modules for styling
-- Ensure responsive design principles are followed
-- Break down complex UI into smaller, reusable components
-- Add appropriate PropTypes or TypeScript interfaces
-- Consider performance optimization where applicable`;
-                        break;
+\`\`\`jsx
+const diagram = \`
+${getMermaidDiagram()}
+\`;
+\`\`\``;
+                    break;
+                default:
+                    formatInstructions = `
+## Output Format: ${outputFormat}
+- Include Mermaid diagrams where appropriate to illustrate concepts
+- Maintain a card-based UI approach for content organization
+- Ensure diagrams fit well within card containers without overflow
+- Example diagram to incorporate:
 
-                    case 'drawio':
-                        formatInstructions = `
-## Output Format: Draw.io Diagram
-- Design a clear, structured diagram suitable for Draw.io
-- Organize elements in a logical flow with appropriate connectors
-- Use consistent shapes and styling for similar elements
-- Include color-coding for different categories or states
-- Add text labels that are concise and descriptive
-- Consider providing export-ready XML structure where possible`;
-                        break;
-
-                    case 'mermaid':
-                        formatInstructions = `
-## Output Format: Mermaid Diagram
-- Follow Mermaid syntax conventions for the appropriate diagram type
-- Choose the most suitable diagram type (flowchart, sequence, class, etc.)
-- Maintain a logical flow and clear relationships between nodes
-- Use concise labels that communicate essential information
-- Implement consistent styling and color-coding
-- Keep the diagram focused and avoid unnecessary complexity`;
-                        break;
-                }
-
-                // Final prompt template generation
-                promptTemplate = `# Layout and Style Instructions for "${topic}"
+\`\`\`mermaid
+${getMermaidDiagram()}
+\`\`\``;
+            }
+            
+            // Language-specific instructions
+            const languageOptions = {
+                en: 'English',
+                ja: 'Japanese',
+                zh: 'Chinese',
+                ko: 'Korean'
+            };
+            
+            const langInstructions = outputLanguage !== 'en' ? 
+                `\n\n## Language\nOutput should be in ${languageOptions[outputLanguage]}.` : '';
+                
+            // Final prompt template generation
+            const promptTemplate = `# Layout and Style Instructions for "${topic}"
 
 Create a comprehensive explanation about ${topic} with the following design approach:
 
 ## Content Requirements
 ${contentDescription}
 
-Focus especially on: ${contentFocus || "Clear, detailed explanations"}
+Focus especially on: ${selectedTagLabels || "Clear, detailed explanations"}
 
-## Design Concept: ${selectedConcept === 'neumorphism' ? 'Fluid Neumorphism' : selectedConcept === 'colorscape' ? 'Dynamic Colorscape' : 'Typographic Grid'}
+## Design Concept: ${state.selectedConcept === 'neumorphism' ? 'Fluid Neumorphism' : state.selectedConcept === 'colorscape' ? 'Dynamic Colorscape' : 'Typographic Grid'}
 ${designStyle}
 
 ## Visual Structure
-- Create a clean, organized layout with a multi-column grid (3-5 columns depending on content density)
+- Create a clean, organized layout with card-based UI components
 - Implement a compact header with in-page navigation links to major sections
-- Use clear section dividers and visual landmarks to guide the reader
-- Adapt layout responsively for different screen sizes
+- Ensure all diagrams fit properly within card containers without overflow
+- Design for responsiveness and readability across different screen sizes
 
 ## Typography
 - Use ${fontFamily} for consistent readability
@@ -1464,45 +1771,60 @@ ${colorApproach}
 
 ## Interactive Considerations
 ${interactions}
-${formatInstructions}
+${formatInstructions}${langInstructions}
 
-Remember to prioritize clarity, readability, and information hierarchy throughout the entire explanation.`;
+Remember to prioritize clarity, readability, and information hierarchy throughout the entire explanation. All diagrams should fit well within card UI components for a clean, consistent presentation.`;
+            
+            // Set result with animation
+            result.style.opacity = '0';
+            setTimeout(() => {
+                result.textContent = promptTemplate;
+                result.style.opacity = '1';
+            }, 300);
+        });
 
-                // Display result (with animation effect)
-                resultContent.style.opacity = '0';
-                setTimeout(() => {
-                    resultContent.textContent = promptTemplate;
-                    resultContent.style.opacity = '1';
-                }, 300);
-            });
+        // Copy to clipboard
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(result.textContent)
+                .then(() => {
+                    // Show copy status
+                    copyStatus.classList.add('visible');
+                    
+                    // Show toast
+                    toast.classList.add('active');
+                    
+                    setTimeout(() => {
+                        copyStatus.classList.remove('visible');
+                    }, 2000);
+                    
+                    setTimeout(() => {
+                        toast.classList.remove('active');
+                    }, 3000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy to clipboard:', err);
+                    alert('Copy failed. Check your permissions.');
+                });
+        });
 
-            // Copy functionality
-            const copyBtn = document.getElementById('copy-btn');
+        // Show toast notification
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('active');
+            
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
 
-            copyBtn.addEventListener('click', () => {
-                const resultText = resultContent.textContent;
-
-                navigator.clipboard.writeText(resultText)
-                    .then(() => {
-                        // Success handler
-                        const originalText = copyBtn.innerHTML;
-                        copyBtn.textContent = 'Copied!';
-
-                        setTimeout(() => {
-                            copyBtn.innerHTML = originalText;
-                        }, 2000);
-                    })
-                    .catch(err => {
-                        console.error('Failed to copy text: ', err);
-                        alert('Copy failed.');
-                    });
-            });
-
-            // Initial selection setup
-            document.querySelector('.concept-card[data-concept="neumorphism"]').click();
-            document.querySelector('.color-theme[data-theme="modern"]').click();
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial colors
+            updateColorsFromTheme('modern');
+            
+            // Initialize Mermaid previews
+            updateMermaidPreviews();
         });
     </script>
 </body>
-
 </html>
