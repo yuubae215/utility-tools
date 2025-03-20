@@ -4,7 +4,7 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Active-brightgreen)](https://yuubae215.github.io/utility-tools/)
 ![Made with](https://img.shields.io/badge/Made%20with-❤️-red)
 
-A collection of elegant, modern web-based tools to enhance your design and development workflow. Simplify complex tasks with intuitive UI and efficient functionality.
+A collection of elegant, modern web-based tools specifically designed to enhance your interaction with Large Language Models (LLMs). Supercharge your AI workflow with intuitive interfaces and powerful functionality.
 
 **🔗 Live Demo: [https://yuubae215.github.io/utility-tools/](https://yuubae215.github.io/utility-tools/)**
 
@@ -13,7 +13,7 @@ A collection of elegant, modern web-based tools to enhance your design and devel
 ## 🛠️ Tools Available
 
 ### 📂 File Binder
-Combine multiple files into a single markdown document with automatic file structure visualization. Perfect for documentation, code reviews, and project sharing.
+Combine multiple files into a single markdown document with automatic file structure visualization. Specifically designed for LLM prompting - synthesize text from multiple files and folder structures directly into your LLM prompts for maximum efficiency.
 
 **Key Features:**
 - Drag & drop interface for files and folders
@@ -24,15 +24,24 @@ Combine multiple files into a single markdown document with automatic file struc
 - Dark/light mode toggle
 
 ### 📝 Layout & Style Prompt Generator
-Generate effective design instruction prompts with a few clicks. Ideal for designers, developers, and project managers who need to communicate design requirements.
+Create powerful design instruction prompts that control the output design and layout of LLM-generated content. Easily generate visually appealing HTML, Markdown, SVG, and Mermaid diagrams by simply selecting templates and references.
 
 **Key Features:**
 - Interactive prompt building interface
 - Multiple design concept templates (Neumorphism, Dynamic Colorscape, Typographic Grid)
 - Color theme selection with custom options
-- Visualization previews with Mermaid diagrams
+- Infographic and Graphic Record concepts for visually organized information
+- Mermaid diagram integration for visual, elemental, relational, and chronological information organization
 - Support for various output formats (Markdown, HTML, React)
 - Multi-language support (English, Japanese, Chinese, Korean)
+
+## 💡 Design Concept
+
+The Utility Tools Portal is built specifically to enhance your interaction with Large Language Models (LLMs):
+
+- **File Binder** is designed to synthesize text from multiple files into direct LLM prompts. By maintaining folder structures and combining multiple files, it creates extremely efficient prompts that provide complete context to the LLM in a single input.
+
+- **Prompt Generator** helps control the design and layout of LLM-generated outputs. Users can easily create sophisticated, visually appealing documents by selecting from templates and references. With Mermaid diagram integration, the tool enables the creation of documents that organize information visually, elementally, relationally, and chronologically.
 
 ## ✨ Features
 
@@ -42,6 +51,8 @@ Generate effective design instruction prompts with a few clicks. Ideal for desig
 - 🌐 **Offline Capable**: Most tools function without internet once loaded
 - 🔄 **Modern UI**: Clean, intuitive interface with smooth animations
 - 🌈 **Accessibility**: Designed with accessibility in mind
+- 🧠 **LLM Optimized**: Specifically designed to enhance LLM workflows
+- 🔄 **Bi-directional Workflow**: Helps with both input (prompts) and output (design) phases of LLM usage
 
 ## 📚 Documentation
 
