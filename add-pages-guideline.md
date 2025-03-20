@@ -1,78 +1,80 @@
-# 設計支援ツールポータル - ページ追加ガイドライン
+# Design Support Tools Portal - Page Addition Guidelines
 
-このガイドラインでは、設計支援ツールポータルに新しいツールページを追加する方法について説明します。ガイドラインに従うことで、一貫したデザインとユーザーエクスペリエンスを維持できます。
+This guideline explains how to add new tool pages to the Design Support Tools Portal. Following these guidelines will help maintain consistent design and user experience.
 
-## 目次
+## Table of Contents
 
-1. [ファイル構造](#ファイル構造)
-2. [新しいツールページの作成](#新しいツールページの作成)
-3. [ランディングページへの追加](#ランディングページへの追加)
-4. [アイコンとカラー](#アイコンとカラー)
-5. [カテゴリー](#カテゴリー)
-6. [テスト](#テスト)
+- [Design Support Tools Portal - Page Addition Guidelines](#design-support-tools-portal---page-addition-guidelines)
+  - [Table of Contents](#table-of-contents)
+  - [File Structure](#file-structure)
+  - [Creating a New Tool Page](#creating-a-new-tool-page)
+  - [Adding to the Landing Page](#adding-to-the-landing-page)
+  - [Icons and Colors](#icons-and-colors)
+  - [Categories](#categories)
+  - [Testing](#testing)
 
-## ファイル構造
+## File Structure
 
-プロジェクトのファイル構造は以下のようになっています：
+The project file structure is as follows:
 
 ```
 utility-tools/
-├── index.html             # ランディングページ
-├── color-palette.html     # カラーパレット生成ツール
-├── layout-tool.html       # レイアウト設計ツール
-├── size-calculator.html   # サイズ計算ツール
-├── font-pairing.html      # フォント組み合わせツール
-└── [your-new-tool].html   # 新しいツールページ
+├── index.html             # Landing page
+├── color-palette.html     # Color palette generation tool
+├── layout-tool.html       # Layout design tool
+├── size-calculator.html   # Size calculator tool
+├── font-pairing.html      # Font pairing tool
+└── [your-new-tool].html   # Your new tool page
 ```
 
-## 新しいツールページの作成
+## Creating a New Tool Page
 
-1. **テンプレートを使用する**
+1. **Use a Template**
 
-既存のツールページ（例：`color-palette.html`）をコピーして新しいファイルを作成します。ファイル名は機能を表す英語の小文字とハイフンを使用してください。
+Create a new file by copying an existing tool page (e.g., `color-palette.html`). The filename should use lowercase English letters with hyphens to represent the functionality.
 
-2. **基本構造を維持する**
+2. **Maintain the Basic Structure**
 
-新しいツールページには以下の基本構造を維持してください：
+Your new tool page should maintain the following basic structure:
 
 ```html
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ツール名 - 設計支援ツール</title>
+    <title>Tool Name - Design Support Tools</title>
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        /* スタイル設定 */
+        /* Style settings */
     </style>
 </head>
 <body>
     <header>
-        <h1>ツール名</h1>
-        <p class="description">このツールの説明文...</p>
-        <a href="index.html" class="home-link">← ホームに戻る</a>
+        <h1>Tool Name</h1>
+        <p class="description">Description of this tool...</p>
+        <a href="index.html" class="home-link">← Back to Home</a>
     </header>
 
     <main>
-        <!-- ツールの内容 -->
+        <!-- Tool content -->
     </main>
 
     <footer>
-        <p>&copy; 2025 設計支援ツールポータル｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
+        <p>&copy; 2025 Design Support Tools Portal｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
     </footer>
 
     <script>
-        // JavaScriptコード
+        // JavaScript code
     </script>
 </body>
 </html>
 ```
 
-3. **スタイル**
+3. **Styling**
 
-基本的なスタイル（色、フォント、ボタンのデザインなど）は一貫性を保つために既存のツールページから流用してください。以下の変数は共通で使用されています：
+To maintain consistency, reuse the basic styles (colors, fonts, button designs, etc.) from existing tool pages. The following variables are commonly used:
 
 ```css
 :root {
@@ -86,103 +88,103 @@ utility-tools/
 }
 ```
 
-4. **「ホームに戻る」リンク**
+4. **"Back to Home" Link**
 
-すべてのツールページには、ランディングページに戻るためのリンクを含めてください：
+Include a link to return to the landing page on all tool pages:
 
 ```html
-<a href="index.html" class="home-link">← ホームに戻る</a>
+<a href="index.html" class="home-link">← Back to Home</a>
 ```
 
-5. **フッター**
+5. **Footer**
 
-フッターに正しいGitHubリポジトリのリンクを含めてください：
+Include the correct GitHub repository link in the footer:
 
 ```html
 <footer>
-    <p>&copy; 2025 設計支援ツールポータル｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
+    <p>&copy; 2025 Design Support Tools Portal｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
 </footer>
 ```
 
-## ランディングページへの追加
+## Adding to the Landing Page
 
-新しいツールを作成したら、ランディングページ（`index.html`）に追加する必要があります。
+After creating a new tool, you need to add it to the landing page (`index.html`).
 
-1. **`tools-grid` に新しいカードを追加**
+1. **Add a New Card to `tools-grid`**
 
-`index.html` の `<div class="tools-grid" id="tools-grid">` 内に新しいツールカードを追加します：
+Add a new tool card inside the `<div class="tools-grid" id="tools-grid">` in `index.html`:
 
 ```html
-<!-- 新しいツールカード -->
-<div class="tool-card" data-category="[カテゴリー]">
+<!-- New Tool Card -->
+<div class="tool-card" data-category="[category]">
     <div class="tool-icon">
-        <i class="fas fa-[アイコン名]"></i>
+        <i class="fas fa-[icon-name]"></i>
     </div>
     <div class="tool-content">
-        <h3>[ツール名]</h3>
-        <p>[ツールの説明]</p>
-        <a href="[ファイル名].html" class="button">ツールを使用する</a>
+        <h3>[Tool Name]</h3>
+        <p>[Tool Description]</p>
+        <a href="[filename].html" class="button">Use Tool</a>
     </div>
 </div>
 ```
 
-2. **カスタムスタイルの追加**
+2. **Add Custom Styles**
 
-必要に応じて、新しいツールカードのアイコン背景色を定義します：
+If necessary, define the icon background color for your new tool card:
 
 ```css
-.tool-card:nth-child([番号]) .tool-icon {
-    background: linear-gradient(135deg, #[色1], #[色2]);
+.tool-card:nth-child([number]) .tool-icon {
+    background: linear-gradient(135deg, #[color1], #[color2]);
 }
 ```
 
-## アイコンとカラー
+## Icons and Colors
 
-1. **Font Awesomeアイコンの選択**
+1. **Selecting Font Awesome Icons**
 
-[Font Awesome Icons](https://fontawesome.com/icons) から適切なアイコンを選択してください。アイコンはツールの機能を直感的に表現するものを選びましょう。
+Choose an appropriate icon from [Font Awesome Icons](https://fontawesome.com/icons). The icon should intuitively represent the tool's functionality.
 
-例：
-- `fa-palette`: カラー関連のツール
-- `fa-font`: タイポグラフィ関連のツール
-- `fa-ruler-combined`: 測定関連のツール
-- `fa-th-large`: レイアウト関連のツール
+Examples:
+- `fa-palette`: For color-related tools
+- `fa-font`: For typography-related tools
+- `fa-ruler-combined`: For measurement-related tools
+- `fa-th-large`: For layout-related tools
 
-2. **グラデーションカラーの設定**
+2. **Setting Gradient Colors**
 
-各ツールカードには固有のグラデーション背景色を設定します。推奨される色の組み合わせ：
+Each tool card should have a unique gradient background color. Recommended color combinations:
 
-- 青系: `#3498db` → `#2980b9`
-- 赤系: `#e74c3c` → `#c0392b`
-- 緑系: `#2ecc71` → `#27ae60`
-- 紫系: `#9b59b6` → `#8e44ad`
-- 黄系: `#f1c40f` → `#f39c12`
-- ティール系: `#1abc9c` → `#16a085`
+- Blue: `#3498db` → `#2980b9`
+- Red: `#e74c3c` → `#c0392b`
+- Green: `#2ecc71` → `#27ae60`
+- Purple: `#9b59b6` → `#8e44ad`
+- Yellow: `#f1c40f` → `#f39c12`
+- Teal: `#1abc9c` → `#16a085`
 
-## カテゴリー
+## Categories
 
-各ツールには以下のいずれかのカテゴリーを割り当ててください：
+Assign one of the following categories to each tool:
 
-- `color`: 色に関するツール
-- `layout`: レイアウトやデザイン構成に関するツール
-- `typography`: フォントやテキストに関するツール
-- `measure`: 測定、計算、変換に関するツール
+- `color`: Tools related to colors
+- `layout`: Tools related to layout and design composition
+- `typography`: Tools related to fonts and text
+- `measure`: Tools related to measurement, calculation, and conversion
 
-カテゴリーは `data-category` 属性に設定します：
+Set the category in the `data-category` attribute:
 
 ```html
 <div class="tool-card" data-category="color">
 ```
 
-## テスト
+## Testing
 
-新しいページを追加した後は、以下の点をテストしてください：
+After adding a new page, test the following:
 
-1. ランディングページから新しいツールページにアクセスできるか
-2. 新しいツールページからランディングページに戻れるか
-3. ツールの機能が正しく動作するか
-4. ランディングページの検索機能で新しいツールが検索できるか
-5. カテゴリーフィルタで正しくフィルタリングされるか
-6. レスポンシブデザインが正しく機能するか（スマートフォン、タブレット、デスクトップ）
+1. Can you access the new tool page from the landing page?
+2. Can you return to the landing page from the new tool page?
+3. Does the tool's functionality work correctly?
+4. Can the new tool be found using the search function on the landing page?
+5. Is the tool properly filtered by the category filter?
+6. Does the responsive design work correctly (smartphone, tablet, desktop)?
 
-以上のガイドラインに従うことで、一貫性のあるデザインと使いやすいユーザーエクスペリエンスを維持できます。
+Following these guidelines will help maintain consistent design and user-friendly experience.
