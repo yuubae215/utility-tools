@@ -1,10 +1,10 @@
-# Utility Tools Portal ✨
+# PromptCraft IO ✨
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Active-brightgreen)](https://yuubae215.github.io/utility-tools/)
 ![Made with](https://img.shields.io/badge/Made%20with-❤️-red)
 
-A collection of elegant, modern web-based tools specifically designed to enhance your interaction with Large Language Models (LLMs). Supercharge your AI workflow with intuitive interfaces and powerful functionality.
+A powerful toolkit for crafting sophisticated LLM prompts and controlling output formats. PromptCraft IO helps you shape both the input and output of your Large Language Model interactions, giving you precise control over the entire AI workflow.
 
 **🔗 Live Demo: [https://yuubae215.github.io/utility-tools/](https://yuubae215.github.io/utility-tools/)**
 
@@ -37,7 +37,7 @@ Create powerful design instruction prompts that control the output design and la
 
 ## 💡 Design Concept
 
-The Utility Tools Portal is built specifically to enhance your interaction with Large Language Models (LLMs):
+PromptCraft IO is built around a key insight: controlling output format through carefully crafted input:
 
 - **File Binder** is designed to synthesize text from multiple files into direct LLM prompts. By maintaining folder structures and combining multiple files, it creates extremely efficient prompts that provide complete context to the LLM in a single input.
 
@@ -74,6 +74,8 @@ Simply visit [https://yuubae215.github.io/utility-tools/](https://yuubae215.gith
    ```bash
    cd utility-tools
    ```
+
+> **Note:** The repository URL still uses the original name, but the project is now called PromptCraft IO.
 
 3. Open `index.html` in your browser or use a local server:
    ```bash
@@ -117,7 +119,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ⭐ Show Your Support
 
-If you find this project useful, please consider giving it a star on GitHub. It helps more people discover these tools!
+If you find PromptCraft IO useful, please consider giving it a star on GitHub. It helps more people discover these tools!
 
 [⭐ Star on GitHub](https://github.com/yuubae215/utility-tools)
 
@@ -127,4 +129,4 @@ Created by [@yuubae215](https://github.com/yuubae215)
 
 ---
 
-<p align="center">Made with ❤️ for the developer community</p>
+<p align="center">Made with ❤️ for the LLM community</p>
