@@ -618,6 +618,18 @@
                             <span class="sm:hidden">Combine</span>
                             <span class="tooltip-text">Generate markdown document</span>
                         </button>
+                        <button id="copyButton"
+                            class="btn bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center hidden tooltip text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span class="hidden sm:inline">Copy</span>
+                            <span class="sm:hidden">Copy</span>
+                            <span class="tooltip-text">Copy to clipboard</span>
+                        </button>
                         <button id="downloadButton"
                             class="btn bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center hidden tooltip text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
@@ -835,6 +847,7 @@
         const actionsContainer = document.getElementById('actionsContainer');
         const combineButton = document.getElementById('combineButton');
         const combineButtonText = document.getElementById('combineButtonText');
+        const copyButton = document.getElementById('copyButton');
         const downloadButton = document.getElementById('downloadButton');
         const fileListContainer = document.getElementById('fileListContainer');
         const fileList = document.getElementById('fileList');
@@ -1655,6 +1668,7 @@
             selectedFileContent.classList.add('hidden');
             combinedContent.classList.remove('hidden');
             noFileSelected.classList.add('hidden');
+            copyButton.classList.remove('hidden');
             downloadButton.classList.remove('hidden');
 
             // Re-enable combine button
@@ -1670,6 +1684,48 @@
                 type: 'text/markdown;charset=utf-8'
             });
             saveAs(blob, 'base-code.md');
+        }
+
+        // Copy combined file to clipboard
+        async function copyCombinedFile() {
+            try {
+                await navigator.clipboard.writeText(combinedContentText);
+
+                // Visual feedback - change button text temporarily
+                const originalHTML = copyButton.innerHTML;
+                copyButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span class="hidden sm:inline">Copied!</span>
+                    <span class="sm:hidden">Copied!</span>
+                `;
+
+                log('Content copied to clipboard');
+
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    copyButton.innerHTML = originalHTML;
+                }, 2000);
+            } catch (error) {
+                log('Error copying to clipboard: ' + error.message);
+                // Fallback for older browsers
+                try {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = combinedContentText;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    log('Content copied to clipboard (fallback method)');
+                } catch (fallbackError) {
+                    log('Failed to copy to clipboard: ' + fallbackError.message);
+                }
+            }
         }
 
         // Clear all files
@@ -1852,6 +1908,7 @@ poetry.lock
         dropZone.addEventListener('dragleave', preventDefault);
         dropZone.addEventListener('drop', handleDrop);
         combineButton.addEventListener('click', combineFiles);
+        copyButton.addEventListener('click', copyCombinedFile);
         downloadButton.addEventListener('click', downloadCombinedFile);
         clearButton.addEventListener('click', clearAllFiles);
         document.getElementById('downloadSampleIgnore').addEventListener('click', downloadLoadIgnoreSample);
