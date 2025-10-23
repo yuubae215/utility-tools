@@ -1067,10 +1067,10 @@
             progressBar.style.width = `${progress}%`;
             progressText.textContent = progress;
 
-            // Log progress every 20 files
-            if (processedFiles > 0 && processedFiles % 20 === 0) {
+            // Log progress every 10 files for more frequent updates
+            if (processedFiles > 0 && processedFiles % 10 === 0) {
                 const totalFound = files.length + skippedFiles.length + ignoredFiles.length;
-                log(`Processing... ${processedFiles} entries checked, ${totalFound} files found (${files.length} included, ${skippedFiles.length} skipped, ${ignoredFiles.length} ignored)`, 'info');
+                log(`Progress: ${progress}% - ${processedFiles} entries checked, ${totalFound} files found (${files.length} included, ${skippedFiles.length} skipped, ${ignoredFiles.length} ignored)`, 'info');
             }
         }
 
@@ -1156,18 +1156,23 @@
                                 const filteredEntries = allEntries.filter(e => !isLoadIgnoreFile(e.name));
                                 const results = [];
 
-                                // Process in smaller chunks of 5 for better responsiveness
-                                for (let i = 0; i < filteredEntries.length; i += 5) {
-                                    const chunk = filteredEntries.slice(i, i + 5);
-                                    const chunkResults = await Promise.all(
-                                        chunk.map(e => processEntry(e, dirPath, currentIgnorePatterns, rootPath))
-                                    );
-                                    results.push(...chunkResults);
+                                log(`Starting to process ${filteredEntries.length} entries in directory ${fullPath}`, 'info');
 
-                                    // Yield to UI thread every chunk
-                                    await new Promise(resolve => setTimeout(resolve, 0));
+                                // Process one at a time for maximum UI responsiveness
+                                for (let i = 0; i < filteredEntries.length; i++) {
+                                    const entry = filteredEntries[i];
+                                    const result = await processEntry(entry, dirPath, currentIgnorePatterns, rootPath);
+                                    if (result) {
+                                        results.push(result);
+                                    }
+
+                                    // Yield to UI thread after each entry
+                                    if (i % 5 === 0) {
+                                        await new Promise(resolve => setTimeout(resolve, 1));
+                                    }
                                 }
 
+                                log(`Completed processing directory ${fullPath}`, 'info');
                                 resolve(results.flat().filter(Boolean));
                             } else {
                                 // Add these entries and continue reading
