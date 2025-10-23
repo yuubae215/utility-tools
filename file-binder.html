@@ -873,6 +873,7 @@
         const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB total
         const FILE_READ_TIMEOUT = 30000; // 30 seconds timeout for file reading
         const CHUNK_SIZE = 10; // Process files in chunks of 10
+        const DEBUG_MODE = false; // Set to true for detailed logging
 
         // Binary file extensions to skip
         const BINARY_EXTENSIONS = new Set([
@@ -909,6 +910,7 @@
         let activeFileItem = null;
         let ignoredFiles = []; // Track ignored files for UI feedback
         let skippedFiles = []; // Track skipped files (binary/too large)
+        let patternCache = new Map(); // Cache for compiled regex patterns
 
         // Theme toggle functionality - 修正済み
         themeToggle.addEventListener('change', function () {
@@ -929,11 +931,13 @@
             }
         });
 
-        // Log function
-        function log(message) {
-            const timestamp = new Date().toLocaleTimeString();
-            const logMessage = `[${timestamp}] ${message}`;
-            console.log(logMessage); // コンソールにのみ出力
+        // Log function (only logs in debug mode or for important messages)
+        function log(message, level = 'debug') {
+            if (level !== 'debug' || DEBUG_MODE) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logMessage = `[${timestamp}] ${message}`;
+                console.log(logMessage);
+            }
         }
 
         // Format file size
@@ -997,12 +1001,17 @@
                     .map(line => line.trim())
                     .filter(line => line && !line.startsWith('#')) // Skip empty lines and lines starting with #
             );
-            log(`Parsed .loadignore file: ${file.name}, patterns: ${Array.from(patterns).join(', ')}`);
+            log(`Parsed .loadignore file: ${file.name}, ${patterns.size} patterns`, 'info');
             return patterns;
         }
 
-        // Convert ignore pattern to RegExp
+        // Convert ignore pattern to RegExp (with caching)
         function convertPatternToRegExp(pattern) {
+            // Check cache first
+            if (patternCache.has(pattern)) {
+                return patternCache.get(pattern);
+            }
+
             // Escape special regex characters
             const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
 
@@ -1025,26 +1034,29 @@
             );
 
             // Consider path beginning and ending
-            return new RegExp(`^(.*\\/)?${converted}(\\/.*)?$`);
+            const regex = new RegExp(`^(.*\\/)?${converted}(\\/.*)?$`);
+
+            // Store in cache
+            patternCache.set(pattern, regex);
+
+            return regex;
         }
 
         // Check if file should be ignored
         function shouldIgnoreFile(filePath, ignorePatterns) {
-            log(`Checking if ${filePath} should be ignored`);
-
             for (const pattern of ignorePatterns) {
                 if (pattern.startsWith('#') || pattern.trim() === '') continue;
 
                 const regex = convertPatternToRegExp(pattern.trim());
-                log(`  Checking against pattern: ${pattern} (regex: ${regex})`);
 
                 if (regex.test(filePath)) {
-                    log(`  Matched! File will be ignored.`);
+                    if (DEBUG_MODE) {
+                        log(`Ignoring ${filePath} (matched pattern: ${pattern})`);
+                    }
                     return true;
                 }
             }
 
-            log(`  No match found. File will be included.`);
             return false;
         }
 
@@ -1064,7 +1076,6 @@
         // Process a file entry
         async function processEntry(entry, path = '', currentIgnorePatterns = new Set(), rootPath = '') {
             const fullPath = rootPath + path + entry.name;
-            log(`Processing entry: ${fullPath}`);
 
             if (entry.isFile) {
                 return new Promise((resolve) => {
@@ -1074,7 +1085,7 @@
 
                         // Support both .loadignore and loadignore.txt
                         if (isLoadIgnoreFile(file.name)) {
-                            log(`Found loadignore file: ${fullPath}`);
+                            log(`Found loadignore file: ${fullPath}`, 'info');
                             const newIgnorePatterns = await parseLoadIgnore(file);
                             currentIgnorePatterns = new Set([
                                 ...currentIgnorePatterns,
@@ -1084,22 +1095,17 @@
                                 ...ignorePatterns,
                                 ...currentIgnorePatterns
                             ]);
-                            log(`Updated ignore patterns: ${Array.from(ignorePatterns).join(', ')}`);
                             resolve(null);
                         } else if (shouldIgnoreFile(fullPath, ignorePatterns)) {
-                            log(`Ignoring file (pattern match): ${fullPath}`);
                             ignoredFiles.push({ path: fullPath, reason: 'Pattern match' });
                             resolve(null);
                         } else if (isBinaryFile(fullPath)) {
-                            log(`Skipping binary file: ${fullPath}`);
                             skippedFiles.push({ path: fullPath, reason: 'Binary file', size: file.size });
                             resolve(null);
                         } else if (!isFileSizeAcceptable(file.size)) {
-                            log(`Skipping large file: ${fullPath} (${formatFileSize(file.size)})`);
                             skippedFiles.push({ path: fullPath, reason: `File too large (${formatFileSize(file.size)})`, size: file.size });
                             resolve(null);
                         } else {
-                            log(`Including file: ${fullPath}`);
                             resolve({ path: fullPath, file });
                         }
                     });
@@ -1110,10 +1116,8 @@
                 updateProgress();
 
                 const dirPath = path + entry.name + '/';
-                log(`Processing directory: ${fullPath}/`);
 
                 if (shouldIgnoreFile(fullPath + '/', ignorePatterns)) {
-                    log(`Ignoring directory: ${fullPath}/`);
                     return Promise.resolve([]);
                 }
 
@@ -1159,6 +1163,7 @@
             estimatedTotalFiles = 0;
             error = null;
             ignorePatterns.clear();
+            patternCache.clear(); // Clear regex cache
             ignoredFiles = [];
             skippedFiles = [];
             debugLog = [];
@@ -1167,7 +1172,7 @@
             loadingContainer.classList.remove('hidden');
             dropContent.classList.add('hidden');
 
-            log('Starting file processing');
+            log('Starting file processing', 'info');
 
             const items = e.dataTransfer.items;
 
@@ -1191,7 +1196,7 @@
                 const allFiles = fileArrays.flat().filter(Boolean);
 
                 files = allFiles;
-                log(`Processed ${files.length} files`);
+                log(`Processed ${files.length} files (${skippedFiles.length} skipped, ${ignoredFiles.length} ignored)`, 'info');
 
                 // Show the clear button
                 clearButton.classList.remove('hidden');
@@ -1213,7 +1218,7 @@
                 updateProgress();
             } catch (err) {
                 error = 'Error processing files: ' + err.message;
-                log(`Error: ${error}`);
+                log(`Error: ${error}`, 'info');
                 errorContainer.classList.remove('hidden');
                 errorText.textContent = error;
             } finally {
@@ -2100,7 +2105,7 @@ poetry.lock
         });
 
         // Initial log entry
-        log('Binder initialized. Drag and drop files to begin.');
+        log('File Binder initialized. Drag and drop files to begin.', 'info');
     </script>
 </body>
 
