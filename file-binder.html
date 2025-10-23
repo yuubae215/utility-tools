@@ -251,23 +251,75 @@
             overflow-x: hidden;
         }
 
-        /* Home link */
-        .home-link {
-            display: inline-block;
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            white-space: nowrap;
+        /* Header styles - Modernized */
+        header {
+            position: relative;
+            overflow: hidden;
         }
 
-        .home-link:hover {
-            text-decoration: underline;
-            opacity: 0.9;
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: headerShine 8s infinite;
         }
 
-        .home-link i {
-            margin-right: 5px;
+        @keyframes headerShine {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+
+        /* Header action buttons */
+        header button,
+        header a {
+            position: relative;
+            overflow: hidden;
+        }
+
+        header button::before,
+        header a::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        header button:hover::before,
+        header a:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        /* Logo icon container */
+        header .flex-shrink-0.w-10,
+        header .flex-shrink-0.w-12 {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* Beta badge animation */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 4px rgba(255, 255, 255, 0);
+            }
+        }
+
+        header .rounded-full {
+            animation: pulse-glow 2s infinite;
         }
 
         /* Custom scrollbar - Modernized */
@@ -304,12 +356,31 @@
             display: inline-block;
             width: 56px;
             height: 28px;
+            z-index: 1;
         }
 
         .theme-switch input {
             opacity: 0;
             width: 0;
             height: 0;
+        }
+
+        /* Header theme switch special styling */
+        header .theme-switch .slider {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        header .theme-switch .slider:hover {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        header .theme-switch input:checked+.slider {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.35);
         }
 
         .slider {
@@ -532,32 +603,51 @@
             transform: scale(1.1);
         }
 
-        /* Tooltip */
+        /* Tooltip - Modernized */
         .tooltip {
             position: relative;
         }
 
         .tooltip .tooltip-text {
             visibility: hidden;
-            width: 120px;
-            background-color: #1e293b;
+            min-width: 120px;
+            background: linear-gradient(135deg, #1e293b, #334155);
             color: #fff;
             text-align: center;
-            border-radius: 6px;
-            padding: 5px;
+            border-radius: 8px;
+            padding: 6px 12px;
             position: absolute;
             z-index: 10;
             top: 100%;
             left: 50%;
-            margin-left: -60px;
-            margin-top: 5px;
+            transform: translateX(-50%);
+            margin-top: 8px;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, visibility 0.3s;
             font-size: 12px;
+            font-weight: 500;
             pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Footer styles */
+        .tooltip .tooltip-text::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-bottom-color: #1e293b;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Footer styles - Modernized */
         footer {
             flex-shrink: 0;
             text-align: center;
@@ -565,7 +655,35 @@
             border-top: 1px solid var(--border-color);
             color: var(--text-light);
             width: 100%;
-            background-color: var(--card-color);
+            background: var(--card-color);
+            position: relative;
+        }
+
+        footer .github-link {
+            color: var(--text-light);
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+            text-decoration: none;
+        }
+
+        footer .github-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-600));
+            transition: width 0.3s ease;
+        }
+
+        footer .github-link:hover {
+            color: var(--primary-color);
+        }
+
+        footer .github-link:hover::after {
+            width: 100%;
         }
 
         /* Card styles - Modernized */
@@ -698,45 +816,97 @@
 
             /* ヘッダーの小さいスクリーン調整 */
             header h1 {
-                font-size: 1.125rem !important;
+                font-size: 1rem !important;
+            }
+
+            header .w-10,
+            header .w-12 {
+                width: 2.25rem !important;
+                height: 2.25rem !important;
+            }
+
+            header .gap-2 {
+                gap: 0.25rem !important;
             }
         }
+
+        /* Header max-width container */
+        header .max-w-7xl {
+            transition: padding 0.3s ease;
+        }
+
+        /* Improve header button spacing on mobile */
+        @media (max-width: 640px) {
+            header .space-x-2 {
+                gap: 0.375rem !important;
+            }
+        }
+
     </style>
 </head>
 
 <body class="dark dark-mode flex flex-col min-h-screen">
-    <!-- Header for File Binder - Modified for PromptCraft IO -->
+    <!-- Header for File Binder - Modernized Design -->
     <header
-        class="flex-shrink-0 px-3 sm:px-6 py-3 sm:py-4 text-white flex justify-between items-center w-full overflow-hidden backdrop-blur-md bg-gradient-to-r from-primary-600 via-primary-500 to-secondary-600 shadow-lg"
-        style="backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-        <div class="flex items-center space-x-2 overflow-hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0 text-white"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M21 8v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8" />
-                <path d="M21 2H3v6h18V2z" />
-                <path d="M9 14v4" />
-                <path d="M15 14v4" />
-            </svg>
-            <div class="overflow-hidden">
-                <h1 class="text-lg sm:text-xl font-semibold tracking-tight text-white truncate">File Binder</h1>
-                <p class="text-xs sm:text-sm text-slate-100 hidden sm:block">Combine multiple files for LLM prompts
-                    using drag & drop
-                </p>
+        class="flex-shrink-0 w-full overflow-hidden backdrop-blur-xl bg-gradient-to-r from-primary-600 via-primary-500 to-secondary-600 shadow-xl border-b border-white/10 relative"
+        style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
+        <!-- Header background decoration -->
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="flex items-center justify-between py-4 sm:py-5">
+                <!-- Left: Logo and Title -->
+                <div class="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
+                    <div class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg border border-white/20 group hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 text-white group-hover:scale-110 transition-transform"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 8v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8" />
+                            <path d="M21 2H3v6h18V2z" />
+                            <path d="M9 14v4" />
+                            <path d="M15 14v4" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h1 class="text-lg sm:text-2xl font-bold tracking-tight text-white truncate flex items-center gap-2">
+                            File Binder
+                            <span class="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white border border-white/30">
+                                Beta
+                            </span>
+                        </h1>
+                        <p class="text-xs sm:text-sm text-white/80 hidden sm:block font-medium">
+                            Combine multiple files for LLM prompts
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 ml-4">
+                    <!-- Clear Button -->
+                    <button id="clearButton"
+                        class="hidden px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/40 hover:shadow-lg hover:scale-105 active:scale-95">
+                        <span class="hidden sm:inline">Clear All</span>
+                        <span class="sm:hidden">Clear</span>
+                    </button>
+
+                    <!-- Home Link -->
+                    <a href="index.html"
+                        class="flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/40 hover:shadow-lg hover:scale-105 active:scale-95 no-underline">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        <span class="hidden sm:inline">Home</span>
+                    </a>
+
+                    <!-- Theme Toggle -->
+                    <div class="relative group">
+                        <label class="theme-switch cursor-pointer" title="Toggle theme">
+                            <input type="checkbox" id="themeToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-            <button id="clearButton"
-                class="hidden text-xs sm:text-sm text-slate-200 hover:text-white dark:hover:text-primary-400 transition-colors">
-                Clear
-            </button>
-            <a href="index.html" class="home-link text-xs sm:text-sm"><i class="fas fa-arrow-left"></i> <span
-                    class="hidden sm:inline">Back to Home</span></a>
-            <label class="theme-switch tooltip">
-                <input type="checkbox" id="themeToggle" checked>
-                <span class="slider"></span>
-                <span class="tooltip-text">Toggle theme</span>
-            </label>
         </div>
     </header>
 
@@ -1101,13 +1271,18 @@
         </div>
     </main>
 
-    <!-- Simple footer -->
+    <!-- Footer - Modernized -->
     <footer
         class="flex-shrink-0 px-4 py-3 sm:px-6 sm:py-4 border-t border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-center backdrop-blur-sm"
         style="background: var(--card-color);">
-        <div class="text-slate-500 dark:text-slate-400">
-            &copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools"
-                class="github-link hover:text-primary-500 transition-colors">GitHub</a>
+        <div class="text-slate-500 dark:text-slate-400 font-medium">
+            &copy; 2025 <span class="font-semibold text-slate-700 dark:text-slate-300">PromptCraft IO</span> ｜
+            <a href="https://github.com/yuubae215/utility-tools" class="github-link inline-flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub
+            </a>
         </div>
     </footer>
 
