@@ -486,8 +486,11 @@
                 </svg>
                 <h3 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-2">Drag & Drop to Upload
                 </h3>
-                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-4">Drop files or folders here to
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-2">Drop files or folders here to
                     organize</p>
+                <p class="text-xs text-slate-500 dark:text-slate-500 mb-4">
+                    Binary files and files larger than 10MB will be automatically skipped
+                </p>
                 <div class="flex flex-wrap justify-center gap-2">
                     <span
                         class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/30">Files</span>
@@ -505,10 +508,10 @@
                             <polyline points="7 10 12 15 17 10" />
                             <line x1="12" y1="15" x2="12" y2="3" />
                         </svg>
-                        Download .loadignore sample
+                        Download ignore pattern sample
                     </button>
                     <div class="text-xs text-slate-500 dark:text-slate-400 ml-6 mt-1">
-                        Use # for comments in .loadignore files
+                        Supports both <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-700 rounded">.loadignore</code> and <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-700 rounded">loadignore.txt</code> filenames. Use # for comments.
                     </div>
                 </div>
             </div>
@@ -865,6 +868,32 @@
         const fileCount = document.getElementById('fileCount');
         const clearButton = document.getElementById('clearButton');
 
+        // Configuration constants
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
+        const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB total
+        const FILE_READ_TIMEOUT = 30000; // 30 seconds timeout for file reading
+        const CHUNK_SIZE = 10; // Process files in chunks of 10
+
+        // Binary file extensions to skip
+        const BINARY_EXTENSIONS = new Set([
+            // Images
+            'jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'svg', 'webp', 'tiff', 'psd',
+            // Videos
+            'mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm', 'm4v',
+            // Audio
+            'mp3', 'wav', 'flac', 'aac', 'm4a', 'ogg', 'wma',
+            // Archives
+            'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'iso',
+            // Executables
+            'exe', 'dll', 'so', 'dylib', 'app', 'deb', 'rpm',
+            // Documents
+            'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+            // Database
+            'db', 'sqlite', 'mdb',
+            // Other binary formats
+            'bin', 'dat', 'class', 'pyc', 'o', 'obj', 'wasm'
+        ]);
+
         // Global variables
         let files = [];
         let isLoading = false;
@@ -878,6 +907,8 @@
         let isCombining = false;
         let ignorePatterns = new Set();
         let activeFileItem = null;
+        let ignoredFiles = []; // Track ignored files for UI feedback
+        let skippedFiles = []; // Track skipped files (binary/too large)
 
         // Theme toggle functionality - 修正済み
         themeToggle.addEventListener('change', function () {
@@ -912,6 +943,36 @@
             const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Check if file is binary based on extension
+        function isBinaryFile(fileName) {
+            const extension = getFileExtension(fileName).toLowerCase();
+            return BINARY_EXTENSIONS.has(extension);
+        }
+
+        // Check if file size is acceptable
+        function isFileSizeAcceptable(fileSize) {
+            return fileSize <= MAX_FILE_SIZE;
+        }
+
+        // Read file with timeout
+        async function readFileWithTimeout(file, timeout = FILE_READ_TIMEOUT) {
+            return new Promise((resolve, reject) => {
+                const timer = setTimeout(() => {
+                    reject(new Error(`File reading timeout after ${timeout / 1000} seconds`));
+                }, timeout);
+
+                file.text()
+                    .then(text => {
+                        clearTimeout(timer);
+                        resolve(text);
+                    })
+                    .catch(err => {
+                        clearTimeout(timer);
+                        reject(err);
+                    });
+            });
         }
 
         // Prevent default behavior for drag over
@@ -995,6 +1056,11 @@
             progressText.textContent = progress;
         }
 
+        // Check if file is a loadignore file
+        function isLoadIgnoreFile(fileName) {
+            return fileName === '.loadignore' || fileName === 'loadignore.txt';
+        }
+
         // Process a file entry
         async function processEntry(entry, path = '', currentIgnorePatterns = new Set(), rootPath = '') {
             const fullPath = rootPath + path + entry.name;
@@ -1006,8 +1072,9 @@
                         processedFiles++;
                         updateProgress();
 
-                        if (file.name === '.loadignore') {
-                            log(`Found .loadignore file: ${fullPath}`);
+                        // Support both .loadignore and loadignore.txt
+                        if (isLoadIgnoreFile(file.name)) {
+                            log(`Found loadignore file: ${fullPath}`);
                             const newIgnorePatterns = await parseLoadIgnore(file);
                             currentIgnorePatterns = new Set([
                                 ...currentIgnorePatterns,
@@ -1019,12 +1086,21 @@
                             ]);
                             log(`Updated ignore patterns: ${Array.from(ignorePatterns).join(', ')}`);
                             resolve(null);
-                        } else if (!shouldIgnoreFile(fullPath, ignorePatterns)) {
+                        } else if (shouldIgnoreFile(fullPath, ignorePatterns)) {
+                            log(`Ignoring file (pattern match): ${fullPath}`);
+                            ignoredFiles.push({ path: fullPath, reason: 'Pattern match' });
+                            resolve(null);
+                        } else if (isBinaryFile(fullPath)) {
+                            log(`Skipping binary file: ${fullPath}`);
+                            skippedFiles.push({ path: fullPath, reason: 'Binary file', size: file.size });
+                            resolve(null);
+                        } else if (!isFileSizeAcceptable(file.size)) {
+                            log(`Skipping large file: ${fullPath} (${formatFileSize(file.size)})`);
+                            skippedFiles.push({ path: fullPath, reason: `File too large (${formatFileSize(file.size)})`, size: file.size });
+                            resolve(null);
+                        } else {
                             log(`Including file: ${fullPath}`);
                             resolve({ path: fullPath, file });
-                        } else {
-                            log(`Ignoring file: ${fullPath}`);
-                            resolve(null);
                         }
                     });
                 });
@@ -1045,7 +1121,8 @@
                 return new Promise((resolve) => {
                     const readEntries = async () => {
                         dirReader.readEntries(async (entries) => {
-                            const loadIgnoreEntry = entries.find(e => e.name === '.loadignore');
+                            // Support both .loadignore and loadignore.txt
+                            const loadIgnoreEntry = entries.find(e => isLoadIgnoreFile(e.name));
 
                             if (loadIgnoreEntry) {
                                 await processEntry(loadIgnoreEntry, dirPath, currentIgnorePatterns, rootPath);
@@ -1056,7 +1133,7 @@
                             } else {
                                 const results = await Promise.all(
                                     entries
-                                        .filter(e => e.name !== '.loadignore')
+                                        .filter(e => !isLoadIgnoreFile(e.name))
                                         .map(e => processEntry(e, dirPath, currentIgnorePatterns, rootPath))
                                 );
                                 resolve(results.flat().filter(Boolean));
@@ -1082,6 +1159,8 @@
             estimatedTotalFiles = 0;
             error = null;
             ignorePatterns.clear();
+            ignoredFiles = [];
+            skippedFiles = [];
             debugLog = [];
 
             // Show loading state
@@ -1514,7 +1593,34 @@
         async function handleFileSelect(file) {
             selectedFile = file;
             try {
-                const text = await file.file.text();
+                // Check if file is binary
+                if (isBinaryFile(file.path)) {
+                    fileContentText = `[Binary file: ${file.path}]\n\nThis file appears to be a binary file and cannot be displayed as text.`;
+                    fileContentView.textContent = fileContentText;
+                    fileContentView.className = '';
+                    selectedFilePath.textContent = file.path;
+                    fileSize.textContent = formatFileSize(file.file.size);
+                    selectedFileContent.classList.remove('hidden');
+                    combinedContent.classList.add('hidden');
+                    noFileSelected.classList.add('hidden');
+                    return;
+                }
+
+                // Check file size
+                if (!isFileSizeAcceptable(file.file.size)) {
+                    fileContentText = `[Large file: ${file.path}]\n\nThis file is too large (${formatFileSize(file.file.size)}) and cannot be displayed.\nMaximum file size: ${formatFileSize(MAX_FILE_SIZE)}`;
+                    fileContentView.textContent = fileContentText;
+                    fileContentView.className = '';
+                    selectedFilePath.textContent = file.path;
+                    fileSize.textContent = formatFileSize(file.file.size);
+                    selectedFileContent.classList.remove('hidden');
+                    combinedContent.classList.add('hidden');
+                    noFileSelected.classList.add('hidden');
+                    return;
+                }
+
+                // Read file with timeout
+                const text = await readFileWithTimeout(file.file);
                 fileContentText = text;
                 selectedFilePath.textContent = file.path;
                 fileContentView.textContent = text;
@@ -1631,6 +1737,29 @@
 
             // Header and file structure diagram
             combinedContentText = '# Combined Files\n\n';
+
+            // Add summary of skipped/ignored files if any
+            if (skippedFiles.length > 0 || ignoredFiles.length > 0) {
+                combinedContentText += '## Processing Summary\n\n';
+                combinedContentText += `- **Included files**: ${files.length}\n`;
+
+                if (skippedFiles.length > 0) {
+                    combinedContentText += `- **Skipped files**: ${skippedFiles.length}\n`;
+                    combinedContentText += '\n### Skipped Files\n\n';
+                    for (const skipped of skippedFiles.slice(0, 20)) {
+                        combinedContentText += `- \`${skipped.path}\` - ${skipped.reason}\n`;
+                    }
+                    if (skippedFiles.length > 20) {
+                        combinedContentText += `- ... and ${skippedFiles.length - 20} more files\n`;
+                    }
+                    combinedContentText += '\n';
+                }
+
+                if (ignoredFiles.length > 0) {
+                    combinedContentText += `- **Ignored files** (via loadignore): ${ignoredFiles.length}\n\n`;
+                }
+            }
+
             combinedContentText += '## File Structure\n\n';
             combinedContentText += '```mermaid\n';
 
@@ -1639,14 +1768,25 @@
             combinedContentText += generateMermaidDiagram(tree);
             combinedContentText += '```\n\n';
 
-            // Add each file's content
+            // Add each file's content - process in chunks to prevent browser freeze
             combinedContentText += '## File Contents\n\n';
-            for (const file of files) {
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
                 try {
-                    const text = await file.file.text();
+                    // Update progress text
+                    combineButtonText.textContent = `結合中... (${i + 1}/${files.length})`;
+
+                    // Read file with timeout
+                    const text = await readFileWithTimeout(file.file);
                     const fileName = file.path;
                     const extension = getFileExtension(fileName);
                     combinedContentText += `### ${fileName}\n\`\`\`${extension}\n${text}\n\`\`\`\n\n`;
+
+                    // Allow UI to breathe every CHUNK_SIZE files
+                    if ((i + 1) % CHUNK_SIZE === 0) {
+                        await new Promise(resolve => setTimeout(resolve, 0));
+                    }
                 } catch (err) {
                     console.error(`Error processing file ${file.path}:`, err);
                     combinedContentText += `### Error: ${file.path}\n\`\`\`\nError: ${err.message}\n\`\`\`\n\n`;
@@ -1790,6 +1930,8 @@
         // Create and download .loadignore sample
         function downloadLoadIgnoreSample() {
             const sampleContent = `# .loadignore - Sample ignore pattern file
+# This file can be named either ".loadignore" or "loadignore.txt"
+# Both names are supported - use whichever is easier for your system
 # Lines starting with # are comments and will be ignored
 
 # --------------------------------------------------
