@@ -1130,59 +1130,91 @@
                 const dirReader = entry.createReader();
                 return new Promise((resolve) => {
                     let allEntries = [];
+                    let reading = true;
 
                     // readEntries may need to be called multiple times to get all entries
-                    const readAllEntries = () => {
-                        dirReader.readEntries(async (entries) => {
+                    const readAllEntries = async () => {
+                        log(`Reading entries from directory ${fullPath}`, 'info');
+                        let batchCount = 0;
+
+                        while (reading) {
+                            // Wrap readEntries in a promise
+                            const entries = await new Promise((resolveRead) => {
+                                dirReader.readEntries((entries) => {
+                                    resolveRead(entries);
+                                });
+                            });
+
                             if (entries.length === 0) {
-                                // No more entries, process what we have
-                                if (allEntries.length === 0) {
-                                    resolve([]);
-                                    return;
-                                }
-
-                                if (DEBUG_MODE) {
-                                    log(`Processing directory ${fullPath} with ${allEntries.length} total entries`);
-                                }
-
-                                // Support both .loadignore and loadignore.txt
-                                const loadIgnoreEntry = allEntries.find(e => isLoadIgnoreFile(e.name));
-
-                                if (loadIgnoreEntry) {
-                                    await processEntry(loadIgnoreEntry, dirPath, currentIgnorePatterns, rootPath);
-                                }
-
-                                // Process entries in chunks to avoid blocking UI
-                                const filteredEntries = allEntries.filter(e => !isLoadIgnoreFile(e.name));
-                                const results = [];
-
-                                log(`Starting to process ${filteredEntries.length} entries in directory ${fullPath}`, 'info');
-
-                                // Process one at a time for maximum UI responsiveness
-                                for (let i = 0; i < filteredEntries.length; i++) {
-                                    const entry = filteredEntries[i];
-                                    const result = await processEntry(entry, dirPath, currentIgnorePatterns, rootPath);
-                                    if (result) {
-                                        results.push(result);
-                                    }
-
-                                    // Yield to UI thread after each entry
-                                    if (i % 5 === 0) {
-                                        await new Promise(resolve => setTimeout(resolve, 1));
-                                    }
-                                }
-
-                                log(`Completed processing directory ${fullPath}`, 'info');
-                                resolve(results.flat().filter(Boolean));
-                            } else {
-                                // Add these entries and continue reading
-                                allEntries.push(...entries);
-                                readAllEntries(); // Read more entries
+                                reading = false;
+                                break;
                             }
-                        });
+
+                            batchCount++;
+                            allEntries.push(...entries);
+
+                            if (DEBUG_MODE) {
+                                log(`Batch ${batchCount}: Read ${entries.length} entries from ${fullPath}, total: ${allEntries.length}`);
+                            }
+
+                            // Yield to UI thread after each batch
+                            await new Promise(resolve => setTimeout(resolve, 1));
+                        }
+
+                        log(`Finished reading ${allEntries.length} entries from ${fullPath} in ${batchCount} batches`, 'info');
+
+                        // Now process all collected entries
+                        if (allEntries.length === 0) {
+                            resolve([]);
+                            return;
+                        }
+
+                        log(`Processing directory ${fullPath} with ${allEntries.length} total entries`, 'info');
+
+                        // Support both .loadignore and loadignore.txt
+                        const loadIgnoreEntry = allEntries.find(e => isLoadIgnoreFile(e.name));
+
+                        if (loadIgnoreEntry) {
+                            await processEntry(loadIgnoreEntry, dirPath, currentIgnorePatterns, rootPath);
+                        }
+
+                        // Process entries in chunks to avoid blocking UI
+                        const filteredEntries = allEntries.filter(e => !isLoadIgnoreFile(e.name));
+                        const results = [];
+
+                        log(`Starting to process ${filteredEntries.length} entries in directory ${fullPath}`, 'info');
+
+                        // Process one at a time for maximum UI responsiveness
+                        for (let i = 0; i < filteredEntries.length; i++) {
+                            const entry = filteredEntries[i];
+
+                            if (DEBUG_MODE) {
+                                log(`Processing entry ${i + 1}/${filteredEntries.length}: ${entry.name} (${entry.isDirectory ? 'dir' : 'file'})`);
+                            }
+
+                            try {
+                                const result = await processEntry(entry, dirPath, currentIgnorePatterns, rootPath);
+                                if (result) {
+                                    results.push(result);
+                                }
+                            } catch (err) {
+                                log(`Error processing entry ${entry.name}: ${err.message}`, 'info');
+                            }
+
+                            // Yield to UI thread after each entry
+                            if (i % 5 === 0) {
+                                await new Promise(resolve => setTimeout(resolve, 1));
+                            }
+                        }
+
+                        log(`Completed processing directory ${fullPath}`, 'info');
+                        resolve(results.flat().filter(Boolean));
                     };
 
-                    readAllEntries();
+                    readAllEntries().catch(error => {
+                        log(`Error processing directory ${fullPath}: ${error.message}`, 'info');
+                        resolve([]);
+                    });
                 });
             }
         }
