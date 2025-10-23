@@ -1066,6 +1066,11 @@
             progress = Math.min(Math.round((processedFiles / estimatedTotalFiles) * 100), 100);
             progressBar.style.width = `${progress}%`;
             progressText.textContent = progress;
+
+            // Log progress every 50 files
+            if (processedFiles > 0 && processedFiles % 50 === 0) {
+                log(`Processing... ${processedFiles} files scanned (${files.length} included, ${skippedFiles.length} skipped, ${ignoredFiles.length} ignored)`, 'info');
+            }
         }
 
         // Check if file is a loadignore file
@@ -1125,6 +1130,15 @@
                 return new Promise((resolve) => {
                     const readEntries = async () => {
                         dirReader.readEntries(async (entries) => {
+                            if (entries.length === 0) {
+                                resolve([]);
+                                return;
+                            }
+
+                            if (DEBUG_MODE) {
+                                log(`Processing directory ${fullPath} with ${entries.length} entries`);
+                            }
+
                             // Support both .loadignore and loadignore.txt
                             const loadIgnoreEntry = entries.find(e => isLoadIgnoreFile(e.name));
 
@@ -1132,16 +1146,23 @@
                                 await processEntry(loadIgnoreEntry, dirPath, currentIgnorePatterns, rootPath);
                             }
 
-                            if (entries.length === 0) {
-                                resolve([]);
-                            } else {
-                                const results = await Promise.all(
-                                    entries
-                                        .filter(e => !isLoadIgnoreFile(e.name))
-                                        .map(e => processEntry(e, dirPath, currentIgnorePatterns, rootPath))
+                            // Process entries in chunks to avoid blocking UI
+                            const filteredEntries = entries.filter(e => !isLoadIgnoreFile(e.name));
+                            const results = [];
+
+                            // Process in chunks of 10 to keep UI responsive
+                            for (let i = 0; i < filteredEntries.length; i += 10) {
+                                const chunk = filteredEntries.slice(i, i + 10);
+                                const chunkResults = await Promise.all(
+                                    chunk.map(e => processEntry(e, dirPath, currentIgnorePatterns, rootPath))
                                 );
-                                resolve(results.flat().filter(Boolean));
+                                results.push(...chunkResults);
+
+                                // Yield to UI thread every chunk
+                                await new Promise(resolve => setTimeout(resolve, 0));
                             }
+
+                            resolve(results.flat().filter(Boolean));
                         });
                     };
                     readEntries();
