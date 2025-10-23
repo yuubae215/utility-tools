@@ -63,11 +63,48 @@
                             700: '#6d28d9',
                             800: '#5b21b6',
                             900: '#4c1d95',
+                        },
+                        accent: {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            200: '#f5d0fe',
+                            300: '#f0abfc',
+                            400: '#e879f9',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                            700: '#a21caf',
+                            800: '#86198f',
+                            900: '#701a75',
                         }
                     },
                     animation: {
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'bounce-slow': 'bounce 2s infinite',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                    },
+                    backdropBlur: {
+                        xs: '2px',
                     }
                 }
             }
@@ -75,49 +112,68 @@
     </script>
 
     <style>
-        /* Common color variables */
+        /* Common color variables - Modernized */
         :root {
-            --primary-color: #3498db;
-            --primary-dark: #2980b9;
-            --primary-light: #EEF2FF;
-            --accent-color: #e74c3c;
-            --secondary-color: #12B981;
-            --text-color: #2c3e50;
-            --text-light: #636e72;
-            --text-primary: #2c3e50;
-            --text-secondary: #636e72;
-            --text-tertiary: #9CA3AF;
+            --primary-color: #0284c7;
+            --primary-dark: #0369a1;
+            --primary-light: #e0f2fe;
+            --accent-color: #d946ef;
+            --accent-light: #f0abfc;
+            --secondary-color: #10b981;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
             --bg-color: #f8fafc;
-            --card-color: #fff;
-            --surface-color: #F9FAFB;
-            --border-color: #E5E7EB;
-            --border-radius: 12px;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            --transition: all 0.3s ease;
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+            --card-color: rgba(255, 255, 255, 0.95);
+            --surface-color: #f1f5f9;
+            --border-color: #e2e8f0;
+            --border-radius: 16px;
+            --border-radius-lg: 20px;
+            --shadow: 0 4px 20px rgba(14, 165, 233, 0.1);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 16px rgba(14, 165, 233, 0.12);
+            --shadow-lg: 0 12px 32px rgba(14, 165, 233, 0.15);
+            --shadow-xl: 0 20px 48px rgba(14, 165, 233, 0.2);
+            --hover-shadow: 0 12px 32px rgba(14, 165, 233, 0.25);
+            --glow: 0 0 20px rgba(14, 165, 233, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-normal: 0.2s ease-in-out;
             --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
         }
 
-        /* Dark mode variables */
+        /* Dark mode variables - Enhanced */
         body.dark-mode {
-            --primary-color: #5dade2;
-            --primary-dark: #3498db;
-            --primary-light: #2d3748;
-            --accent-color: #e76f51;
-            --text-color: #ecf0f1;
-            --text-light: #bdc3c7;
-            --text-primary: #ecf0f1;
-            --text-secondary: #bdc3c7;
-            --text-tertiary: #a0aec0;
+            --primary-color: #38bdf8;
+            --primary-dark: #0ea5e9;
+            --primary-light: #1e3a52;
+            --accent-color: #e879f9;
+            --accent-light: #c026d3;
+            --secondary-color: #10b981;
+            --text-color: #f1f5f9;
+            --text-light: #cbd5e1;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
             --bg-color: #0f172a;
-            --card-color: #1e293b;
-            --surface-color: #2d3748;
-            --border-color: #4a5568;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --card-color: rgba(30, 41, 59, 0.95);
+            --surface-color: #1e293b;
+            --border-color: #334155;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 48px rgba(0, 0, 0, 0.5);
+            --hover-shadow: 0 12px 32px rgba(56, 189, 248, 0.3);
+            --glow: 0 0 20px rgba(56, 189, 248, 0.4);
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(148, 163, 184, 0.2);
         }
 
         /* Base styles - 修正済み */
@@ -134,8 +190,9 @@
         body {
             font-family: var(--font-sans);
             color: var(--text-color);
-            background-color: var(--bg-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
+            background: var(--bg-gradient);
+            transition: background 0.5s ease, color 0.3s ease;
+            position: relative;
 
             /* Flexbox構造 - フッターを下部に固定 */
             display: flex;
@@ -143,9 +200,31 @@
             min-height: 100vh;
         }
 
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         body.dark {
             color: #e2e8f0;
-            background-color: #0f172a;
+        }
+
+        body.dark::before {
+            background: radial-gradient(circle at 20% 50%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%);
+        }
+
+        body > * {
+            position: relative;
+            z-index: 1;
         }
 
         /* メインコンテンツの横スクロール防止 */
@@ -191,32 +270,40 @@
             margin-right: 5px;
         }
 
-        /* Custom scrollbar */
+        /* Custom scrollbar - Modernized */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
         }
 
         ::-webkit-scrollbar-track {
-            background: transparent;
+            background: var(--surface-color);
+            border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background-color: rgba(155, 155, 155, 0.5);
-            border-radius: 20px;
-            transition: background-color 0.2s ease;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-600));
+            border-radius: 10px;
+            border: 2px solid var(--surface-color);
+            transition: background 0.2s ease;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(155, 155, 155, 0.8);
+            background: linear-gradient(180deg, var(--primary-dark), var(--secondary-700));
         }
 
-        /* Theme toggle switch styles */
+        /* Firefox scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--surface-color);
+        }
+
+        /* Theme toggle switch styles - Modernized */
         .theme-switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 26px;
+            width: 56px;
+            height: 28px;
         }
 
         .theme-switch input {
@@ -232,9 +319,14 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #cbd5e1;
-            transition: .4s;
+            background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+            transition: var(--transition);
             border-radius: 30px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider:hover {
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .slider:before {
@@ -243,40 +335,43 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 20px;
-            width: 20px;
+            height: 22px;
+            width: 22px;
             left: 3px;
             bottom: 3px;
-            background-color: white;
-            transition: .4s;
+            background: linear-gradient(135deg, #ffffff, #f1f5f9);
+            transition: var(--transition);
             border-radius: 50%;
-            font-size: 12px;
+            font-size: 11px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
         input:checked+.slider {
-            background-color: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
         }
 
         input:checked+.slider:before {
-            transform: translateX(24px);
+            transform: translateX(28px);
             content: "🌙";
         }
 
-        /* Progress bar */
+        /* Progress bar - Modernized */
         .progress-container {
             width: 100%;
-            height: 10px;
-            background-color: #e2e8f0;
-            border-radius: 10px;
+            height: 12px;
+            background: var(--surface-color);
+            border-radius: 12px;
             overflow: hidden;
             margin: 10px 0;
             position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-            border-radius: 10px;
+            background: linear-gradient(90deg, #0ea5e9, #8b5cf6, #d946ef);
+            background-size: 200% 100%;
+            border-radius: 12px;
             transition: width 0.5s ease;
             display: flex;
             align-items: center;
@@ -284,6 +379,30 @@
             color: white;
             font-size: 0;
             position: relative;
+            animation: gradientShift 2s ease infinite;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         /* コードビューの横スクロール調整 */
@@ -312,13 +431,46 @@
             max-width: 100%;
         }
 
-        /* ドロップゾーンの調整 */
+        /* ドロップゾーンの調整 - Modernized */
         .dropzone {
-            border: 2px dashed #94a3b8;
-            transition: all 0.3s ease;
+            border: 2px dashed var(--border-color);
+            background: var(--card-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--transition);
             position: relative;
             overflow: hidden;
             max-width: 100%;
+            box-shadow: var(--shadow-md);
+        }
+
+        .dropzone:hover {
+            border-color: var(--primary-color);
+            background: var(--glass-bg);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .dropzone.drag-active {
+            border-color: var(--accent-color);
+            background: var(--glass-bg);
+            box-shadow: var(--glow), var(--shadow-xl);
+            transform: scale(1.02);
+        }
+
+        .dropzone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .dropzone:hover::before {
+            left: 100%;
         }
 
         /* モーダルの幅調整 */
@@ -335,12 +487,49 @@
             overflow-x: auto;
         }
 
-        /* Button styles */
+        /* Button styles - Modernized */
         .btn {
-            transition: all 0.3s ease;
+            transition: var(--transition);
             position: relative;
             overflow: hidden;
             white-space: nowrap;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn svg {
+            transition: var(--transition-fast);
+        }
+
+        .btn:hover svg {
+            transform: scale(1.1);
         }
 
         /* Tooltip */
@@ -377,6 +566,94 @@
             color: var(--text-light);
             width: 100%;
             background-color: var(--card-color);
+        }
+
+        /* Card styles - Modernized */
+        .card {
+            background: var(--card-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        /* Empty state icon animation */
+        .empty-state-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* File list items */
+        #fileList li {
+            transition: var(--transition);
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        #fileList li:hover {
+            background: var(--surface-color);
+            border-left-color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        #fileList li.active {
+            background: var(--primary-light);
+            border-left-color: var(--primary-color);
+        }
+
+        body.dark #fileList li.active {
+            background: var(--primary-light);
+        }
+
+        /* Scrollbar improvements */
+        #fileList::-webkit-scrollbar,
+        #fileContentView::-webkit-scrollbar,
+        #combinedContentView::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #fileList::-webkit-scrollbar-track,
+        #fileContentView::-webkit-scrollbar-track,
+        #combinedContentView::-webkit-scrollbar-track {
+            background: var(--surface-color);
+            border-radius: 10px;
+        }
+
+        #fileList::-webkit-scrollbar-thumb,
+        #fileContentView::-webkit-scrollbar-thumb,
+        #combinedContentView::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+            opacity: 0.7;
+        }
+
+        #fileList::-webkit-scrollbar-thumb:hover,
+        #fileContentView::-webkit-scrollbar-thumb:hover,
+        #combinedContentView::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Loading dots animation */
+        .loading-dots::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
         }
 
         /* Mobile responsiveness improvements */
@@ -430,7 +707,8 @@
 <body class="dark dark-mode flex flex-col min-h-screen">
     <!-- Header for File Binder - Modified for PromptCraft IO -->
     <header
-        class="flex-shrink-0 px-3 sm:px-6 py-3 sm:py-4 bg-primary-600 text-white flex justify-between items-center w-full overflow-hidden">
+        class="flex-shrink-0 px-3 sm:px-6 py-3 sm:py-4 text-white flex justify-between items-center w-full overflow-hidden backdrop-blur-md bg-gradient-to-r from-primary-600 via-primary-500 to-secondary-600 shadow-lg"
+        style="backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
         <div class="flex items-center space-x-2 overflow-hidden">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0 text-white"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -463,10 +741,10 @@
     </header>
 
     <!-- Main content -->
-    <main class="flex-grow p-3 sm:p-4 md:p-6 bg-slate-50 dark:bg-slate-900 overflow-x-hidden w-full">
+    <main class="flex-grow p-3 sm:p-4 md:p-6 overflow-x-hidden w-full">
         <!-- Drop zone -->
         <div id="dropZone"
-            class="dropzone rounded-xl p-4 sm:p-6 md:p-8 text-center cursor-pointer mb-4 sm:mb-6 bg-white dark:bg-slate-800 shadow-sm max-w-full overflow-hidden">
+            class="dropzone rounded-xl p-4 sm:p-6 md:p-8 text-center cursor-pointer mb-4 sm:mb-6 max-w-full overflow-hidden">
             <div id="loadingContainer" class="w-full hidden">
                 <div class="progress-container">
                     <div id="progressBar" class="progress-bar" style="width: 0%"></div>
@@ -493,11 +771,11 @@
                 </p>
                 <div class="flex flex-wrap justify-center gap-2">
                     <span
-                        class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/30">Files</span>
+                        class="inline-flex items-center rounded-lg bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/40 dark:to-primary-800/30 px-3 py-1.5 text-xs font-semibold text-primary-700 dark:text-primary-300 shadow-sm border border-primary-200 dark:border-primary-700/30">Files</span>
                     <span
-                        class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-400 ring-1 ring-inset ring-indigo-700/10 dark:ring-indigo-400/30">Folders</span>
+                        class="inline-flex items-center rounded-lg bg-gradient-to-r from-secondary-50 to-secondary-100 dark:from-secondary-900/40 dark:to-secondary-800/30 px-3 py-1.5 text-xs font-semibold text-secondary-700 dark:text-secondary-300 shadow-sm border border-secondary-200 dark:border-secondary-700/30">Folders</span>
                     <span
-                        class="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-900/30 px-2 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 ring-1 ring-inset ring-purple-700/10 dark:ring-purple-400/30">.loadignore</span>
+                        class="inline-flex items-center rounded-lg bg-gradient-to-r from-accent-50 to-accent-100 dark:from-accent-900/40 dark:to-accent-800/30 px-3 py-1.5 text-xs font-semibold text-accent-700 dark:text-accent-300 shadow-sm border border-accent-200 dark:border-accent-700/30">.loadignore</span>
                 </div>
                 <div class="mt-4 flex flex-col">
                     <button id="downloadSampleIgnore"
@@ -519,7 +797,7 @@
 
         <!-- Error message -->
         <div id="errorContainer"
-            class="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg hidden">
+            class="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-xl shadow-md backdrop-blur-sm hidden">
             <div class="flex">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -536,7 +814,7 @@
 
         <!-- Empty state when no files are loaded -->
         <div id="emptyState"
-            class="card flex flex-col items-center justify-center py-8 sm:py-12 bg-white dark:bg-slate-800 rounded-xl shadow-sm">
+            class="card flex flex-col items-center justify-center py-8 sm:py-12">
             <svg xmlns="http://www.w3.org/2000/svg"
                 class="h-16 w-16 text-slate-300 dark:text-slate-600 mb-4 empty-state-icon" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
@@ -553,28 +831,28 @@
             <div class="text-sm text-slate-500 dark:text-slate-500 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl">
                 <div class="flex items-start">
                     <div
-                        class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mr-3">
+                        class="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white mr-3 shadow-md font-semibold">
                         1</div>
                     <div>
-                        <h4 class="font-medium text-slate-900 dark:text-white">Upload</h4>
+                        <h4 class="font-semibold text-slate-900 dark:text-white">Upload</h4>
                         <p class="mt-1">Drag & drop files</p>
                     </div>
                 </div>
                 <div class="flex items-start">
                     <div
-                        class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mr-3">
+                        class="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-secondary-400 to-secondary-600 text-white mr-3 shadow-md font-semibold">
                         2</div>
                     <div>
-                        <h4 class="font-medium text-slate-900 dark:text-white">Preview</h4>
+                        <h4 class="font-semibold text-slate-900 dark:text-white">Preview</h4>
                         <p class="mt-1">Review file contents</p>
                     </div>
                 </div>
                 <div class="flex items-start">
                     <div
-                        class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mr-3">
+                        class="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 text-white mr-3 shadow-md font-semibold">
                         3</div>
                     <div>
-                        <h4 class="font-medium text-slate-900 dark:text-white">Combine</h4>
+                        <h4 class="font-semibold text-slate-900 dark:text-white">Combine</h4>
                         <p class="mt-1">Generate & download</p>
                     </div>
                 </div>
@@ -585,7 +863,7 @@
         <div id="fileContainer" class="hidden w-full overflow-hidden">
             <!-- Actions -->
             <div id="actionsContainer"
-                class="mb-4 sm:mb-6 p-3 sm:p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm w-full overflow-hidden">
+                class="card mb-4 sm:mb-6 p-3 sm:p-4 w-full overflow-hidden">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full">
                     <div class="mb-3 sm:mb-0 max-w-full">
                         <h3 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-1 truncate">
@@ -652,9 +930,10 @@
 
             <!-- Size Analysis Modal -->
             <div id="sizeAnalysisModal"
-                class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden overflow-y-auto overflow-x-hidden">
+                class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center hidden overflow-y-auto overflow-x-hidden">
                 <div
-                    class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-[95%] max-w-4xl max-h-[90vh] flex flex-col m-4">
+                    class="card rounded-2xl shadow-2xl w-[95%] max-w-4xl max-h-[90vh] flex flex-col m-4"
+                    style="animation: scaleIn 0.2s ease-out;">
                     <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                         <h3 class="text-lg font-medium text-slate-900 dark:text-white">File Size Analysis</h3>
                         <button id="closeSizeAnalysisModal"
@@ -722,7 +1001,7 @@
             <div class="flex flex-col lg:flex-row gap-4 sm:gap-6 w-full overflow-hidden">
                 <!-- File list -->
                 <div id="fileListContainer"
-                    class="lg:w-1/3 w-full card bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden">
+                    class="lg:w-1/3 w-full card overflow-hidden">
                     <div class="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-700">
                         <div class="flex items-center justify-between">
                             <h2 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white">File List</h2>
@@ -747,7 +1026,7 @@
 
                 <!-- File content preview -->
                 <div id="fileContentContainer"
-                    class="lg:w-2/3 w-full card bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden">
+                    class="lg:w-2/3 w-full card overflow-hidden">
                     <div id="selectedFileContent" class="hidden h-full flex flex-col">
                         <div
                             class="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
@@ -824,10 +1103,11 @@
 
     <!-- Simple footer -->
     <footer
-        class="flex-shrink-0 px-4 py-3 sm:px-6 sm:py-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-center">
+        class="flex-shrink-0 px-4 py-3 sm:px-6 sm:py-4 border-t border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-center backdrop-blur-sm"
+        style="background: var(--card-color);">
         <div class="text-slate-500 dark:text-slate-400">
             &copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools"
-                class="github-link">GitHub</a>
+                class="github-link hover:text-primary-500 transition-colors">GitHub</a>
         </div>
     </footer>
 
