@@ -350,7 +350,7 @@
             scrollbar-color: var(--primary-color) var(--surface-color);
         }
 
-        /* Theme toggle switch styles - Modernized */
+        /* Theme toggle switch styles - Modernized with SVG icons */
         .theme-switch {
             position: relative;
             display: inline-block;
@@ -394,6 +394,7 @@
             transition: var(--transition);
             border-radius: 30px;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: visible;
         }
 
         .slider:hover {
@@ -402,19 +403,57 @@
 
         .slider:before {
             position: absolute;
-            content: "🌞";
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            content: "";
             height: 22px;
             width: 22px;
             left: 3px;
             bottom: 3px;
-            background: linear-gradient(135deg, #ffffff, #f1f5f9);
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
             transition: var(--transition);
             border-radius: 50%;
-            font-size: 11px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Sun and Moon icons */
+        .theme-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            transition: var(--transition);
+            pointer-events: none;
+        }
+
+        .theme-icon svg {
+            color: #64748b;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+        }
+
+        header .theme-icon svg {
+            color: rgba(255, 255, 255, 0.9);
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+        }
+
+        .sun-icon {
+            left: 7px;
+            opacity: 1;
+        }
+
+        .moon-icon {
+            right: 7px;
+            opacity: 0.4;
+        }
+
+        input:checked+.slider .sun-icon {
+            opacity: 0.4;
+        }
+
+        input:checked+.slider .moon-icon {
+            opacity: 1;
         }
 
         input:checked+.slider {
@@ -423,7 +462,21 @@
 
         input:checked+.slider:before {
             transform: translateX(28px);
-            content: "🌙";
+        }
+
+        /* Icon animation on toggle */
+        .theme-icon svg {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .slider:hover .sun-icon svg {
+            transform: rotate(45deg);
+        }
+
+        .slider:hover .moon-icon svg {
+            transform: rotate(-15deg);
         }
 
         /* Progress bar - Modernized */
@@ -902,7 +955,28 @@
                     <div class="relative group">
                         <label class="theme-switch cursor-pointer" title="Toggle theme">
                             <input type="checkbox" id="themeToggle" checked>
-                            <span class="slider"></span>
+                            <span class="slider">
+                                <!-- Sun Icon -->
+                                <span class="theme-icon sun-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="4"/>
+                                        <path d="M12 2v2"/>
+                                        <path d="M12 20v2"/>
+                                        <path d="m4.93 4.93 1.41 1.41"/>
+                                        <path d="m17.66 17.66 1.41 1.41"/>
+                                        <path d="M2 12h2"/>
+                                        <path d="M20 12h2"/>
+                                        <path d="m6.34 17.66-1.41 1.41"/>
+                                        <path d="m19.07 4.93-1.41 1.41"/>
+                                    </svg>
+                                </span>
+                                <!-- Moon Icon -->
+                                <span class="theme-icon moon-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                                    </svg>
+                                </span>
+                            </span>
                         </label>
                     </div>
                 </div>
