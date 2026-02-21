@@ -222,7 +222,8 @@
         input[type="text"]:focus,
         textarea:focus,
         select:focus {
-            outline: none;
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(66, 99, 235, 0.35);
         }
@@ -876,21 +877,6 @@
             display: none;
         }
 
-        .responsive-hint {
-            display: none;
-            padding: var(--space-md);
-            background-color: var(--primary-light);
-            border-radius: var(--border-radius);
-            margin-bottom: var(--space-md);
-            color: var(--primary-color);
-            text-align: center;
-        }
-
-        @media (max-width: 1023px) {
-            .responsive-hint {
-                display: block;
-            }
-        }
     </style>
 </head>
 
@@ -906,10 +892,6 @@
 
     <main role="main">
     <div class="container">
-        <div class="responsive-hint">
-            For a better experience, desktop viewing is recommended.
-        </div>
-
         <div class="app-container">
             <div class="form-container">
                 <!-- Section 1: Content Information -->
