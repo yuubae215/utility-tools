@@ -1023,12 +1023,12 @@
                             aria-label="Learn about .loadignore pattern filtering"
                             aria-expanded="false"
                             aria-controls="loadignorePopover"
-                            style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--primary-500,#6366f1);border:none;cursor:pointer;font-size:11px;font-weight:bold;color:white;line-height:1;">ⓘ</button>
-                        <div id="loadignorePopover" role="tooltip" hidden
-                            style="position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);width:280px;background:var(--card-bg,#fff);border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:12px 14px;font-size:0.8rem;text-align:left;z-index:100;color:#374151;">
+                            style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--primary-500,#6366f1);border:none;cursor:pointer;font-size:14px;font-weight:bold;color:white;line-height:1;">ⓘ</button>
+                        <div id="loadignorePopover" role="dialog" aria-label="Loadignore pattern filtering help" hidden
+                            style="position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);width:280px;background:var(--card-color);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:12px 14px;font-size:0.8rem;text-align:left;z-index:100;color:var(--text-color);">
                             <p style="margin:0 0 6px;font-weight:600;">.loadignore — Pattern Filtering</p>
-                            <p style="margin:0 0 6px;">Add a file named <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;">.loadignore</code> or <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;">loadignore.txt</code> to your dropped folder to exclude files from being loaded.</p>
-                            <p style="margin:0;color:#6b7280;">Each line is a glob pattern. Lines starting with <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;">#</code> are comments. Example: <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;">*.log</code>, <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;">node_modules/</code></p>
+                            <p style="margin:0 0 6px;">Add a file named <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">.loadignore</code> or <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">loadignore.txt</code> to your dropped folder to exclude files from being loaded.</p>
+                            <p style="margin:0;color:var(--text-light);">Each line is a glob pattern. Lines starting with <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">#</code> are comments. Example: <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">*.log</code>, <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">node_modules/</code></p>
                         </div>
                     </span>
                 </h2>
@@ -1064,11 +1064,11 @@
         </div>
 
         <!-- Error message -->
-        <div id="errorContainer"
+        <div id="errorContainer" role="alert" aria-live="assertive"
             class="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-xl shadow-md backdrop-blur-sm hidden">
             <div class="flex">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
                     <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -1216,7 +1216,7 @@
                         </svg>
                         <h3 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white">Advanced Filters</h3>
                     </div>
-                    <button id="toggleFilterPanel" aria-label="Collapse filter panel" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1">
+                    <button id="toggleFilterPanel" aria-label="Collapse filter panel" aria-expanded="true" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1 py-2">
                         <span id="filterToggleText">Collapse</span>
                         <svg id="filterToggleIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <polyline points="18 15 12 9 6 15"></polyline>
@@ -1335,7 +1335,7 @@
                             <div
                                 class="flex items-center justify-between py-2 border-b border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-500 dark:text-slate-400">
                                 <div class="w-8 text-center">
-                                    <input type="checkbox" id="selectAllFiles"
+                                    <input type="checkbox" id="selectAllFiles" aria-label="Select all files"
                                         class="rounded border-slate-300 dark:border-slate-600 text-primary-600 focus:ring-primary-500">
                                 </div>
                                 <div class="flex-1 min-w-0">Filename</div>
@@ -3032,11 +3032,13 @@ poetry.lock
                 filterToggleText.textContent = 'Collapse';
                 filterToggleIcon.classList.remove('rotate-180');
                 toggleBtn.setAttribute('aria-label', 'Collapse filter panel');
+                toggleBtn.setAttribute('aria-expanded', 'true');
             } else {
                 filterContent.classList.add('hidden');
                 filterToggleText.textContent = 'Expand';
                 filterToggleIcon.classList.add('rotate-180');
                 toggleBtn.setAttribute('aria-label', 'Expand filter panel');
+                toggleBtn.setAttribute('aria-expanded', 'false');
             }
         }
 
