@@ -1,4 +1,4 @@
-# Design Support Tools Portal - Page Addition Guidelines
+# PromptCraft IO - Page Addition Guidelines
 
 This guideline explains how to add new tool pages to the Design Support Tools Portal. Following these guidelines will help maintain consistent design and user experience.
 
@@ -19,12 +19,10 @@ The project file structure is as follows:
 
 ```
 utility-tools/
-├── index.html             # Landing page
-├── color-palette.html     # Color palette generation tool
-├── layout-tool.html       # Layout design tool
-├── size-calculator.html   # Size calculator tool
-├── font-pairing.html      # Font pairing tool
-└── [your-new-tool].html   # Your new tool page
+├── index.html                # Landing page (portal)
+├── file-binder.html          # File Binder tool
+├── prompt-generator.html     # Layout & Style Prompt Generator tool
+└── [your-new-tool].html      # Your new tool page
 ```
 
 ## Creating a New Tool Page
@@ -43,7 +41,7 @@ Your new tool page should maintain the following basic structure:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tool Name - Design Support Tools</title>
+    <title>Tool Name - PromptCraft IO</title>
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
@@ -62,7 +60,7 @@ Your new tool page should maintain the following basic structure:
     </main>
 
     <footer>
-        <p>&copy; 2025 Design Support Tools Portal｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
+        <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
     </footer>
 
     <script>
@@ -102,7 +100,7 @@ Include the correct GitHub repository link in the footer:
 
 ```html
 <footer>
-    <p>&copy; 2025 Design Support Tools Portal｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
+    <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
 </footer>
 ```
 
@@ -165,15 +163,14 @@ Each tool card should have a unique gradient background color. Recommended color
 
 Assign one of the following categories to each tool:
 
-- `color`: Tools related to colors
+- `utility`: General-purpose tools (file handling, data processing, etc.)
 - `layout`: Tools related to layout and design composition
-- `typography`: Tools related to fonts and text
-- `measure`: Tools related to measurement, calculation, and conversion
+- `typography`: Tools related to fonts, text, and prompt generation
 
 Set the category in the `data-category` attribute:
 
 ```html
-<div class="tool-card" data-category="color">
+<div class="tool-card" data-category="utility">
 ```
 
 ## Testing
