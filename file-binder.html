@@ -995,7 +995,7 @@
     </header>
 
     <!-- Main content -->
-    <main class="flex-grow p-3 sm:p-4 md:p-6 overflow-x-hidden w-full">
+    <main role="main" class="flex-grow p-3 sm:p-4 md:p-6 overflow-x-hidden w-full">
         <!-- Drop zone -->
         <div id="dropZone"
             class="dropzone rounded-xl p-4 sm:p-6 md:p-8 text-center cursor-pointer mb-4 sm:mb-6 max-w-full overflow-hidden">
@@ -1300,11 +1300,11 @@
                     <div class="p-4 overflow-auto flex-1">
                         <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
                             <div class="flex items-center flex-wrap gap-2">
-                                <button id="sortByName"
+                                <button id="sortByName" aria-pressed="false"
                                     class="px-3 py-1 text-sm rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-primary-500">
                                     Sort by Name
                                 </button>
-                                <button id="sortBySize"
+                                <button id="sortBySize" aria-pressed="true"
                                     class="px-3 py-1 text-sm rounded-md border border-slate-300 dark:border-slate-600 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500">
                                     Sort by Size
                                 </button>
@@ -1358,7 +1358,7 @@
                         <div class="flex items-center justify-between">
                             <h2 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white">File List</h2>
                             <div class="relative">
-                                <input type="text" id="fileSearchInput" placeholder="Search..."
+                                <input type="text" id="fileSearchInput" placeholder="Search..." aria-label="Search files"
                                     class="py-1 px-3 pr-8 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-slate-400 dark:placeholder-slate-500">
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                     class="h-4 w-4 absolute right-2.5 top-2 text-slate-400 dark:text-slate-500"
@@ -2800,15 +2800,63 @@
             }
         }
 
+        // Focus trap state
+        let modalTriggerElement = null;
+        let modalFocusTrapHandler = null;
+
         // Open size analysis modal
         function openSizeAnalysisModal() {
-            document.getElementById('sizeAnalysisModal').classList.remove('hidden');
+            modalTriggerElement = document.activeElement;
+            const modal = document.getElementById('sizeAnalysisModal');
+            modal.classList.remove('hidden');
             renderSizeAnalysis('size'); // Default sort by size
+
+            // Move focus to first focusable element
+            const focusable = getFocusableElements(modal);
+            if (focusable.length) focusable[0].focus();
+
+            // Install focus trap
+            modalFocusTrapHandler = function (e) {
+                if (e.key !== 'Tab') return;
+                const elements = getFocusableElements(modal);
+                if (!elements.length) { e.preventDefault(); return; }
+                const first = elements[0];
+                const last = elements[elements.length - 1];
+                if (e.shiftKey) {
+                    if (document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    }
+                } else {
+                    if (document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+            };
+            modal.addEventListener('keydown', modalFocusTrapHandler);
         }
 
         // Close size analysis modal
         function closeSizeAnalysisModal() {
-            document.getElementById('sizeAnalysisModal').classList.add('hidden');
+            const modal = document.getElementById('sizeAnalysisModal');
+            modal.classList.add('hidden');
+            if (modalFocusTrapHandler) {
+                modal.removeEventListener('keydown', modalFocusTrapHandler);
+                modalFocusTrapHandler = null;
+            }
+            // Restore focus to trigger element
+            if (modalTriggerElement) {
+                modalTriggerElement.focus();
+                modalTriggerElement = null;
+            }
+        }
+
+        // Collect all focusable elements within a container
+        function getFocusableElements(container) {
+            return Array.from(container.querySelectorAll(
+                'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            )).filter(el => !el.closest('[hidden]') && !el.classList.contains('hidden'));
         }
 
         // Create and download .loadignore sample
@@ -2960,15 +3008,18 @@ poetry.lock
             const filterContent = document.getElementById('filterContent');
             const filterToggleText = document.getElementById('filterToggleText');
             const filterToggleIcon = document.getElementById('filterToggleIcon');
+            const toggleBtn = document.getElementById('toggleFilterPanel');
 
             if (filterContent.classList.contains('hidden')) {
                 filterContent.classList.remove('hidden');
                 filterToggleText.textContent = 'Collapse';
                 filterToggleIcon.classList.remove('rotate-180');
+                toggleBtn.setAttribute('aria-label', 'Collapse filter panel');
             } else {
                 filterContent.classList.add('hidden');
                 filterToggleText.textContent = 'Expand';
                 filterToggleIcon.classList.add('rotate-180');
+                toggleBtn.setAttribute('aria-label', 'Expand filter panel');
             }
         }
 
@@ -3077,12 +3128,18 @@ poetry.lock
         document.getElementById('cancelSizeAnalysis').addEventListener('click', closeSizeAnalysisModal);
         document.getElementById('sortBySize').addEventListener('click', function () {
             this.classList.add('bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-400');
-            document.getElementById('sortByName').classList.remove('bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-400');
+            this.setAttribute('aria-pressed', 'true');
+            const sortByName = document.getElementById('sortByName');
+            sortByName.classList.remove('bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-400');
+            sortByName.setAttribute('aria-pressed', 'false');
             renderSizeAnalysis('size');
         });
         document.getElementById('sortByName').addEventListener('click', function () {
             this.classList.add('bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-400');
-            document.getElementById('sortBySize').classList.remove('bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-400');
+            this.setAttribute('aria-pressed', 'true');
+            const sortBySize = document.getElementById('sortBySize');
+            sortBySize.classList.remove('bg-primary-50', 'dark:bg-primary-900/30', 'text-primary-700', 'dark:text-primary-400');
+            sortBySize.setAttribute('aria-pressed', 'false');
             renderSizeAnalysis('name');
         });
         document.getElementById('selectAllFiles').addEventListener('change', function () {

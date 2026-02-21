@@ -90,7 +90,7 @@
             margin-bottom: var(--space-xs);
         }
 
-        h2 {
+        .subtitle {
             font-size: 1.25rem;
             margin-bottom: var(--space-lg);
             font-weight: 500;
@@ -171,7 +171,9 @@
         .form-section-title {
             display: flex;
             align-items: center;
+            margin-top: 0;
             margin-bottom: var(--space-md);
+            padding: 0;
             font-size: 1.125rem;
             font-weight: 600;
             color: var(--text-color);
@@ -221,7 +223,7 @@
         select:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(66, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(66, 99, 235, 0.35);
         }
 
         textarea {
@@ -478,7 +480,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.6rem;
+            font-size: 0.875rem;
         }
 
         .color-preview {
@@ -773,7 +775,7 @@
                 font-size: 1.5rem;
             }
 
-            h2 {
+            .subtitle {
                 font-size: 1.1rem;
                 margin-bottom: var(--space-md);
             }
@@ -872,10 +874,11 @@
             <i class="fas fa-moon" aria-hidden="true"></i>
         </button>
         <h1>Layout &amp; Style Prompt Generator</h1>
-        <h2>Shape your LLM inputs and outputs with precision</h2>
+        <p class="subtitle">Shape your LLM inputs and outputs with precision</p>
         <a href="index.html" class="home-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Home</a>
     </header>
 
+    <main role="main">
     <div class="container">
         <div class="responsive-hint">
             For a better experience, desktop viewing is recommended.
@@ -885,10 +888,10 @@
             <div class="form-container">
                 <!-- Section 1: Content Information -->
                 <div class="form-section">
-                    <div class="form-section-title">
+                    <h2 class="form-section-title">
                         <div class="form-section-number">1</div>
                         Content Information
-                    </div>
+                    </h2>
 
                     <div class="form-group">
                         <label for="topic">Main Theme/Topic</label>
@@ -927,10 +930,10 @@
 
                 <!-- Section 2: Design Concept -->
                 <div class="form-section">
-                    <div class="form-section-title">
+                    <h2 class="form-section-title">
                         <div class="form-section-number">2</div>
                         Design Concept Selection
-                    </div>
+                    </h2>
 
                     <div class="concept-cards" role="radiogroup" aria-label="Design concept">
                         <div class="concept-card selected" data-concept="neumorphism" role="radio" aria-checked="true" tabindex="0">
@@ -964,10 +967,10 @@
 
                 <!-- Section 3: Color Scheme -->
                 <div class="form-section">
-                    <div class="form-section-title">
+                    <h2 class="form-section-title">
                         <div class="form-section-number">3</div>
                         Color Scheme
-                    </div>
+                    </h2>
 
                     <div class="color-option-toggle">
                         <button class="color-option-btn active" data-option="theme">Choose from themes</button>
@@ -1050,10 +1053,10 @@
 
                 <!-- Section 4: Style and Format -->
                 <div class="form-section">
-                    <div class="form-section-title">
+                    <h2 class="form-section-title">
                         <div class="form-section-number">4</div>
                         Style and Format
-                    </div>
+                    </h2>
 
                     <div class="form-group">
                         <label for="font-style">Font Style</label>
@@ -1151,6 +1154,7 @@
             </div>
         </div>
     </div>
+    </main>
 
     <footer>
         <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools" class="github-link">GitHub</a></p>
@@ -1404,6 +1408,19 @@
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     tab.click();
+                }
+                if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    const allTabs = Array.from(document.querySelectorAll('.tab'));
+                    const currentIndex = allTabs.indexOf(tab);
+                    let nextIndex;
+                    if (e.key === 'ArrowRight') {
+                        nextIndex = (currentIndex + 1) % allTabs.length;
+                    } else {
+                        nextIndex = (currentIndex - 1 + allTabs.length) % allTabs.length;
+                    }
+                    allTabs[nextIndex].focus();
+                    allTabs[nextIndex].click();
                 }
             });
         });
