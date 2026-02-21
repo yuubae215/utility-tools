@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-US">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,6 +28,7 @@
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             --transition: all 0.3s ease;
+            --transition-fast: 0.15s ease;
             --transition-normal: 0.2s ease-in-out;
             --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             --space-xs: 0.25rem;
@@ -867,12 +868,12 @@
 
 <body>
     <header>
-        <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">
-            <i class="fas fa-moon"></i>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode">
+            <i class="fas fa-moon" aria-hidden="true"></i>
         </button>
-        <h1>PromptCraft IO</h1>
+        <h1>Layout &amp; Style Prompt Generator</h1>
         <h2>Shape your LLM inputs and outputs with precision</h2>
-        <a href="index.html" class="home-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        <a href="index.html" class="home-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Home</a>
     </header>
 
     <div class="container">
@@ -902,14 +903,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Key Focus Areas</label>
-                        <div class="tags-container" id="focus-tags">
-                            <div class="tag" data-tag="data">Data Analysis</div>
-                            <div class="tag" data-tag="visual">Visual Representation</div>
-                            <div class="tag" data-tag="simple">Simplified Explanation</div>
-                            <div class="tag" data-tag="comparison">Comparison</div>
-                            <div class="tag" data-tag="process">Process Flow</div>
-                            <div class="tag" data-tag="hierarchy">Hierarchy</div>
+                        <label id="focus-tags-label">Key Focus Areas</label>
+                        <div class="tags-container" id="focus-tags" role="group" aria-labelledby="focus-tags-label">
+                            <div class="tag" data-tag="data" role="checkbox" aria-checked="false" tabindex="0">Data Analysis</div>
+                            <div class="tag" data-tag="visual" role="checkbox" aria-checked="false" tabindex="0">Visual Representation</div>
+                            <div class="tag" data-tag="simple" role="checkbox" aria-checked="false" tabindex="0">Simplified Explanation</div>
+                            <div class="tag" data-tag="comparison" role="checkbox" aria-checked="false" tabindex="0">Comparison</div>
+                            <div class="tag" data-tag="process" role="checkbox" aria-checked="false" tabindex="0">Process Flow</div>
+                            <div class="tag" data-tag="hierarchy" role="checkbox" aria-checked="false" tabindex="0">Hierarchy</div>
                         </div>
                     </div>
 
@@ -931,30 +932,30 @@
                         Design Concept Selection
                     </div>
 
-                    <div class="concept-cards">
-                        <div class="concept-card selected" data-concept="neumorphism">
+                    <div class="concept-cards" role="radiogroup" aria-label="Design concept">
+                        <div class="concept-card selected" data-concept="neumorphism" role="radio" aria-checked="true" tabindex="0">
                             <h3>Fluid Neumorphism</h3>
                             <p>A tactile design with soft shadows and subtle 3D effects. Suitable for elegant, premium
                                 interfaces.</p>
-                            <div class="neumorphism-preview" style="margin-top: 10px;">
+                            <div class="neumorphism-preview" style="margin-top: 10px;" aria-hidden="true">
                                 <div class="preview-title">Preview</div>
                             </div>
                         </div>
 
-                        <div class="concept-card" data-concept="colorscape">
+                        <div class="concept-card" data-concept="colorscape" role="radio" aria-checked="false" tabindex="0">
                             <h3>Dynamic Colorscape</h3>
                             <p>Energetic design using vibrant colors, gradients, and spatial depth. Ideal when visual
                                 impact is important.</p>
-                            <div class="colorscape-preview" style="margin-top: 10px;">
+                            <div class="colorscape-preview" style="margin-top: 10px;" aria-hidden="true">
                                 <div class="preview-title">Preview</div>
                             </div>
                         </div>
 
-                        <div class="concept-card" data-concept="typographic">
+                        <div class="concept-card" data-concept="typographic" role="radio" aria-checked="false" tabindex="0">
                             <h3>Typographic Grid</h3>
                             <p>Minimal design focusing on typography, whitespace, and structural layout. Perfect when
                                 readability and content structure matter.</p>
-                            <div class="typographic-preview" style="margin-top: 10px;">
+                            <div class="typographic-preview" style="margin-top: 10px;" aria-hidden="true">
                                 <div class="preview-title">Preview</div>
                             </div>
                         </div>
@@ -973,9 +974,9 @@
                         <button class="color-option-btn" data-option="custom">Custom</button>
                     </div>
 
-                    <div id="theme-selector" class="color-theme-selector">
-                        <div class="color-theme selected" data-theme="modern">
-                            <div class="color-preview">
+                    <div id="theme-selector" class="color-theme-selector" role="radiogroup" aria-label="Color theme">
+                        <div class="color-theme selected" data-theme="modern" role="radio" aria-checked="true" tabindex="0">
+                            <div class="color-preview" aria-hidden="true">
                                 <div class="color-primary" style="background-color: #4263EB;"></div>
                                 <div class="color-secondary" style="background-color: #12B981;"></div>
                                 <div class="color-accent" style="background-color: #F97316;"></div>
@@ -983,8 +984,8 @@
                             <div class="color-theme-name">Modern</div>
                         </div>
 
-                        <div class="color-theme" data-theme="classic">
-                            <div class="color-preview">
+                        <div class="color-theme" data-theme="classic" role="radio" aria-checked="false" tabindex="0">
+                            <div class="color-preview" aria-hidden="true">
                                 <div class="color-primary" style="background-color: #8B5A2B;"></div>
                                 <div class="color-secondary" style="background-color: #D4AF37;"></div>
                                 <div class="color-accent" style="background-color: #7D3C3C;"></div>
@@ -992,8 +993,8 @@
                             <div class="color-theme-name">Classic</div>
                         </div>
 
-                        <div class="color-theme" data-theme="vivid">
-                            <div class="color-preview">
+                        <div class="color-theme" data-theme="vivid" role="radio" aria-checked="false" tabindex="0">
+                            <div class="color-preview" aria-hidden="true">
                                 <div class="color-primary" style="background-color: #FF3366;"></div>
                                 <div class="color-secondary" style="background-color: #33CCFF;"></div>
                                 <div class="color-accent" style="background-color: #FFCC00;"></div>
@@ -1001,8 +1002,8 @@
                             <div class="color-theme-name">Vivid</div>
                         </div>
 
-                        <div class="color-theme" data-theme="monochrome">
-                            <div class="color-preview">
+                        <div class="color-theme" data-theme="monochrome" role="radio" aria-checked="false" tabindex="0">
+                            <div class="color-preview" aria-hidden="true">
                                 <div class="color-primary" style="background-color: #333333;"></div>
                                 <div class="color-secondary" style="background-color: #666666;"></div>
                                 <div class="color-accent" style="background-color: #999999;"></div>
@@ -1010,8 +1011,8 @@
                             <div class="color-theme-name">Monochrome</div>
                         </div>
 
-                        <div class="color-theme" data-theme="pastel">
-                            <div class="color-preview">
+                        <div class="color-theme" data-theme="pastel" role="radio" aria-checked="false" tabindex="0">
+                            <div class="color-preview" aria-hidden="true">
                                 <div class="color-primary" style="background-color: #FFAAA7;"></div>
                                 <div class="color-secondary" style="background-color: #A8E6CF;"></div>
                                 <div class="color-accent" style="background-color: #FFD3B6;"></div>
@@ -1019,8 +1020,8 @@
                             <div class="color-theme-name">Pastel</div>
                         </div>
 
-                        <div class="color-theme" data-theme="corporate">
-                            <div class="color-preview">
+                        <div class="color-theme" data-theme="corporate" role="radio" aria-checked="false" tabindex="0">
+                            <div class="color-preview" aria-hidden="true">
                                 <div class="color-primary" style="background-color: #0A2463;"></div>
                                 <div class="color-secondary" style="background-color: #3E92CC;"></div>
                                 <div class="color-accent" style="background-color: #D8315B;"></div>
@@ -1076,12 +1077,12 @@
                         </select>
                     </div>
 
-                    <div class="tabs">
-                        <div class="tab active" data-tab="infographic">Infographic</div>
-                        <div class="tab" data-tab="recording">Graphic Recording</div>
+                    <div class="tabs" role="tablist" aria-label="Visualization style">
+                        <div class="tab active" data-tab="infographic" role="tab" aria-selected="true" aria-controls="infographic-tab" id="tab-infographic" tabindex="0">Infographic</div>
+                        <div class="tab" data-tab="recording" role="tab" aria-selected="false" aria-controls="recording-tab" id="tab-recording" tabindex="-1">Graphic Recording</div>
                     </div>
 
-                    <div id="infographic-tab" class="tab-content active">
+                    <div id="infographic-tab" class="tab-content active" role="tabpanel" aria-labelledby="tab-infographic">
                         <div class="form-group">
                             <label for="infographic-style">Infographic Technique</label>
                             <select id="infographic-style">
@@ -1103,7 +1104,7 @@
                         </div>
                     </div>
 
-                    <div id="recording-tab" class="tab-content">
+                    <div id="recording-tab" class="tab-content" role="tabpanel" aria-labelledby="tab-recording">
                         <div class="form-group">
                             <label for="recording-style">Graphic Recording Technique</label>
                             <select id="recording-style">
@@ -1135,10 +1136,10 @@
                 <div class="result-card">
                     <div class="result-header">
                         <div class="result-title">Generated Prompt</div>
-                        <button id="copy-btn" class="btn btn-secondary">
+                        <button id="copy-btn" class="btn btn-secondary" aria-label="Copy generated prompt">
                             Copy
                             <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                             </svg>
@@ -1234,22 +1235,23 @@
         const recordingStyle = document.getElementById('recording-style');
 
         // Theme toggle
-        themeToggle.addEventListener('click', function () {
-            document.body.classList.toggle('dark-mode');
-            
-            if (document.body.classList.contains('dark-mode')) {
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-            
-            // Update Mermaid theme
+        const themeIcon = themeToggle.querySelector('i');
+
+        function applyTheme(isDark) {
+            document.body.classList.toggle('dark-mode', isDark);
+            themeIcon.classList.toggle('fa-sun', isDark);
+            themeIcon.classList.toggle('fa-moon', !isDark);
+            themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
             mermaid.initialize({
-                theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default'
+                theme: isDark ? 'dark' : 'default'
             });
-            
-            // Re-render previews
             updateMermaidPreviews();
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = !document.body.classList.contains('dark-mode');
+            applyTheme(isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
 
         // Color option toggle
@@ -1283,12 +1285,22 @@
         // Theme selection
         themeItems.forEach(theme => {
             theme.addEventListener('click', () => {
-                themeItems.forEach(t => t.classList.remove('selected'));
+                themeItems.forEach(t => {
+                    t.classList.remove('selected');
+                    t.setAttribute('aria-checked', 'false');
+                });
                 theme.classList.add('selected');
-                
+                theme.setAttribute('aria-checked', 'true');
+
                 state.selectedTheme = theme.dataset.theme;
                 updateColorsFromTheme(state.selectedTheme);
                 updateMermaidPreviews();
+            });
+            theme.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    theme.click();
+                }
             });
         });
 
@@ -1328,8 +1340,10 @@
             tag.addEventListener('click', () => {
                 tag.classList.toggle('selected');
                 const tagId = tag.dataset.tag;
-                
-                if (tag.classList.contains('selected')) {
+                const isSelected = tag.classList.contains('selected');
+                tag.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+
+                if (isSelected) {
                     if (!state.selectedTags.includes(tagId)) {
                         state.selectedTags.push(tagId);
                     }
@@ -1337,32 +1351,60 @@
                     state.selectedTags = state.selectedTags.filter(id => id !== tagId);
                 }
             });
+            tag.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    tag.click();
+                }
+            });
         });
 
         // Concept cards
         conceptCards.forEach(card => {
             card.addEventListener('click', () => {
-                conceptCards.forEach(c => c.classList.remove('selected'));
+                conceptCards.forEach(c => {
+                    c.classList.remove('selected');
+                    c.setAttribute('aria-checked', 'false');
+                });
                 card.classList.add('selected');
+                card.setAttribute('aria-checked', 'true');
                 state.selectedConcept = card.dataset.concept;
+            });
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
             });
         });
 
         // Tabs
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                    t.setAttribute('tabindex', '-1');
+                });
                 tab.classList.add('active');
-                
+                tab.setAttribute('aria-selected', 'true');
+                tab.setAttribute('tabindex', '0');
+
                 const tabId = tab.dataset.tab;
                 state.activeTab = tabId;
-                
+
                 document.querySelectorAll('.tab-content').forEach(content => {
                     content.classList.remove('active');
                 });
-                
+
                 document.getElementById(`${tabId}-tab`).classList.add('active');
                 updateMermaidPreviews();
+            });
+            tab.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    tab.click();
+                }
             });
         });
 
@@ -1817,9 +1859,14 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
+            // Restore theme from localStorage or system preference
+            const storedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(storedTheme === 'dark' || (storedTheme === null && prefersDark));
+
             // Set initial colors
             updateColorsFromTheme('modern');
-            
+
             // Initialize Mermaid previews
             updateMermaidPreviews();
         });
