@@ -227,6 +227,28 @@
             box-shadow: 0 0 0 3px rgba(66, 99, 235, 0.35);
         }
 
+        .btn:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .theme-toggle:focus-visible {
+            outline: 2px solid white;
+            outline-offset: 2px;
+        }
+
+        .tab:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: -2px;
+        }
+
+        .concept-card:focus-visible,
+        .color-theme:focus-visible,
+        .tag:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
         textarea {
             min-height: 100px;
             resize: vertical;
@@ -1573,10 +1595,10 @@
                     })
                     .catch(error => {
                         container.innerHTML = `
-                            <div style="color: #e53e3e; padding: 1rem; background-color: #fee2e2; border-radius: 0.5rem;">
+                            <div style="color: var(--accent-color); padding: 1rem; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 0.5rem;">
                                 Error: Failed to render diagram
                             </div>
-                            <pre style="margin-top: 1rem; padding: 1rem; background-color: #f8f8f8; border-radius: 0.5rem; overflow-x: auto;">${mermaidCode}</pre>
+                            <pre style="margin-top: 1rem; padding: 1rem; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 0.5rem; overflow-x: auto; color: var(--text-primary);">${mermaidCode}</pre>
                         `;
                         console.error('Mermaid rendering error:', error);
                     });
