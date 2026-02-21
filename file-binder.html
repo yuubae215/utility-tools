@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Mermaid for diagram generation -->
@@ -1016,8 +1016,22 @@
                     <polyline points="17 8 12 3 7 8" />
                     <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                <h3 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-2">Drag & Drop to Upload
-                </h3>
+                <h2 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-2">
+                    Drag &amp; Drop to Upload
+                    <span class="loadignore-help-wrapper" style="position:relative;display:inline-block;vertical-align:middle;margin-left:6px;">
+                        <button id="loadignoreHelpBtn"
+                            aria-label="Learn about .loadignore pattern filtering"
+                            aria-expanded="false"
+                            aria-controls="loadignorePopover"
+                            style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--primary-500,#6366f1);border:none;cursor:pointer;font-size:11px;font-weight:bold;color:white;line-height:1;">ⓘ</button>
+                        <div id="loadignorePopover" role="tooltip" hidden
+                            style="position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);width:280px;background:var(--card-bg,#fff);border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:12px 14px;font-size:0.8rem;text-align:left;z-index:100;color:#374151;">
+                            <p style="margin:0 0 6px;font-weight:600;">.loadignore — Pattern Filtering</p>
+                            <p style="margin:0 0 6px;">Add a file named <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;">.loadignore</code> or <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;">loadignore.txt</code> to your dropped folder to exclude files from being loaded.</p>
+                            <p style="margin:0;color:#6b7280;">Each line is a glob pattern. Lines starting with <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;">#</code> are comments. Example: <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;">*.log</code>, <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;">node_modules/</code></p>
+                        </div>
+                    </span>
+                </h2>
                 <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-2">Drop files or folders here to
                     organize</p>
                 <p class="text-xs text-slate-500 dark:text-slate-500 mb-4">
@@ -1088,7 +1102,7 @@
                         class="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white mr-3 shadow-md font-semibold">
                         1</div>
                     <div>
-                        <h4 class="font-semibold text-slate-900 dark:text-white">Upload</h4>
+                        <p class="font-semibold text-slate-900 dark:text-white">Upload</p>
                         <p class="mt-1">Drag & drop files</p>
                     </div>
                 </div>
@@ -1097,7 +1111,7 @@
                         class="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-secondary-400 to-secondary-600 text-white mr-3 shadow-md font-semibold">
                         2</div>
                     <div>
-                        <h4 class="font-semibold text-slate-900 dark:text-white">Preview</h4>
+                        <p class="font-semibold text-slate-900 dark:text-white">Preview</p>
                         <p class="mt-1">Review file contents</p>
                     </div>
                 </div>
@@ -1106,7 +1120,7 @@
                         class="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 text-white mr-3 shadow-md font-semibold">
                         3</div>
                     <div>
-                        <h4 class="font-semibold text-slate-900 dark:text-white">Combine</h4>
+                        <p class="font-semibold text-slate-900 dark:text-white">Combine</p>
                         <p class="mt-1">Generate & download</p>
                     </div>
                 </div>
@@ -1282,12 +1296,15 @@
 
             <!-- Size Analysis Modal -->
             <div id="sizeAnalysisModal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="sizeAnalysisTitle"
                 class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center hidden overflow-y-auto overflow-x-hidden">
                 <div
                     class="card rounded-2xl shadow-2xl w-[95%] max-w-4xl max-h-[90vh] flex flex-col m-4"
                     style="animation: scaleIn 0.2s ease-out;">
                     <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                        <h3 class="text-lg font-medium text-slate-900 dark:text-white">File Size Analysis</h3>
+                        <h3 id="sizeAnalysisTitle" class="text-lg font-medium text-slate-900 dark:text-white">File Size Analysis</h3>
                         <button id="closeSizeAnalysisModal" aria-label="Close size analysis"
                             class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -3174,6 +3191,23 @@ poetry.lock
 
         // Initial log entry
         log('File Binder initialized. Drag and drop files to begin.', 'info');
+
+        // .loadignore help popover
+        const loadignoreHelpBtn = document.getElementById('loadignoreHelpBtn');
+        const loadignorePopover = document.getElementById('loadignorePopover');
+        if (loadignoreHelpBtn && loadignorePopover) {
+            loadignoreHelpBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = !loadignorePopover.hidden;
+                loadignorePopover.hidden = isOpen;
+                loadignoreHelpBtn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+            });
+            document.addEventListener('click', () => {
+                loadignorePopover.hidden = true;
+                loadignoreHelpBtn.setAttribute('aria-expanded', 'false');
+            });
+            loadignorePopover.addEventListener('click', (e) => e.stopPropagation());
+        }
     </script>
 </body>
 

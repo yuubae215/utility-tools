@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PromptCraft IO</title>
     <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             /* Common color variables */
@@ -374,6 +374,18 @@
             }
         }
 
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
         @media (max-width: 480px) {
             body {
                 padding: 15px;
@@ -408,13 +420,17 @@
             .tool-icon {
                 height: 100px;
             }
+
+            .category-btn {
+                min-height: 44px;
+            }
         }
     </style>
 </head>
 
 <body>
     <header>
-        <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode" aria-pressed="false">
             <i class="fas fa-moon" aria-hidden="true"></i>
         </button>
         <h1>PromptCraft IO</h1>
@@ -434,6 +450,8 @@
     </header>
 
     <main role="main">
+        <p id="no-results" hidden style="text-align:center;color:var(--text-light);padding:40px 0;font-size:1.1rem;">No tools found matching your search.</p>
+        <h2 class="sr-only">Available Tools</h2>
         <div class="tools-grid" id="tools-grid">
             <!-- File Management Tool -->
             <div class="tool-card" data-category="utility">
@@ -481,6 +499,7 @@
                     themeIcon.classList.remove('fa-sun');
                     themeIcon.classList.add('fa-moon');
                 }
+                themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
             }
 
             // Restore saved theme preference
@@ -497,22 +516,37 @@
             const searchInput = document.getElementById('search-tools');
             const toolCards = document.querySelectorAll('.tool-card');
             const categoryButtons = document.querySelectorAll('.category-btn');
-            let activeCategory = 'all';
+            let activeCategory = sessionStorage.getItem('activeCategory') || 'all';
+
+            const noResults = document.getElementById('no-results');
 
             function filterCards() {
                 const searchTerm = searchInput.value.toLowerCase();
+                let visibleCount = 0;
 
                 toolCards.forEach(card => {
                     const title = card.querySelector('h3').textContent.toLowerCase();
                     const description = card.querySelector('p').textContent.toLowerCase();
                     const matchesSearch = !searchTerm || title.includes(searchTerm) || description.includes(searchTerm);
                     const matchesCategory = activeCategory === 'all' || card.dataset.category === activeCategory;
+                    const visible = matchesSearch && matchesCategory;
 
-                    card.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
+                    card.style.display = visible ? '' : 'none';
+                    if (visible) visibleCount++;
                 });
+
+                noResults.hidden = visibleCount > 0;
             }
 
             searchInput.addEventListener('input', filterCards);
+
+            // Restore saved category filter
+            categoryButtons.forEach(btn => {
+                const isActive = btn.dataset.category === activeCategory;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+            filterCards();
 
             categoryButtons.forEach(button => {
                 button.addEventListener('click', function () {
@@ -523,6 +557,7 @@
                     this.classList.add('active');
                     this.setAttribute('aria-pressed', 'true');
                     activeCategory = this.dataset.category;
+                    sessionStorage.setItem('activeCategory', activeCategory);
                     filterCards();
                 });
             });
