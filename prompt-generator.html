@@ -26,6 +26,7 @@
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.2);
             --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             --transition: all 0.3s ease;
             --transition-fast: 0.15s ease;
@@ -523,7 +524,10 @@
             font-weight: 500;
             color: var(--text-secondary);
             cursor: pointer;
+            border: none;
             border-bottom: 2px solid transparent;
+            background: none;
+            font-family: var(--font-sans);
             transition: all var(--transition-normal);
         }
         
@@ -668,7 +672,7 @@
             border-radius: 50%;
             background-color: var(--text-tertiary);
             color: white;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: bold;
         }
 
@@ -973,8 +977,8 @@
                     </h2>
 
                     <div class="color-option-toggle">
-                        <button class="color-option-btn active" data-option="theme">Choose from themes</button>
-                        <button class="color-option-btn" data-option="custom">Custom</button>
+                        <button class="color-option-btn active" data-option="theme" aria-pressed="true">Choose from themes</button>
+                        <button class="color-option-btn" data-option="custom" aria-pressed="false">Custom</button>
                     </div>
 
                     <div id="theme-selector" class="color-theme-selector" role="radiogroup" aria-label="Color theme">
@@ -1081,8 +1085,8 @@
                     </div>
 
                     <div class="tabs" role="tablist" aria-label="Visualization style">
-                        <div class="tab active" data-tab="infographic" role="tab" aria-selected="true" aria-controls="infographic-tab" id="tab-infographic" tabindex="0">Infographic</div>
-                        <div class="tab" data-tab="recording" role="tab" aria-selected="false" aria-controls="recording-tab" id="tab-recording" tabindex="-1">Graphic Recording</div>
+                        <button class="tab active" data-tab="infographic" role="tab" aria-selected="true" aria-controls="infographic-tab" id="tab-infographic" tabindex="0">Infographic</button>
+                        <button class="tab" data-tab="recording" role="tab" aria-selected="false" aria-controls="recording-tab" id="tab-recording" tabindex="-1">Graphic Recording</button>
                     </div>
 
                     <div id="infographic-tab" class="tab-content active" role="tabpanel" aria-labelledby="tab-infographic">
@@ -1160,7 +1164,7 @@
         <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools" class="github-link">GitHub</a></p>
     </footer>
 
-    <div id="toast" class="toast">Prompt copied to clipboard!</div>
+    <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">Prompt copied to clipboard!</div>
 
     <!-- Mermaid JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
@@ -1261,28 +1265,33 @@
         // Color option toggle
         colorOptions.forEach(option => {
             option.addEventListener('click', () => {
-                colorOptions.forEach(opt => opt.classList.remove('active'));
+                colorOptions.forEach(opt => {
+                    opt.classList.remove('active');
+                    opt.setAttribute('aria-pressed', 'false');
+                });
                 option.classList.add('active');
-                
+                option.setAttribute('aria-pressed', 'true');
+
                 state.selectedColorOption = option.dataset.option;
-                
+
                 if (state.selectedColorOption === 'theme') {
                     themeSelector.classList.remove('hidden');
                     customColors.classList.add('hidden');
-                    
+
                     // Update colors from theme
                     updateColorsFromTheme(state.selectedTheme);
                 } else {
                     themeSelector.classList.add('hidden');
                     customColors.classList.remove('hidden');
-                    
+
                     // Update colors from custom inputs
                     state.primaryColor = document.getElementById('primary-color').value;
                     state.secondaryColor = document.getElementById('secondary-color').value;
                     state.accentColor = document.getElementById('accent-color').value;
                 }
-                
+
                 updateMermaidPreviews();
+                saveFormState();
             });
         });
 
@@ -1299,6 +1308,7 @@
                 state.selectedTheme = theme.dataset.theme;
                 updateColorsFromTheme(state.selectedTheme);
                 updateMermaidPreviews();
+                saveFormState();
             });
             theme.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -1327,16 +1337,19 @@
         document.getElementById('primary-color').addEventListener('input', (e) => {
             state.primaryColor = e.target.value;
             updateMermaidPreviews();
+            saveFormState();
         });
-        
+
         document.getElementById('secondary-color').addEventListener('input', (e) => {
             state.secondaryColor = e.target.value;
             updateMermaidPreviews();
+            saveFormState();
         });
-        
+
         document.getElementById('accent-color').addEventListener('input', (e) => {
             state.accentColor = e.target.value;
             updateMermaidPreviews();
+            saveFormState();
         });
 
         // Focus tags
@@ -1354,6 +1367,7 @@
                 } else {
                     state.selectedTags = state.selectedTags.filter(id => id !== tagId);
                 }
+                saveFormState();
             });
             tag.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -1373,6 +1387,7 @@
                 card.classList.add('selected');
                 card.setAttribute('aria-checked', 'true');
                 state.selectedConcept = card.dataset.concept;
+                saveFormState();
             });
             card.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -1403,6 +1418,7 @@
 
                 document.getElementById(`${tabId}-tab`).classList.add('active');
                 updateMermaidPreviews();
+                saveFormState();
             });
             tab.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -1874,6 +1890,116 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
             }, 3000);
         }
 
+        // Form state persistence
+        const FORM_STATE_KEY = 'promptGeneratorFormState';
+
+        function saveFormState() {
+            const formState = {
+                topic: document.getElementById('topic').value,
+                description: document.getElementById('content-description').value,
+                outputLanguage: document.getElementById('output-language').value,
+                selectedTags: state.selectedTags,
+                selectedConcept: state.selectedConcept,
+                selectedColorOption: state.selectedColorOption,
+                selectedTheme: state.selectedTheme,
+                primaryColor: state.primaryColor,
+                secondaryColor: state.secondaryColor,
+                accentColor: state.accentColor,
+                activeTab: state.activeTab,
+                infographicStyle: document.getElementById('infographic-style').value,
+                recordingStyle: document.getElementById('recording-style').value
+            };
+            localStorage.setItem(FORM_STATE_KEY, JSON.stringify(formState));
+        }
+
+        function restoreFormState(saved) {
+            if (saved.topic) document.getElementById('topic').value = saved.topic;
+            if (saved.description) document.getElementById('content-description').value = saved.description;
+            if (saved.outputLanguage) document.getElementById('output-language').value = saved.outputLanguage;
+            if (saved.infographicStyle) document.getElementById('infographic-style').value = saved.infographicStyle;
+            if (saved.recordingStyle) document.getElementById('recording-style').value = saved.recordingStyle;
+
+            // Restore tags
+            if (saved.selectedTags && saved.selectedTags.length) {
+                state.selectedTags = saved.selectedTags;
+                focusTags.forEach(tag => {
+                    const isSelected = state.selectedTags.includes(tag.dataset.tag);
+                    tag.classList.toggle('selected', isSelected);
+                    tag.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+                });
+            }
+
+            // Restore concept
+            if (saved.selectedConcept) {
+                state.selectedConcept = saved.selectedConcept;
+                conceptCards.forEach(card => {
+                    const isSelected = card.dataset.concept === saved.selectedConcept;
+                    card.classList.toggle('selected', isSelected);
+                    card.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+                });
+            }
+
+            // Restore color option
+            if (saved.selectedColorOption) {
+                state.selectedColorOption = saved.selectedColorOption;
+                colorOptions.forEach(opt => {
+                    const isActive = opt.dataset.option === saved.selectedColorOption;
+                    opt.classList.toggle('active', isActive);
+                    opt.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+                if (saved.selectedColorOption === 'custom') {
+                    document.getElementById('theme-selector').classList.add('hidden');
+                    document.getElementById('custom-colors').classList.remove('hidden');
+                }
+            }
+
+            // Restore theme
+            if (saved.selectedTheme) {
+                state.selectedTheme = saved.selectedTheme;
+                themeItems.forEach(t => {
+                    const isSelected = t.dataset.theme === saved.selectedTheme;
+                    t.classList.toggle('selected', isSelected);
+                    t.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+                });
+            }
+
+            // Restore colors
+            if (saved.primaryColor) {
+                state.primaryColor = saved.primaryColor;
+                document.getElementById('primary-color').value = saved.primaryColor;
+            }
+            if (saved.secondaryColor) {
+                state.secondaryColor = saved.secondaryColor;
+                document.getElementById('secondary-color').value = saved.secondaryColor;
+            }
+            if (saved.accentColor) {
+                state.accentColor = saved.accentColor;
+                document.getElementById('accent-color').value = saved.accentColor;
+            }
+
+            // Restore active tab
+            if (saved.activeTab) {
+                state.activeTab = saved.activeTab;
+                tabs.forEach(t => {
+                    const isActive = t.dataset.tab === saved.activeTab;
+                    t.classList.toggle('active', isActive);
+                    t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                    t.setAttribute('tabindex', isActive ? '0' : '-1');
+                });
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                const activeContent = document.getElementById(`${saved.activeTab}-tab`);
+                if (activeContent) activeContent.classList.add('active');
+            }
+        }
+
+        // Attach save listeners
+        ['topic', 'content-description', 'output-language', 'infographic-style', 'recording-style'].forEach(id => {
+            document.getElementById(id).addEventListener('input', saveFormState);
+            document.getElementById(id).addEventListener('change', saveFormState);
+        });
+
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             // Restore theme from localStorage or system preference
@@ -1883,6 +2009,16 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
 
             // Set initial colors
             updateColorsFromTheme('modern');
+
+            // Restore saved form state
+            const savedForm = localStorage.getItem(FORM_STATE_KEY);
+            if (savedForm) {
+                try {
+                    restoreFormState(JSON.parse(savedForm));
+                } catch (e) {
+                    localStorage.removeItem(FORM_STATE_KEY);
+                }
+            }
 
             // Initialize Mermaid previews
             updateMermaidPreviews();
