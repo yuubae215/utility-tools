@@ -467,7 +467,10 @@
 
     <main role="main">
         <div aria-live="polite" aria-atomic="true" class="sr-only" id="filter-status"></div>
-        <p id="no-results" hidden style="text-align:center;color:var(--text-light);padding:40px 0;font-size:1.1rem;">No tools found matching your search.</p>
+        <div id="no-results" hidden style="text-align:center;padding:40px 0;">
+            <p style="color:var(--text-light);font-size:1.1rem;margin-bottom:0.75rem;">No tools found matching your search.</p>
+            <p style="color:var(--text-tertiary);font-size:0.95rem;">Try different keywords or <button id="reset-filters" style="background:none;border:none;color:var(--primary-color);cursor:pointer;font-size:0.95rem;text-decoration:underline;padding:0;">reset filters</button>.</p>
+        </div>
         <h2 class="sr-only">Available Tools</h2>
         <div class="tools-grid" id="tools-grid">
             <!-- File Management Tool -->
@@ -537,6 +540,7 @@
 
             const noResults = document.getElementById('no-results');
             const filterStatus = document.getElementById('filter-status');
+            const resetFiltersBtn = document.getElementById('reset-filters');
 
             function filterCards() {
                 const searchTerm = searchInput.value.toLowerCase();
@@ -560,6 +564,19 @@
             }
 
             searchInput.addEventListener('input', filterCards);
+
+            resetFiltersBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                activeCategory = 'all';
+                categoryButtons.forEach(btn => {
+                    const isAll = btn.dataset.category === 'all';
+                    btn.classList.toggle('active', isAll);
+                    btn.setAttribute('aria-pressed', isAll ? 'true' : 'false');
+                });
+                sessionStorage.setItem('activeCategory', 'all');
+                filterCards();
+                searchInput.focus();
+            });
 
             // Restore saved category filter
             categoryButtons.forEach(btn => {
