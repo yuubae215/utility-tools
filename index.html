@@ -167,6 +167,7 @@
 
         .category-btn {
             padding: 8px 18px;
+            min-height: 44px;
             border: none;
             border-radius: 50px;
             background-color: var(--card-color);
@@ -441,10 +442,26 @@
                 min-height: 44px;
             }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+            .tool-card { opacity: 1 !important; }
+        }
     </style>
 </head>
 
 <body>
+<script>
+(function(){
+    var s = localStorage.getItem('theme');
+    var p = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if(s === 'dark' || (s === null && p)) document.body.classList.add('dark-mode');
+})();
+</script>
     <header>
         <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode" aria-pressed="false">
             <i class="fas fa-moon" aria-hidden="true"></i>
@@ -460,7 +477,6 @@
         <div class="categories" role="group" aria-label="Filter tools by category">
             <button class="category-btn active" data-category="all" aria-pressed="true">All</button>
             <button class="category-btn" data-category="utility" aria-pressed="false">Utility</button>
-            <button class="category-btn" data-category="layout" aria-pressed="false">Layout</button>
             <button class="category-btn" data-category="typography" aria-pressed="false">Typography</button>
         </div>
     </header>
