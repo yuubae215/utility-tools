@@ -830,6 +830,11 @@
             60%, 100% { content: '...'; }
         }
 
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
         /* Mobile responsiveness improvements */
         @media (max-width: 768px) {
             .flex-col.lg\:flex-row {
@@ -959,7 +964,7 @@
                     <!-- Keyboard Shortcuts Help Button -->
                     <button id="shortcutHelpBtn" aria-label="Show keyboard shortcuts"
                             aria-expanded="false" aria-controls="shortcutPanel"
-                            class="flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/40">?</button>
+                            class="flex items-center justify-center w-11 h-11 text-sm font-bold text-white bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/40">?</button>
 
                     <!-- Clear Button -->
                     <button id="clearButton" aria-label="Clear all files"
@@ -1183,8 +1188,8 @@
                 class="card mb-4 sm:mb-6 p-3 sm:p-4 w-full overflow-hidden">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full">
                     <div class="mb-3 sm:mb-0 max-w-full">
-                        <h3 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-1 truncate">
-                            Project Files</h3>
+                        <h2 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-1 truncate">
+                            Project Files</h2>
                         <p class="text-sm text-slate-600 dark:text-slate-400 truncate">
                             <span id="fileCount">0</span> files ready to process •
                             <span id="totalSize">0 KB</span> total
@@ -1263,7 +1268,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 dark:text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                         </svg>
-                        <h3 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white">Advanced Filters</h3>
+                        <h2 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white">Advanced Filters</h2>
                     </div>
                     <button id="toggleFilterPanel" aria-label="Collapse filter panel" aria-expanded="true" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1 py-2">
                         <span id="filterToggleText">Collapse</span>
@@ -1429,7 +1434,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                     class="h-4 w-4 absolute right-2.5 top-2 text-slate-400 dark:text-slate-500"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round">
+                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <circle cx="11" cy="11" r="8" />
                                     <line x1="21" y1="21" x2="16.65" y2="16.65" />
                                 </svg>
