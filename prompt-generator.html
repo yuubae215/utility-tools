@@ -877,10 +877,25 @@
             display: none;
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+        }
+
     </style>
 </head>
 
 <body>
+<script>
+(function(){
+    var s = localStorage.getItem('theme');
+    var p = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if(s === 'dark' || (s === null && p)) document.body.classList.add('dark-mode');
+})();
+</script>
     <header>
         <button class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
             <i class="fas fa-moon" aria-hidden="true"></i>

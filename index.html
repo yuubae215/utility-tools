@@ -441,10 +441,26 @@
                 min-height: 44px;
             }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+            .tool-card { opacity: 1 !important; }
+        }
     </style>
 </head>
 
 <body>
+<script>
+(function(){
+    var s = localStorage.getItem('theme');
+    var p = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if(s === 'dark' || (s === null && p)) document.body.classList.add('dark-mode');
+})();
+</script>
     <header>
         <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode" aria-pressed="false">
             <i class="fas fa-moon" aria-hidden="true"></i>
