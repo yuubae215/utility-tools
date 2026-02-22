@@ -120,6 +120,7 @@
             --accent-color: #d946ef;
             --accent-light: #f0abfc;
             --secondary-color: #10b981;
+            --secondary-600: #059669;
             --text-color: #1e293b;
             --text-light: #64748b;
             --text-primary: #0f172a;
@@ -155,6 +156,7 @@
             --accent-color: #e879f9;
             --accent-light: #c026d3;
             --secondary-color: #10b981;
+            --secondary-600: #34d399;
             --text-color: #f1f5f9;
             --text-light: #cbd5e1;
             --text-primary: #f8fafc;
@@ -954,6 +956,11 @@
 
                 <!-- Right: Actions -->
                 <div class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 ml-4">
+                    <!-- Keyboard Shortcuts Help Button -->
+                    <button id="shortcutHelpBtn" aria-label="Show keyboard shortcuts"
+                            aria-expanded="false" aria-controls="shortcutPanel"
+                            class="flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/40">?</button>
+
                     <!-- Clear Button -->
                     <button id="clearButton" aria-label="Clear all files"
                         class="hidden px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/40 hover:shadow-lg hover:scale-105 active:scale-95">
@@ -1002,6 +1009,20 @@
             </div>
         </div>
     </header>
+
+    <!-- Keyboard Shortcuts Panel -->
+    <div id="shortcutPanel" role="region" aria-label="Keyboard shortcuts" hidden
+         class="mx-4 mt-4 p-4 rounded-xl text-sm"
+         style="background: var(--card-color); border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+        <table class="w-full border-collapse">
+            <caption class="text-left font-semibold mb-2" style="color: var(--text-primary);">Keyboard Shortcuts</caption>
+            <tbody>
+                <tr><td class="py-1 pr-4 font-mono text-xs" style="color: var(--text-secondary);"><kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">Ctrl</kbd>+<kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">Enter</kbd></td><td style="color: var(--text-color);">Combine files</td></tr>
+                <tr><td class="py-1 pr-4 font-mono text-xs" style="color: var(--text-secondary);"><kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">Ctrl</kbd>+<kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">D</kbd></td><td style="color: var(--text-color);">Download as .md</td></tr>
+                <tr><td class="py-1 pr-4 font-mono text-xs" style="color: var(--text-secondary);"><kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">Escape</kbd></td><td style="color: var(--text-color);">Close dialog / popover</td></tr>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Main content -->
     <main role="main" class="flex-grow p-3 sm:p-4 md:p-6 overflow-x-hidden w-full">
@@ -1195,7 +1216,7 @@
                             <span class="sm:hidden" aria-hidden="true">Size</span>
                             <span class="tooltip-text" aria-hidden="true">Analyze file sizes</span>
                         </button>
-                        <button id="combineButton" aria-label="Combine files"
+                        <button id="combineButton" aria-label="Combine files (Ctrl+Enter)" title="Combine files (Ctrl+Enter)"
                             class="btn bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1218,7 +1239,7 @@
                             <span class="sm:hidden" aria-hidden="true">Copy</span>
                             <span class="tooltip-text" aria-hidden="true">Copy to clipboard</span>
                         </button>
-                        <button id="downloadButton" aria-label="Download as markdown file"
+                        <button id="downloadButton" aria-label="Download as markdown file (Ctrl+D)" title="Download as markdown (Ctrl+D)"
                             class="btn bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center hidden tooltip text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -3374,6 +3395,31 @@ poetry.lock
                     loadignorePopover.hidden = true;
                     loadignoreHelpBtn.setAttribute('aria-expanded', 'false');
                     loadignoreHelpBtn.focus();
+                }
+            });
+        }
+
+        // Keyboard shortcuts panel
+        const shortcutHelpBtn = document.getElementById('shortcutHelpBtn');
+        const shortcutPanel = document.getElementById('shortcutPanel');
+        if (shortcutHelpBtn && shortcutPanel) {
+            shortcutHelpBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = !shortcutPanel.hidden;
+                shortcutPanel.hidden = isOpen;
+                shortcutHelpBtn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+            });
+            document.addEventListener('click', (e) => {
+                if (!shortcutPanel.hidden && !shortcutPanel.contains(e.target)) {
+                    shortcutPanel.hidden = true;
+                    shortcutHelpBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !shortcutPanel.hidden) {
+                    shortcutPanel.hidden = true;
+                    shortcutHelpBtn.setAttribute('aria-expanded', 'false');
+                    shortcutHelpBtn.focus();
                 }
             });
         }

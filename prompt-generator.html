@@ -38,6 +38,8 @@
             --space-lg: 1.5rem;
             --space-xl: 2rem;
             --space-2xl: 3rem;
+            --toast-bg: #2c3e50;
+            --toast-color: #f8fafc;
         }
 
         /* Dark mode variables */
@@ -57,6 +59,8 @@
             --border-color: #4a5568;
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            --toast-bg: #1e293b;
+            --toast-color: #f1f5f9;
         }
 
         * {
@@ -450,6 +454,7 @@
         .color-option-btn {
             flex: 1;
             padding: var(--space-xs) var(--space-sm);
+            min-height: 44px;
             background: none;
             border: none;
             font-size: 0.875rem;
@@ -543,6 +548,7 @@
         
         .tab {
             padding: var(--space-sm) var(--space-md);
+            min-height: 44px;
             font-size: 0.875rem;
             font-weight: 500;
             color: var(--text-secondary);
@@ -620,6 +626,7 @@
         }
 
         .result-card {
+            position: relative;
             background-color: var(--card-color);
             border-radius: var(--border-radius);
             padding: var(--space-lg);
@@ -662,8 +669,8 @@
             bottom: 20px;
             right: 20px;
             padding: var(--space-sm) var(--space-md);
-            background-color: var(--text-color);
-            color: white;
+            background-color: var(--toast-bg);
+            color: var(--toast-color);
             border-radius: var(--border-radius);
             font-size: 0.875rem;
             box-shadow: var(--shadow-lg);
@@ -779,8 +786,8 @@
             top: 10px;
             right: 10px;
             padding: var(--space-xs) var(--space-sm);
-            background-color: var(--text-color);
-            color: white;
+            background-color: var(--toast-bg);
+            color: var(--toast-color);
             border-radius: var(--border-radius);
             font-size: 0.75rem;
             opacity: 0;
@@ -1124,6 +1131,10 @@
                             <div class="preview-header">
                                 <div class="preview-title">Preview</div>
                             </div>
+                            <p class="text-xs mt-1" style="color: var(--text-light);" aria-live="off">
+                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                                Preview updates automatically as you change options
+                            </p>
                             <div class="preview-content">
                                 <div class="mermaid-container" id="infographic-preview"></div>
                             </div>
@@ -1146,6 +1157,10 @@
                             <div class="preview-header">
                                 <div class="preview-title">Preview</div>
                             </div>
+                            <p class="text-xs mt-1" style="color: var(--text-light);" aria-live="off">
+                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                                Preview updates automatically as you change options
+                            </p>
                             <div class="preview-content">
                                 <div class="mermaid-container" id="recording-preview"></div>
                             </div>
@@ -1188,14 +1203,6 @@
     <!-- Mermaid JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
     <script>
-        // Initialize Mermaid
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
-            securityLevel: 'loose',
-            fontFamily: 'var(--font-sans)'
-        });
-
         // Color themes
         const colorThemes = {
             modern: {
@@ -1295,7 +1302,10 @@
             themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
             themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
             mermaid.initialize({
-                theme: isDark ? 'dark' : 'default'
+                startOnLoad: false,
+                theme: isDark ? 'dark' : 'default',
+                securityLevel: 'loose',
+                fontFamily: 'var(--font-sans)'
             });
             updateMermaidPreviews();
         }
