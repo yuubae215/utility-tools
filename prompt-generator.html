@@ -38,6 +38,8 @@
             --space-lg: 1.5rem;
             --space-xl: 2rem;
             --space-2xl: 3rem;
+            --toast-bg: #2c3e50;
+            --toast-color: #f8fafc;
         }
 
         /* Dark mode variables */
@@ -57,6 +59,8 @@
             --border-color: #4a5568;
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            --toast-bg: #1e293b;
+            --toast-color: #f1f5f9;
         }
 
         * {
@@ -450,6 +454,7 @@
         .color-option-btn {
             flex: 1;
             padding: var(--space-xs) var(--space-sm);
+            min-height: 44px;
             background: none;
             border: none;
             font-size: 0.875rem;
@@ -543,6 +548,7 @@
         
         .tab {
             padding: var(--space-sm) var(--space-md);
+            min-height: 44px;
             font-size: 0.875rem;
             font-weight: 500;
             color: var(--text-secondary);
@@ -620,6 +626,7 @@
         }
 
         .result-card {
+            position: relative;
             background-color: var(--card-color);
             border-radius: var(--border-radius);
             padding: var(--space-lg);
@@ -662,8 +669,8 @@
             bottom: 20px;
             right: 20px;
             padding: var(--space-sm) var(--space-md);
-            background-color: var(--text-color);
-            color: white;
+            background-color: var(--toast-bg);
+            color: var(--toast-color);
             border-radius: var(--border-radius);
             font-size: 0.875rem;
             box-shadow: var(--shadow-lg);
@@ -779,8 +786,8 @@
             top: 10px;
             right: 10px;
             padding: var(--space-xs) var(--space-sm);
-            background-color: var(--text-color);
-            color: white;
+            background-color: var(--toast-bg);
+            color: var(--toast-color);
             border-radius: var(--border-radius);
             font-size: 0.75rem;
             opacity: 0;
@@ -877,10 +884,25 @@
             display: none;
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+        }
+
     </style>
 </head>
 
 <body>
+<script>
+(function(){
+    var s = localStorage.getItem('theme');
+    var p = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if(s === 'dark' || (s === null && p)) document.body.classList.add('dark-mode');
+})();
+</script>
     <header>
         <button class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
             <i class="fas fa-moon" aria-hidden="true"></i>
@@ -1109,6 +1131,10 @@
                             <div class="preview-header">
                                 <div class="preview-title">Preview</div>
                             </div>
+                            <p class="text-xs mt-1" style="color: var(--text-light);" aria-live="off">
+                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                                Preview updates automatically as you change options
+                            </p>
                             <div class="preview-content">
                                 <div class="mermaid-container" id="infographic-preview"></div>
                             </div>
@@ -1131,6 +1157,10 @@
                             <div class="preview-header">
                                 <div class="preview-title">Preview</div>
                             </div>
+                            <p class="text-xs mt-1" style="color: var(--text-light);" aria-live="off">
+                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                                Preview updates automatically as you change options
+                            </p>
                             <div class="preview-content">
                                 <div class="mermaid-container" id="recording-preview"></div>
                             </div>
@@ -1156,7 +1186,7 @@
                             </svg>
                         </button>
                     </div>
-                    <div id="result" class="result-content">The generated prompt will appear here. Fill out the form on the left and click "Generate Prompt" button.</div>
+                    <div id="result" class="result-content" aria-live="polite" aria-atomic="true">The generated prompt will appear here. Fill out the form on the left and click "Generate Prompt" button.</div>
                     <div id="copy-status" class="copy-status">Copied!</div>
                 </div>
             </div>
@@ -1173,14 +1203,6 @@
     <!-- Mermaid JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
     <script>
-        // Initialize Mermaid
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
-            securityLevel: 'loose',
-            fontFamily: 'var(--font-sans)'
-        });
-
         // Color themes
         const colorThemes = {
             modern: {
@@ -1246,6 +1268,30 @@
         const infographicStyle = document.getElementById('infographic-style');
         const recordingStyle = document.getElementById('recording-style');
 
+        // Roving tabindex utility for radiogroup keyboard navigation
+        function makeRoving(items) {
+            items.forEach((item, i) => {
+                const isChecked = item.getAttribute('aria-checked') === 'true';
+                item.setAttribute('tabindex', isChecked ? '0' : '-1');
+                item.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const next = items[(i + 1) % items.length];
+                        items.forEach(t => t.setAttribute('tabindex', '-1'));
+                        next.setAttribute('tabindex', '0');
+                        next.focus();
+                    }
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prev = items[(i - 1 + items.length) % items.length];
+                        items.forEach(t => t.setAttribute('tabindex', '-1'));
+                        prev.setAttribute('tabindex', '0');
+                        prev.focus();
+                    }
+                });
+            });
+        }
+
         // Theme toggle
         const themeIcon = themeToggle.querySelector('i');
 
@@ -1256,7 +1302,10 @@
             themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
             themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
             mermaid.initialize({
-                theme: isDark ? 'dark' : 'default'
+                startOnLoad: false,
+                theme: isDark ? 'dark' : 'default',
+                securityLevel: 'loose',
+                fontFamily: 'var(--font-sans)'
             });
             updateMermaidPreviews();
         }
@@ -1306,9 +1355,11 @@
                 themeItems.forEach(t => {
                     t.classList.remove('selected');
                     t.setAttribute('aria-checked', 'false');
+                    t.setAttribute('tabindex', '-1');
                 });
                 theme.classList.add('selected');
                 theme.setAttribute('aria-checked', 'true');
+                theme.setAttribute('tabindex', '0');
 
                 state.selectedTheme = theme.dataset.theme;
                 updateColorsFromTheme(state.selectedTheme);
@@ -1322,6 +1373,7 @@
                 }
             });
         });
+        makeRoving(Array.from(themeItems));
 
         // Update colors from theme
         function updateColorsFromTheme(themeName) {
@@ -1388,9 +1440,11 @@
                 conceptCards.forEach(c => {
                     c.classList.remove('selected');
                     c.setAttribute('aria-checked', 'false');
+                    c.setAttribute('tabindex', '-1');
                 });
                 card.classList.add('selected');
                 card.setAttribute('aria-checked', 'true');
+                card.setAttribute('tabindex', '0');
                 state.selectedConcept = card.dataset.concept;
                 saveFormState();
             });
@@ -1401,6 +1455,7 @@
                 }
             });
         });
+        makeRoving(Array.from(conceptCards));
 
         // Tabs
         tabs.forEach(tab => {
