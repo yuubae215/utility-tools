@@ -2,7 +2,16 @@
 
 Perform UX validation across all HTML tool pages in PromptCraft IO.
 
-Read every `.html` file in the project root before reporting. For each check, inspect both the HTML structure and the JavaScript that manages it.
+**Do NOT read entire HTML files at once.** Some files exceed 3000 lines and reading them in full will cause the process to hang.
+
+Instead, use targeted searches for each check:
+- Use `Grep` with specific patterns to locate relevant code sections (e.g., `aria-label`, `aria-pressed`, `role=`, `localStorage`, `@media`)
+- Use `Read` with `offset` and `limit` to read only the relevant section (±30 lines around each match)
+- Run Grep across all `.html` files in the project root simultaneously
+
+If you need to understand overall file structure, read only the first 80 lines (`limit: 80`) to get the `<head>` and opening `<body>` context.
+
+For each check, inspect both the HTML structure and the JavaScript that manages it.
 
 ---
 
