@@ -1171,7 +1171,7 @@
                             </svg>
                         </button>
                     </div>
-                    <div id="result" class="result-content">The generated prompt will appear here. Fill out the form on the left and click "Generate Prompt" button.</div>
+                    <div id="result" class="result-content" aria-live="polite" aria-atomic="true">The generated prompt will appear here. Fill out the form on the left and click "Generate Prompt" button.</div>
                     <div id="copy-status" class="copy-status">Copied!</div>
                 </div>
             </div>
@@ -1261,6 +1261,30 @@
         const infographicStyle = document.getElementById('infographic-style');
         const recordingStyle = document.getElementById('recording-style');
 
+        // Roving tabindex utility for radiogroup keyboard navigation
+        function makeRoving(items) {
+            items.forEach((item, i) => {
+                const isChecked = item.getAttribute('aria-checked') === 'true';
+                item.setAttribute('tabindex', isChecked ? '0' : '-1');
+                item.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const next = items[(i + 1) % items.length];
+                        items.forEach(t => t.setAttribute('tabindex', '-1'));
+                        next.setAttribute('tabindex', '0');
+                        next.focus();
+                    }
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prev = items[(i - 1 + items.length) % items.length];
+                        items.forEach(t => t.setAttribute('tabindex', '-1'));
+                        prev.setAttribute('tabindex', '0');
+                        prev.focus();
+                    }
+                });
+            });
+        }
+
         // Theme toggle
         const themeIcon = themeToggle.querySelector('i');
 
@@ -1321,9 +1345,11 @@
                 themeItems.forEach(t => {
                     t.classList.remove('selected');
                     t.setAttribute('aria-checked', 'false');
+                    t.setAttribute('tabindex', '-1');
                 });
                 theme.classList.add('selected');
                 theme.setAttribute('aria-checked', 'true');
+                theme.setAttribute('tabindex', '0');
 
                 state.selectedTheme = theme.dataset.theme;
                 updateColorsFromTheme(state.selectedTheme);
@@ -1337,6 +1363,7 @@
                 }
             });
         });
+        makeRoving(Array.from(themeItems));
 
         // Update colors from theme
         function updateColorsFromTheme(themeName) {
@@ -1403,9 +1430,11 @@
                 conceptCards.forEach(c => {
                     c.classList.remove('selected');
                     c.setAttribute('aria-checked', 'false');
+                    c.setAttribute('tabindex', '-1');
                 });
                 card.classList.add('selected');
                 card.setAttribute('aria-checked', 'true');
+                card.setAttribute('tabindex', '0');
                 state.selectedConcept = card.dataset.concept;
                 saveFormState();
             });
@@ -1416,6 +1445,7 @@
                 }
             });
         });
+        makeRoving(Array.from(conceptCards));
 
         // Tabs
         tabs.forEach(tab => {

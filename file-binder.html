@@ -695,7 +695,8 @@
             border-bottom-color: #1e293b;
         }
 
-        .tooltip:hover .tooltip-text {
+        .tooltip:hover .tooltip-text,
+        .tooltip:focus-within .tooltip-text {
             visibility: visible;
             opacity: 1;
         }
@@ -1011,7 +1012,9 @@
             aria-label="Drop files here, or use the Select Files button below">
             <div id="loadingContainer" class="w-full hidden">
                 <div class="progress-container">
-                    <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+                    <div id="progressBar" class="progress-bar" style="width: 0%"
+                         role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                         aria-label="File processing progress"></div>
                 </div>
                 <p class="mt-2 text-slate-600 dark:text-slate-400">Processing files <span class="loading-dots"></span>
                     <span id="progressText">0</span>%
@@ -1034,7 +1037,7 @@
                             aria-expanded="false"
                             aria-controls="loadignorePopover"
                             style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--primary-500,#6366f1);border:none;cursor:pointer;font-size:14px;font-weight:bold;color:white;line-height:1;">ⓘ</button>
-                        <div id="loadignorePopover" role="dialog" aria-label="Loadignore pattern filtering help" hidden
+                        <div id="loadignorePopover" role="region" aria-label="Loadignore pattern filtering help" hidden
                             style="position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);width:280px;background:var(--card-color);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:12px 14px;font-size:0.8rem;text-align:left;z-index:100;color:var(--text-color);">
                             <p style="margin:0 0 6px;font-weight:600;">.loadignore — Pattern Filtering</p>
                             <p style="margin:0 0 6px;">Add a file named <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">.loadignore</code> or <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">loadignore.txt</code> to your dropped folder to exclude files from being loaded.</p>
@@ -1495,6 +1498,10 @@
         </div>
     </main>
 
+    <!-- Screen reader live region for operation status announcements -->
+    <div id="operationStatus" role="status" aria-live="polite" aria-atomic="true"
+         class="sr-only"></div>
+
     <!-- Footer - Modernized -->
     <footer
         class="flex-shrink-0 px-4 py-3 sm:px-6 sm:py-4 border-t border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-center backdrop-blur-sm"
@@ -1890,6 +1897,7 @@
             estimatedTotalFiles = Math.max(estimatedTotalFiles, processedFiles * 1.1);
             progress = Math.min(Math.round((processedFiles / estimatedTotalFiles) * 100), 100);
             progressBar.style.width = `${progress}%`;
+            progressBar.setAttribute('aria-valuenow', progress);
             progressText.textContent = progress;
 
             // Log progress every 10 files for more frequent updates
@@ -2214,15 +2222,15 @@
             const ext = fileName.split('.').pop()?.toLowerCase();
 
             const iconMap = {
-                js: '<svg class="h-4 w-4 text-yellow-500" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3V3zm16.525 13.707c-.131-.821-.666-1.511-2.252-2.155-.552-.259-1.165-.438-1.349-.854-.068-.248-.078-.382-.034-.529.113-.484.687-.629 1.137-.495.293.09.563.315.732.676.775-.507.775-.507 1.316-.844-.203-.314-.304-.451-.439-.586-.473-.528-1.103-.798-2.126-.775l-.528.067c-.507.124-.991.395-1.283.754-.855.968-.608 2.655.427 3.354 1.023.765 2.521.933 2.712 1.653.18.878-.652 1.159-1.475 1.058-.607-.136-.945-.439-1.316-1.002l-1.372.788c.157.359.337.517.607.832 1.305 1.316 4.568 1.249 5.153-.754.021-.067.176-.528.056-1.237l.034.049zm-6.737-5.434h-1.686c0 1.453-.007 2.898-.007 4.354 0 .924.047 1.772-.104 2.033-.247.517-.886.451-1.175.359-.297-.146-.448-.349-.623-.641-.047-.078-.082-.146-.095-.146l-1.368.844c.229.473.563.879.994 1.137.641.383 1.502.507 2.404.305.588-.17 1.095-.519 1.358-1.059.384-.697.302-1.553.299-2.509.008-1.541 0-3.083 0-4.635l.003-.042z"/></svg>',
-                ts: '<svg class="h-4 w-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3V3zm10.169 12.37c.486.73 1.133 1.275 2.242 1.275 1.051 0 1.72-.596 1.72-1.418 0-.984-.68-1.325-1.82-1.891l-.627-.27c-1.804-.77-3.003-1.736-3.003-3.777 0-1.879 1.431-3.309 3.673-3.309 1.595 0 2.739.69 3.565 2.501l-1.95 1.25c-.429-.808-.893-1.124-1.615-1.124-.736 0-1.203.465-1.203 1.124 0 .786.489 1.104 1.618 1.59l.627.27c2.125.906 3.322 1.829 3.322 3.907 0 2.256-1.771 3.488-4.148 3.488-2.33 0-3.833-1.11-4.566-2.564l2.164-1.25zm-8.792-.37v-2.997h1.949v-4.999h2.753v4.999h1.947v2.997h-1.947v6h-2.753v-6H4.377z"/></svg>',
-                json: '<svg class="h-4 w-4 text-green-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm3.5 8.5C8.5 9.12 7.88 8.5 7 8.5s-1.5.62-1.5 1.5v4c0 .88.62 1.5 1.5 1.5s1.5-.62 1.5-1.5v-.5h-1v.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-4c0-.28.22-.5.5-.5s.5.22.5.5v.5h1v-.5zm5.5 4h-1v-4c0-.88-.62-1.5-1.5-1.5s-1.5.62-1.5 1.5v4h-1v-4c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v4zm3-1v1h-1.5v-1h1.5zm0-3v1h-1.5v-1h1.5zm0-3v1h-1.5v-1h1.5z"/></svg>',
-                md: '<svg class="h-4 w-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M20.553 18.15H3.447a.9.9 0 0 1-.9-.9V6.75a.9.9 0 0 1 .9-.9h17.106a.9.9 0 0 1 .9.9v10.5a.9.9 0 0 1-.9.9zM6.3 16.8l3.6-5.4 3.6 5.4h1.8l-5.4-8.1-5.4 8.1h1.8zm12.6-3.6h-1.8v3.6h-1.8v-3.6h-1.8l2.7-3.6 2.7 3.6z"/></svg>',
-                css: '<svg class="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l-.65 3.34h13.59L17.5 8.5H3.92l-.66 3.33h13.59l-.76 3.81-5.48 1.81-4.75-1.81.33-1.64H2.85l-.79 4 7.85 3 9.05-3 1.2-6.03.24-1.21L21.94 3H5z"/></svg>',
-                html: '<svg class="h-4 w-4 text-orange-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.56l4.07-1.13.55-6.1H9.38L9.2 8.3h7.6l.2-1.99H7l.56 6.01h6.89l-.23 2.58-2.22.6-2.22-.6-.14-1.66h-2l.29 3.19L12 17.56M4.07 3h15.86L18.5 19.2 12 21l-6.5-1.8L4.07 3z"/></svg>',
-                svg: '<svg class="h-4 w-4 text-pink-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5.13 10.71h3.74l-2.6 2.61 2.6 2.6H5.13l-2.6-2.6 2.6-2.61zm6.97-8.54l5.63 5.66-5.63 5.66-5.64-5.66 5.64-5.66zM15.1 19.39l3.73.01-2.6-2.6 2.6-2.61h-3.73l-2.6 2.61 2.6 2.6z"/></svg>',
-                yml: '<svg class="h-4 w-4 text-purple-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm2.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM12 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm5 2a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>',
-                default: '<svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+                js: '<svg aria-hidden="true" class="h-4 w-4 text-yellow-500" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3V3zm16.525 13.707c-.131-.821-.666-1.511-2.252-2.155-.552-.259-1.165-.438-1.349-.854-.068-.248-.078-.382-.034-.529.113-.484.687-.629 1.137-.495.293.09.563.315.732.676.775-.507.775-.507 1.316-.844-.203-.314-.304-.451-.439-.586-.473-.528-1.103-.798-2.126-.775l-.528.067c-.507.124-.991.395-1.283.754-.855.968-.608 2.655.427 3.354 1.023.765 2.521.933 2.712 1.653.18.878-.652 1.159-1.475 1.058-.607-.136-.945-.439-1.316-1.002l-1.372.788c.157.359.337.517.607.832 1.305 1.316 4.568 1.249 5.153-.754.021-.067.176-.528.056-1.237l.034.049zm-6.737-5.434h-1.686c0 1.453-.007 2.898-.007 4.354 0 .924.047 1.772-.104 2.033-.247.517-.886.451-1.175.359-.297-.146-.448-.349-.623-.641-.047-.078-.082-.146-.095-.146l-1.368.844c.229.473.563.879.994 1.137.641.383 1.502.507 2.404.305.588-.17 1.095-.519 1.358-1.059.384-.697.302-1.553.299-2.509.008-1.541 0-3.083 0-4.635l.003-.042z"/></svg>',
+                ts: '<svg aria-hidden="true" class="h-4 w-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3V3zm10.169 12.37c.486.73 1.133 1.275 2.242 1.275 1.051 0 1.72-.596 1.72-1.418 0-.984-.68-1.325-1.82-1.891l-.627-.27c-1.804-.77-3.003-1.736-3.003-3.777 0-1.879 1.431-3.309 3.673-3.309 1.595 0 2.739.69 3.565 2.501l-1.95 1.25c-.429-.808-.893-1.124-1.615-1.124-.736 0-1.203.465-1.203 1.124 0 .786.489 1.104 1.618 1.59l.627.27c2.125.906 3.322 1.829 3.322 3.907 0 2.256-1.771 3.488-4.148 3.488-2.33 0-3.833-1.11-4.566-2.564l2.164-1.25zm-8.792-.37v-2.997h1.949v-4.999h2.753v4.999h1.947v2.997h-1.947v6h-2.753v-6H4.377z"/></svg>',
+                json: '<svg aria-hidden="true" class="h-4 w-4 text-green-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm3.5 8.5C8.5 9.12 7.88 8.5 7 8.5s-1.5.62-1.5 1.5v4c0 .88.62 1.5 1.5 1.5s1.5-.62 1.5-1.5v-.5h-1v.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-4c0-.28.22-.5.5-.5s.5.22.5.5v.5h1v-.5zm5.5 4h-1v-4c0-.88-.62-1.5-1.5-1.5s-1.5.62-1.5 1.5v4h-1v-4c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v4zm3-1v1h-1.5v-1h1.5zm0-3v1h-1.5v-1h1.5zm0-3v1h-1.5v-1h1.5z"/></svg>',
+                md: '<svg aria-hidden="true" class="h-4 w-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M20.553 18.15H3.447a.9.9 0 0 1-.9-.9V6.75a.9.9 0 0 1 .9-.9h17.106a.9.9 0 0 1 .9.9v10.5a.9.9 0 0 1-.9.9zM6.3 16.8l3.6-5.4 3.6 5.4h1.8l-5.4-8.1-5.4 8.1h1.8zm12.6-3.6h-1.8v3.6h-1.8v-3.6h-1.8l2.7-3.6 2.7 3.6z"/></svg>',
+                css: '<svg aria-hidden="true" class="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l-.65 3.34h13.59L17.5 8.5H3.92l-.66 3.33h13.59l-.76 3.81-5.48 1.81-4.75-1.81.33-1.64H2.85l-.79 4 7.85 3 9.05-3 1.2-6.03.24-1.21L21.94 3H5z"/></svg>',
+                html: '<svg aria-hidden="true" class="h-4 w-4 text-orange-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.56l4.07-1.13.55-6.1H9.38L9.2 8.3h7.6l.2-1.99H7l.56 6.01h6.89l-.23 2.58-2.22.6-2.22-.6-.14-1.66h-2l.29 3.19L12 17.56M4.07 3h15.86L18.5 19.2 12 21l-6.5-1.8L4.07 3z"/></svg>',
+                svg: '<svg aria-hidden="true" class="h-4 w-4 text-pink-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5.13 10.71h3.74l-2.6 2.61 2.6 2.6H5.13l-2.6-2.6 2.6-2.61zm6.97-8.54l5.63 5.66-5.63 5.66-5.64-5.66 5.64-5.66zM15.1 19.39l3.73.01-2.6-2.6 2.6-2.61h-3.73l-2.6 2.61 2.6 2.6z"/></svg>',
+                yml: '<svg aria-hidden="true" class="h-4 w-4 text-purple-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm2.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM12 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm5 2a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>',
+                default: '<svg aria-hidden="true" class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
             };
 
             return iconMap[ext] || iconMap.default;
@@ -2304,6 +2312,7 @@
                     button.dataset.path = file.path;
                     button.dataset.size = file.size;
                     button.dataset.index = index;
+                    button.setAttribute('aria-pressed', 'false');
 
                     // Create content section with icon and name
                     const contentDiv = document.createElement('div');
@@ -2342,10 +2351,12 @@
                         // Remove active class from previously selected file
                         if (activeFileItem) {
                             activeFileItem.classList.remove('active');
+                            activeFileItem.setAttribute('aria-pressed', 'false');
                         }
 
                         // Add active class to clicked file
                         button.classList.add('active');
+                        button.setAttribute('aria-pressed', 'true');
                         activeFileItem = button;
 
                         handleFileSelect(file);
@@ -2840,6 +2851,11 @@
             combineButtonText.classList.remove('loading-dots');
             combineButton.disabled = false;
             isCombining = false;
+
+            // Announce completion to screen readers
+            const totalBytes = files.reduce((sum, f) => sum + f.file.size, 0);
+            document.getElementById('operationStatus').textContent =
+                `Files combined: ${files.length} files, ${formatFileSize(totalBytes)}`;
         }
 
         // Download combined file
@@ -2868,6 +2884,7 @@
                 `;
 
                 log('Content copied to clipboard');
+                document.getElementById('operationStatus').textContent = 'Copied to clipboard';
 
                 // Reset button after 2 seconds
                 setTimeout(() => {
