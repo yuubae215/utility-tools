@@ -882,7 +882,7 @@
 
 <body>
     <header>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
             <i class="fas fa-moon" aria-hidden="true"></i>
         </button>
         <h1>Layout &amp; Style Prompt Generator</h1>
@@ -1254,6 +1254,7 @@
             themeIcon.classList.toggle('fa-sun', isDark);
             themeIcon.classList.toggle('fa-moon', !isDark);
             themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+            themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
             mermaid.initialize({
                 theme: isDark ? 'dark' : 'default'
             });
@@ -1880,7 +1881,7 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
                 })
                 .catch(err => {
                     console.error('Failed to copy to clipboard:', err);
-                    alert('Copy failed. Check your permissions.');
+                    showToast('Copy failed. Please check clipboard permissions.');
                 });
         });
 
@@ -1902,6 +1903,8 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
                 topic: document.getElementById('topic').value,
                 description: document.getElementById('content-description').value,
                 outputLanguage: document.getElementById('output-language').value,
+                fontStyle: document.getElementById('font-style').value,
+                outputFormat: document.getElementById('output-format').value,
                 selectedTags: state.selectedTags,
                 selectedConcept: state.selectedConcept,
                 selectedColorOption: state.selectedColorOption,
@@ -1920,6 +1923,8 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
             if (saved.topic) document.getElementById('topic').value = saved.topic;
             if (saved.description) document.getElementById('content-description').value = saved.description;
             if (saved.outputLanguage) document.getElementById('output-language').value = saved.outputLanguage;
+            if (saved.fontStyle) document.getElementById('font-style').value = saved.fontStyle;
+            if (saved.outputFormat) document.getElementById('output-format').value = saved.outputFormat;
             if (saved.infographicStyle) document.getElementById('infographic-style').value = saved.infographicStyle;
             if (saved.recordingStyle) document.getElementById('recording-style').value = saved.recordingStyle;
 
