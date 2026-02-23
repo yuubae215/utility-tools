@@ -5,134 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Layout & Style Prompt Generator - PromptCraft IO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/components.css">
     <style>
-        :root {
-            /* Common color variables */
-            --primary-color: #3498db;
-            --primary-dark: #2980b9;
-            --primary-light: #EEF2FF;
-            --accent-color: #e74c3c;
-            --secondary-color: #12B981;
-            --text-color: #2c3e50;
-            --text-light: #636e72;
-            --text-primary: #2c3e50;
-            --text-secondary: #636e72;
-            --text-tertiary: #9CA3AF;
-            --bg-color: #f8fafc;
-            --card-color: #fff;
-            --surface-color: #F9FAFB;
-            --border-color: #E5E7EB;
-            --border-radius: 12px;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.2);
-            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            --transition: all 0.3s ease;
-            --transition-fast: 0.15s ease;
-            --transition-normal: 0.2s ease-in-out;
-            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            --space-xs: 0.25rem;
-            --space-sm: 0.5rem;
-            --space-md: 1rem;
-            --space-lg: 1.5rem;
-            --space-xl: 2rem;
-            --space-2xl: 3rem;
-            --toast-bg: #2c3e50;
-            --toast-color: #f8fafc;
-        }
-
-        /* Dark mode variables */
-        body.dark-mode {
-            --primary-color: #5dade2;
-            --primary-dark: #3498db;
-            --primary-light: #2d3748;
-            --accent-color: #e76f51;
-            --text-color: #ecf0f1;
-            --text-light: #bdc3c7;
-            --text-primary: #ecf0f1;
-            --text-secondary: #bdc3c7;
-            --text-tertiary: #a0aec0;
-            --bg-color: #1a202c;
-            --card-color: #2d3748;
-            --surface-color: #2d3748;
-            --border-color: #4a5568;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            --toast-bg: #1e293b;
-            --toast-color: #f1f5f9;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            font-family: var(--font-sans);
-            background-color: var(--bg-color);
-            color: var(--text-primary);
             line-height: 1.5;
-            transition: var(--transition);
-        }
-
-        body.dark-mode {
-            color: var(--text-primary);
-            background-color: var(--bg-color);
-        }
-
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: var(--space-lg);
-            text-align: center;
-            position: relative;
-        }
-
-        h1 {
-            font-size: 1.75rem;
-            margin-bottom: var(--space-xs);
-        }
-
-        .subtitle {
-            font-size: 1.25rem;
-            margin-bottom: var(--space-lg);
-            font-weight: 500;
-        }
-
-        .home-link {
-            display: inline-block;
-            margin-top: 15px;
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .home-link:hover {
-            text-decoration: underline;
-            opacity: 0.9;
-        }
-
-        .home-link i {
-            margin-right: 5px;
-        }
-
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: transparent;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .theme-toggle:hover {
-            transform: rotate(30deg);
         }
 
         .container {
@@ -234,11 +111,6 @@
 
         .btn:focus-visible {
             outline: 2px solid var(--primary-color);
-            outline-offset: 2px;
-        }
-
-        .theme-toggle:focus-visible {
-            outline: 2px solid white;
             outline-offset: 2px;
         }
 
@@ -731,26 +603,6 @@
             opacity: 1;
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            margin-top: 70px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(99, 110, 114, 0.2);
-            color: var(--text-light);
-        }
-
-        .github-link {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .github-link:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
-        }
-
         /* Animations */
         @keyframes fadeIn {
             from {
@@ -827,12 +679,6 @@
                 font-size: 1rem;
             }
 
-            .theme-toggle {
-                top: 15px;
-                right: 15px;
-                font-size: 1.2rem;
-            }
-
             .result-content {
                 min-height: 300px;
             }
@@ -885,14 +731,6 @@
             display: none;
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-            }
-        }
-
     </style>
 </head>
 
@@ -904,13 +742,25 @@
     if(s === 'dark' || (s === null && p)) document.body.classList.add('dark-mode');
 })();
 </script>
-    <header>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
-            <i class="fas fa-moon" aria-hidden="true"></i>
-        </button>
-        <h1>Layout &amp; Style Prompt Generator</h1>
-        <p class="subtitle">Shape your LLM inputs and outputs with precision</p>
-        <a href="index.html" class="home-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Home</a>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="header-brand">
+                <h1 class="header-title">
+                    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                    Layout &amp; Style Prompt Generator
+                </h1>
+                <p class="header-subtitle">Shape your LLM inputs and outputs with precision</p>
+            </div>
+            <nav class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                    <span>Home</span>
+                </a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Switch to dark mode" aria-pressed="false">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </div>
     </header>
 
     <main role="main">
@@ -1195,8 +1045,8 @@
     </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools" class="github-link">GitHub</a></p>
+    <footer class="site-footer">
+        <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
     </footer>
 
     <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">Prompt copied to clipboard!</div>
