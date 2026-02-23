@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 ## 実施フェーズ
 
-### Phase 1 — CSS分離（低リスク）
+### Phase 1 — CSS分離（低リスク）✅ 完了 (2026-02-23)
 
 各HTMLの `<style>` ブロックをそのまま対応する `.css` ファイルへ切り出す。
 HTML側の `<style>` タグを削除し `<link>` に置き換えるだけ。
@@ -175,22 +175,47 @@ HTML側の `<style>` タグを削除し `<link>` に置き換えるだけ。
 refactor: extract inline CSS to styles/file-binder.css
 ```
 
+**完了コミット:**
+- `074bc25` refactor: extract inline CSS to external stylesheets (Phase 1)
+- `12140dd` docs: add refactoring plan for HTML/CSS/JS separation
+- `4ef316b` fix: replace Unicode checkmark with Font Awesome icon for Windows compatibility
+
+**成果物:**
+- `styles/index.css` (~214行)
+- `styles/file-binder.css` (~600行)
+- `styles/prompt-generator.css` (~724行)
+- `styles/web-content-aggregator.css` (~513行)
+
 ---
 
-### Phase 2 — JS共通モジュール化（中リスク）
+### Phase 2 — JS共通モジュール化（中リスク）✅ 完了 (2026-02-24)
 
-**2-a. `js/theme-init.js` 作成**
+**2-a. `js/theme-init.js` 作成** ✅
 `file-binder.html` の `<body>` 直後にある同期スクリプト（FOUC防止）を
 `js/theme-init.js` に切り出し、全ページの `<head>` から同期読み込みに統一。
 
-**2-b. `js/theme.js` 作成**
+**2-b. `js/theme.js` 作成** ✅
 全ページで重複しているダークモードトグルロジックを ESM として抽出。
 
-**2-c. 単一ファイルのJS外部化**
+**2-c. 単一ファイルのJS外部化** ✅
 `index.js`, `prompt-generator.js`, `web-content-aggregator.js` の
 メイン `<script>` ブロックを外部ファイルへ移動。
-各ファイル先頭に `import { initTheme } from './theme.js';` を追加し、
-ページ内の重複テーマコードを削除。
+`index.js` / `web-content-aggregator.js` は `import { initTheme }` を使用。
+`prompt-generator.js` は Mermaid と統合したカスタム `applyTheme` を維持。
+
+**成果物:**
+- `js/theme-init.js` (~10行 — 同期FOUC防止)
+- `js/theme.js` (~30行 — ESM共通ダークモード)
+- `js/index.js` (~70行 — ポータル検索・フィルタ)
+- `js/prompt-generator.js` (~580行 — プロンプト生成)
+- `js/web-content-aggregator.js` (~330行 — Web取得)
+
+**HTMLの変更:**
+- 全4ページ: `<script src="js/theme-init.js">` を `<head>` に追加
+- `index.html`: 97行（削減前 192行）
+- `prompt-generator.html`: 328行（削減前 1242行）
+- `web-content-aggregator.html`: 181行（削減前 753行）
+- `file-binder.html`: body内FOUCスクリプトを除去（JS本体はPhase 3で対応）
 
 **検証:** 各ページの全機能（テーマトグル・検索・フィルタ・保存）が正常動作すること
 

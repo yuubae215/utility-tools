@@ -33,6 +33,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/markdown.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+    <!-- FOUC prevention: must be synchronous, before first paint -->
+    <script src="js/theme-init.js"></script>
 
     <script>
         tailwind.config = {
@@ -118,16 +120,6 @@
 </head>
 
 <body class="flex flex-col min-h-screen">
-    <script>
-        // Apply stored theme immediately to prevent flash of unstyled content
-        (function () {
-            var stored = localStorage.getItem('theme');
-            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (stored === 'dark' || (stored === null && prefersDark)) {
-                document.body.classList.add('dark', 'dark-mode');
-            }
-        })();
-    </script>
     <!-- Header -->
     <header class="site-header">
         <div class="header-inner">
