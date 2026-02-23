@@ -441,6 +441,8 @@ body.dark-mode .info-banner {
 /* -- Toast -- */
 .toast {
     position: fixed;
+    top: auto;
+    left: auto;
     bottom: 24px;
     right: 24px;
     padding: 12px 20px;
@@ -454,6 +456,8 @@ body.dark-mode .info-banner {
     display: flex;
     align-items: center;
     gap: 10px;
+    pointer-events: auto;
+    white-space: normal;
     transform: translateY(80px);
     opacity: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;

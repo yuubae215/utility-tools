@@ -477,6 +477,16 @@ body.dark-mode .neumorphism-preview {
 }
 
 .btn-icon {
+    /* Reset components.css standalone icon-button dimensions */
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: none;
+    background: none;
+    border-radius: 0;
+    cursor: inherit;
+    color: inherit;
+    display: inline-block;
     margin-left: var(--space-sm);
 }
 
@@ -528,6 +538,8 @@ body.dark-mode .neumorphism-preview {
 /* Toast Notification */
 .toast {
     position: fixed;
+    top: auto;
+    left: auto;
     bottom: 20px;
     right: 20px;
     padding: var(--space-sm) var(--space-md);
@@ -537,6 +549,7 @@ body.dark-mode .neumorphism-preview {
     font-size: 0.875rem;
     box-shadow: var(--shadow-lg);
     z-index: 1000;
+    pointer-events: auto;
     transform: translateY(100px);
     opacity: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;
