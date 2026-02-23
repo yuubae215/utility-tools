@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Content Aggregator - PromptCraft IO</title>
+    <meta name="description" content="Fetch and combine text content from multiple web pages into a single Markdown document for LLM context.">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- FileSaver for downloading files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2ecc71;
+            --primary-dark: #27ae60;
+            --primary-light: #eafaf1;
+            --accent-color: #e74c3c;
+            --secondary-color: #3498db;
+            --text-color: #2c3e50;
+            --text-light: #636e72;
+            --text-primary: #2c3e50;
+            --text-secondary: #636e72;
+            --text-tertiary: #9CA3AF;
+            --bg-color: #f8fafc;
+            --card-color: #fff;
+            --surface-color: #F9FAFB;
+            --border-color: #E5E7EB;
+            --border-radius: 12px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+        }
+
+        body.dark-mode {
+            --primary-color: #2ecc71;
+            --primary-dark: #27ae60;
+            --primary-light: #1a3329;
+            --accent-color: #e76f51;
+            --text-color: #ecf0f1;
+            --text-light: #bdc3c7;
+            --text-primary: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --text-tertiary: #a0aec0;
+            --bg-color: #1a202c;
+            --card-color: #2d3748;
+            --surface-color: #2d3748;
+            --border-color: #4a5568;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Header ── */
+        header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+            color: #fff;
+            padding: var(--space-lg) var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            flex: 1;
+            min-width: 0;
+        }
+
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        header h1 .badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            padding: 1px 6px;
+            margin-left: 8px;
+            vertical-align: middle;
+            letter-spacing: 0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.22);
+            color: #fff;
+        }
+
+        #theme-toggle {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        #theme-toggle:hover {
+            background: rgba(255,255,255,0.22);
+        }
+
+        #theme-toggle:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+
+        /* ── Main Layout ── */
+        main {
+            flex: 1;
+            max-width: 960px;
+            width: 100%;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-lg);
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 var(--space-md) 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .card-title i {
+            color: var(--primary-color);
+        }
+
+        /* ── URL Input ── */
+        .url-input-row {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-family: var(--font-sans);
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            min-width: 0;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+        }
+
+        .url-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-family: var(--font-sans);
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: #fff;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #2980b9;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border-color);
+        }
+
+        .btn-ghost:hover:not(:disabled) {
+            background: var(--surface-color);
+            color: var(--text-primary);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--accent-color);
+            border: none;
+            padding: 6px 8px;
+            border-radius: 6px;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #fef2f2;
+        }
+
+        body.dark-mode .btn-danger:hover:not(:disabled) {
+            background: rgba(231, 76, 60, 0.15);
+        }
+
+        .btn-icon {
+            padding: 8px 10px;
+        }
+
+        /* ── URL List ── */
+        .url-list {
+            list-style: none;
+            margin: var(--space-md) 0 0 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .url-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 10px 14px;
+            background: var(--surface-color);
+            border-radius: 8px;
+            border: 1.5px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .url-item:hover {
+            border-color: var(--primary-color);
+        }
+
+        .url-item-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .url-item-icon.status-pending {
+            background: #f1f5f9;
+            color: var(--text-tertiary);
+        }
+
+        .url-item-icon.status-loading {
+            background: #eff6ff;
+            color: var(--secondary-color);
+        }
+
+        .url-item-icon.status-success {
+            background: #f0fdf4;
+            color: var(--primary-color);
+        }
+
+        .url-item-icon.status-error {
+            background: #fef2f2;
+            color: var(--accent-color);
+        }
+
+        body.dark-mode .url-item-icon.status-pending { background: #374151; }
+        body.dark-mode .url-item-icon.status-loading { background: #1e3a5f; }
+        body.dark-mode .url-item-icon.status-success { background: #14532d; }
+        body.dark-mode .url-item-icon.status-error   { background: #7f1d1d; }
+
+        .url-item-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .url-item-url {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .url-item-status {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 1px;
+        }
+
+        .url-item-status.error {
+            color: var(--accent-color);
+        }
+
+        .url-item-status.success {
+            color: var(--primary-color);
+        }
+
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ── Options ── */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .option-label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .option-select {
+            padding: 8px 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-family: var(--font-sans);
+            background: var(--bg-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .option-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 8px 0;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .checkbox-row label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        /* ── Actions Bar ── */
+        .actions-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .actions-bar .spacer {
+            flex: 1;
+        }
+
+        /* ── Progress ── */
+        .progress-wrap {
+            display: none;
+            margin-top: var(--space-md);
+        }
+
+        .progress-wrap.visible {
+            display: block;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary-color));
+            border-radius: 999px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-label {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+            text-align: right;
+        }
+
+        /* ── Output ── */
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .output-actions {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .output-textarea {
+            width: 100%;
+            min-height: 340px;
+            padding: 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', monospace;
+            font-size: 0.8125rem;
+            line-height: 1.6;
+            background: var(--surface-color);
+            color: var(--text-color);
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .output-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+        }
+
+        .output-stats {
+            display: flex;
+            gap: var(--space-lg);
+            flex-wrap: wrap;
+            margin-top: var(--space-sm);
+        }
+
+        .stat {
+            font-size: 0.8125rem;
+            color: var(--text-tertiary);
+        }
+
+        .stat strong {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* ── Info Banner ── */
+        .info-banner {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            padding: 12px 16px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            color: #1e40af;
+            font-size: 0.8375rem;
+            line-height: 1.5;
+            margin-bottom: var(--space-md);
+        }
+
+        body.dark-mode .info-banner {
+            background: #1e3a5f;
+            border-color: #2563eb;
+            color: #93c5fd;
+        }
+
+        .info-banner i {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: #1e293b;
+            color: #fff;
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            max-width: 360px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #166534; }
+        .toast.error   { background: #991b1b; }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-xl) var(--space-md);
+            color: var(--text-tertiary);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-md);
+            display: block;
+            opacity: 0.4;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            padding: var(--space-lg);
+            color: var(--text-light);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            main {
+                padding: var(--space-md);
+            }
+
+            header {
+                padding: var(--space-md);
+            }
+
+            header h1 {
+                font-size: 1.1rem;
+            }
+
+            .url-input-row {
+                flex-direction: column;
+            }
+
+            .actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .actions-bar .spacer {
+                display: none;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-left">
+            <div class="header-icon" aria-hidden="true">
+                <i class="fas fa-globe"></i>
+            </div>
+            <h1>Web Content Aggregator <span class="badge">BETA</span></h1>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                <span class="sr-only">Back to Home</span>
+                <span aria-hidden="true">Home</span>
+            </a>
+            <button id="theme-toggle" aria-label="Toggle dark mode">
+                <i class="fas fa-moon" aria-hidden="true"></i>
+            </button>
+        </div>
+    </header>
+
+    <main role="main">
+        <!-- Info Banner -->
+        <div class="info-banner" role="note">
+            <i class="fas fa-circle-info" aria-hidden="true"></i>
+            <div>
+                Fetches publicly accessible web pages and extracts their text content.
+                Due to browser security restrictions (CORS), a proxy service is used as a fallback.
+                <strong>JavaScript-rendered content and login-required pages are not supported.</strong>
+            </div>
+        </div>
+
+        <!-- URL Input -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-link" aria-hidden="true"></i>
+                Add URLs
+            </h2>
+            <div class="url-input-row">
+                <input
+                    type="url"
+                    id="url-input"
+                    class="url-input"
+                    placeholder="https://example.com/page"
+                    aria-label="Enter a URL to add"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <button id="add-url-btn" class="btn btn-primary" aria-label="Add URL to list">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                    Add
+                </button>
+            </div>
+
+            <ul id="url-list" class="url-list" aria-label="URL list" aria-live="polite"></ul>
+
+            <div id="url-list-empty" class="empty-state" aria-hidden="false">
+                <i class="fas fa-list-ul" aria-hidden="true"></i>
+                <p>No URLs added yet. Enter a URL above and click Add.</p>
+            </div>
+        </div>
+
+        <!-- Options -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-sliders" aria-hidden="true"></i>
+                Options
+            </h2>
+            <div class="options-grid">
+                <div class="option-group">
+                    <label class="option-label" for="extraction-mode">Content extraction</label>
+                    <select id="extraction-mode" class="option-select">
+                        <option value="main">Main content only (recommended)</option>
+                        <option value="full">Full page text</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label class="option-label" for="output-format">Output format</label>
+                    <select id="output-format" class="option-select">
+                        <option value="markdown">Markdown</option>
+                        <option value="plain">Plain text</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top: var(--space-md); display: flex; flex-wrap: wrap; gap: var(--space-md);">
+                <div class="checkbox-row">
+                    <input type="checkbox" id="include-url-header" checked>
+                    <label for="include-url-header">Include URL as section header</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="include-title" checked>
+                    <label for="include-title">Include page title</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="include-separator" checked>
+                    <label for="include-separator">Add separator between pages</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+            <div class="actions-bar">
+                <button id="fetch-btn" class="btn btn-primary" disabled>
+                    <i class="fas fa-download" aria-hidden="true"></i>
+                    Fetch &amp; Combine
+                </button>
+                <button id="clear-btn" class="btn btn-ghost" disabled>
+                    <i class="fas fa-trash" aria-hidden="true"></i>
+                    Clear All
+                </button>
+                <div class="spacer"></div>
+                <span id="url-count-label" style="font-size:0.875rem; color:var(--text-tertiary);">0 URLs</span>
+            </div>
+
+            <div id="progress-wrap" class="progress-wrap" role="status" aria-live="polite" aria-label="Fetch progress">
+                <div class="progress-bar-bg">
+                    <div id="progress-bar" class="progress-bar-fill"></div>
+                </div>
+                <div id="progress-label" class="progress-label">0 / 0</div>
+            </div>
+        </div>
+
+        <!-- Output -->
+        <div class="card" id="output-card" hidden>
+            <div class="output-header">
+                <h2 class="card-title" style="margin:0;">
+                    <i class="fas fa-file-lines" aria-hidden="true"></i>
+                    Combined Output
+                </h2>
+                <div class="output-actions">
+                    <button id="copy-btn" class="btn btn-ghost btn-icon" aria-label="Copy to clipboard">
+                        <i class="fas fa-copy" aria-hidden="true"></i>
+                        Copy
+                    </button>
+                    <button id="download-btn" class="btn btn-secondary btn-icon" aria-label="Download as file">
+                        <i class="fas fa-file-arrow-down" aria-hidden="true"></i>
+                        Download
+                    </button>
+                </div>
+            </div>
+            <textarea id="output-textarea" class="output-textarea" readonly aria-label="Combined output content"></textarea>
+            <div class="output-stats">
+                <span class="stat"><strong id="stat-pages">0</strong> pages</span>
+                <span class="stat"><strong id="stat-chars">0</strong> characters</span>
+                <span class="stat"><strong id="stat-words">0</strong> words</span>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
+    </footer>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
+
+    <script>
+        'use strict';
+
+        /* ── Constants ── */
+        const CORS_PROXY = 'https://api.allorigins.win/get?url=';
+        const FETCH_TIMEOUT_MS = 15000;
+
+        /* ── State ── */
+        let urls = []; // [{ id, url, status, statusText, content, title }]
+        let isFetching = false;
+
+        /* ── DOM refs ── */
+        const urlInput       = document.getElementById('url-input');
+        const addUrlBtn      = document.getElementById('add-url-btn');
+        const urlListEl      = document.getElementById('url-list');
+        const urlListEmpty   = document.getElementById('url-list-empty');
+        const fetchBtn       = document.getElementById('fetch-btn');
+        const clearBtn       = document.getElementById('clear-btn');
+        const urlCountLabel  = document.getElementById('url-count-label');
+        const progressWrap   = document.getElementById('progress-wrap');
+        const progressBar    = document.getElementById('progress-bar');
+        const progressLabel  = document.getElementById('progress-label');
+        const outputCard     = document.getElementById('output-card');
+        const outputTextarea = document.getElementById('output-textarea');
+        const copyBtn        = document.getElementById('copy-btn');
+        const downloadBtn    = document.getElementById('download-btn');
+        const statPages      = document.getElementById('stat-pages');
+        const statChars      = document.getElementById('stat-chars');
+        const statWords      = document.getElementById('stat-words');
+        const toastEl        = document.getElementById('toast');
+
+        /* ── Dark Mode ── */
+        (function initTheme() {
+            const btn  = document.getElementById('theme-toggle');
+            const icon = btn.querySelector('i');
+
+            function applyTheme(isDark) {
+                document.body.classList.toggle('dark-mode', isDark);
+                icon.classList.toggle('fa-sun',  isDark);
+                icon.classList.toggle('fa-moon', !isDark);
+            }
+
+            applyTheme(localStorage.getItem('theme') === 'dark');
+
+            btn.addEventListener('click', () => {
+                const isDark = !document.body.classList.contains('dark-mode');
+                applyTheme(isDark);
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            });
+        })();
+
+        /* ── Utilities ── */
+        function uid() {
+            return Math.random().toString(36).slice(2, 9);
+        }
+
+        function isValidUrl(str) {
+            try {
+                const u = new URL(str.trim());
+                return u.protocol === 'http:' || u.protocol === 'https:';
+            } catch {
+                return false;
+            }
+        }
+
+        function showToast(msg, type = '') {
+            toastEl.textContent = msg;
+            toastEl.className   = 'toast show' + (type ? ' ' + type : '');
+            clearTimeout(toastEl._timer);
+            toastEl._timer = setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 3000);
+        }
+
+        function formatNumber(n) {
+            return n.toLocaleString();
+        }
+
+        /* ── URL List UI ── */
+        function updateControls() {
+            const hasUrls = urls.length > 0;
+            fetchBtn.disabled = !hasUrls || isFetching;
+            clearBtn.disabled = !hasUrls || isFetching;
+            urlCountLabel.textContent = urls.length === 1 ? '1 URL' : `${urls.length} URLs`;
+            urlListEmpty.hidden = hasUrls;
+            urlListEmpty.setAttribute('aria-hidden', String(hasUrls));
+        }
+
+        function renderUrlList() {
+            // Rebuild list items
+            urlListEl.innerHTML = '';
+            urls.forEach(entry => {
+                const li = document.createElement('li');
+                li.className = 'url-item';
+                li.dataset.id = entry.id;
+
+                const statusClass = 'status-' + (entry.status || 'pending');
+                const iconHtml = getStatusIcon(entry.status);
+
+                li.innerHTML = `
+                    <div class="url-item-icon ${statusClass}" aria-hidden="true">${iconHtml}</div>
+                    <div class="url-item-text">
+                        <div class="url-item-url" title="${escHtml(entry.url)}">${escHtml(entry.url)}</div>
+                        <div class="url-item-status ${entry.status === 'error' ? 'error' : entry.status === 'success' ? 'success' : ''}">${escHtml(entry.statusText || '')}</div>
+                    </div>
+                    <button class="btn btn-danger btn-icon remove-btn" aria-label="Remove ${escHtml(entry.url)}" data-id="${entry.id}" ${isFetching ? 'disabled' : ''}>
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                `;
+                urlListEl.appendChild(li);
+            });
+
+            // Attach remove listeners
+            urlListEl.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', () => removeUrl(btn.dataset.id));
+            });
+
+            updateControls();
+        }
+
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'loading': return '<i class="fas fa-circle-notch spin"></i>';
+                case 'success': return '<i class="fas fa-check"></i>';
+                case 'error':   return '<i class="fas fa-exclamation-triangle"></i>';
+                default:        return '<i class="fas fa-globe"></i>';
+            }
+        }
+
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function addUrl(url) {
+            url = url.trim();
+            if (!isValidUrl(url)) {
+                showToast('Please enter a valid http:// or https:// URL.', 'error');
+                return;
+            }
+            if (urls.some(u => u.url === url)) {
+                showToast('This URL is already in the list.', '');
+                return;
+            }
+            urls.push({ id: uid(), url, status: 'pending', statusText: 'Ready', content: null, title: null });
+            renderUrlList();
+        }
+
+        function removeUrl(id) {
+            urls = urls.filter(u => u.id !== id);
+            renderUrlList();
+        }
+
+        /* ── Fetch Logic ── */
+        async function fetchWithTimeout(url, timeoutMs) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timer);
+                return res;
+            } catch (err) {
+                clearTimeout(timer);
+                throw err;
+            }
+        }
+
+        /**
+         * Attempt to fetch the URL directly, then fall back to CORS proxy.
+         * Returns { html, finalUrl } or throws.
+         */
+        async function fetchPage(url) {
+            // 1. Try direct fetch
+            try {
+                const res = await fetchWithTimeout(url, FETCH_TIMEOUT_MS);
+                if (res.ok) {
+                    const html = await res.text();
+                    return { html, finalUrl: url };
+                }
+            } catch (directErr) {
+                // CORS or network error — fall through to proxy
+            }
+
+            // 2. Fall back to allorigins proxy
+            const proxyUrl = CORS_PROXY + encodeURIComponent(url);
+            const res = await fetchWithTimeout(proxyUrl, FETCH_TIMEOUT_MS);
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status} from proxy`);
+            }
+            const json = await res.json();
+            if (!json.contents) {
+                throw new Error('Proxy returned empty content');
+            }
+            return { html: json.contents, finalUrl: url };
+        }
+
+        /* ── Text Extraction ── */
+        const BLOCK_TAGS = new Set(['P','H1','H2','H3','H4','H5','H6','LI','BLOCKQUOTE','PRE','CODE','TD','TH','DT','DD','FIGCAPTION','CAPTION']);
+        const HEADING_TAGS = new Set(['H1','H2','H3','H4','H5','H6']);
+        const REMOVE_TAGS  = new Set(['SCRIPT','STYLE','NAV','FOOTER','HEADER','ASIDE','IFRAME','NOSCRIPT','SVG','FORM','MENU','DIALOG','BUTTON','SELECT','INPUT','TEXTAREA']);
+        const CODE_TAGS    = new Set(['PRE','CODE']);
+
+        function extractTextFromDoc(doc, mode) {
+            // Remove unwanted elements
+            REMOVE_TAGS.forEach(tag => {
+                doc.querySelectorAll(tag).forEach(el => el.remove());
+            });
+
+            // Also remove common non-content areas by selector
+            [
+                '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]',
+                '[role="complementary"]', '[role="search"]', '[role="form"]',
+                '.nav', '.navigation', '.sidebar', '.footer', '.header',
+                '#nav', '#navigation', '#sidebar', '#footer', '#header',
+                '.cookie', '.popup', '.modal', '.ad', '.advertisement'
+            ].forEach(sel => {
+                try {
+                    doc.querySelectorAll(sel).forEach(el => el.remove());
+                } catch (_) {}
+            });
+
+            let root = doc.body;
+
+            if (mode === 'main') {
+                const candidates = [
+                    doc.querySelector('main'),
+                    doc.querySelector('article'),
+                    doc.querySelector('[role="main"]'),
+                    doc.querySelector('.post-content'),
+                    doc.querySelector('.entry-content'),
+                    doc.querySelector('.article-body'),
+                    doc.querySelector('.content'),
+                    doc.querySelector('#content'),
+                    doc.querySelector('#main'),
+                ];
+                const found = candidates.find(el => el && el.textContent.trim().length > 200);
+                if (found) root = found;
+            }
+
+            return nodeToText(root).replace(/\n{3,}/g, '\n\n').trim();
+        }
+
+        function nodeToText(node) {
+            if (!node) return '';
+
+            if (node.nodeType === Node.TEXT_NODE) {
+                const t = node.textContent.replace(/\s+/g, ' ');
+                return t === ' ' ? ' ' : t;
+            }
+
+            if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+            const tag = node.tagName;
+
+            if (HEADING_TAGS.has(tag)) {
+                const level = parseInt(tag[1]);
+                const text  = node.textContent.replace(/\s+/g, ' ').trim();
+                if (!text) return '';
+                return '\n\n' + '#'.repeat(level) + ' ' + text + '\n\n';
+            }
+
+            if (tag === 'LI') {
+                const text = childrenToText(node).trim();
+                return text ? '\n- ' + text : '';
+            }
+
+            if (tag === 'UL' || tag === 'OL') {
+                return '\n' + childrenToText(node) + '\n';
+            }
+
+            if (tag === 'PRE') {
+                const text = node.textContent;
+                return '\n\n```\n' + text + '\n```\n\n';
+            }
+
+            if (tag === 'CODE' && node.parentElement && node.parentElement.tagName !== 'PRE') {
+                return '`' + node.textContent.replace(/\s+/g, ' ').trim() + '`';
+            }
+
+            if (tag === 'P' || tag === 'BLOCKQUOTE' || tag === 'DIV' || tag === 'SECTION' || tag === 'ARTICLE') {
+                const inner = childrenToText(node).trim();
+                return inner ? '\n\n' + inner + '\n\n' : '';
+            }
+
+            if (tag === 'BR') return '\n';
+            if (tag === 'HR') return '\n\n---\n\n';
+
+            if (tag === 'A') {
+                const text = childrenToText(node).trim();
+                return text || '';
+            }
+
+            if (tag === 'STRONG' || tag === 'B') {
+                const text = childrenToText(node).trim();
+                return text ? '**' + text + '**' : '';
+            }
+
+            if (tag === 'EM' || tag === 'I') {
+                const text = childrenToText(node).trim();
+                return text ? '_' + text + '_' : '';
+            }
+
+            if (tag === 'TR') {
+                return '\n' + childrenToText(node);
+            }
+
+            if (tag === 'TD' || tag === 'TH') {
+                return ' ' + childrenToText(node).trim() + ' |';
+            }
+
+            if (tag === 'TABLE') {
+                return '\n\n' + childrenToText(node) + '\n\n';
+            }
+
+            return childrenToText(node);
+        }
+
+        function childrenToText(node) {
+            let result = '';
+            for (const child of node.childNodes) {
+                result += nodeToText(child);
+            }
+            return result;
+        }
+
+        /* ── Combine Output ── */
+        function buildOutput(successEntries) {
+            const includeUrlHeader  = document.getElementById('include-url-header').checked;
+            const includeTitle      = document.getElementById('include-title').checked;
+            const includeSeparator  = document.getElementById('include-separator').checked;
+            const outputFormat      = document.getElementById('output-format').value;
+            const isMarkdown        = outputFormat === 'markdown';
+
+            const sep = isMarkdown
+                ? '\n\n---\n\n'
+                : '\n\n' + '='.repeat(60) + '\n\n';
+
+            const parts = successEntries.map((entry, i) => {
+                let chunk = '';
+
+                if (includeUrlHeader) {
+                    chunk += isMarkdown
+                        ? `## Source ${i + 1}: ${entry.url}\n\n`
+                        : `[Source ${i + 1}] ${entry.url}\n\n`;
+                }
+
+                if (includeTitle && entry.title) {
+                    chunk += isMarkdown
+                        ? `> **Page title:** ${entry.title}\n\n`
+                        : `Page title: ${entry.title}\n\n`;
+                }
+
+                chunk += (entry.content || '').trim();
+                return chunk.trim();
+            });
+
+            return parts.join(includeSeparator ? sep : '\n\n');
+        }
+
+        function updateOutput(successEntries) {
+            if (successEntries.length === 0) {
+                outputCard.hidden = true;
+                return;
+            }
+
+            const combined = buildOutput(successEntries);
+            outputTextarea.value = combined;
+
+            const words = combined.trim() ? combined.trim().split(/\s+/).length : 0;
+            statPages.textContent = formatNumber(successEntries.length);
+            statChars.textContent = formatNumber(combined.length);
+            statWords.textContent = formatNumber(words);
+
+            outputCard.hidden = false;
+            outputCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        /* ── Fetch All ── */
+        async function fetchAll() {
+            if (isFetching || urls.length === 0) return;
+
+            isFetching = true;
+            fetchBtn.disabled = true;
+            clearBtn.disabled = true;
+            outputCard.hidden = true;
+
+            const extractionMode = document.getElementById('extraction-mode').value;
+            const total = urls.length;
+            let done = 0;
+
+            progressWrap.classList.add('visible');
+            progressBar.style.width = '0%';
+            progressLabel.textContent = `0 / ${total}`;
+
+            // Reset statuses
+            urls.forEach(u => { u.status = 'pending'; u.statusText = 'Waiting…'; u.content = null; u.title = null; });
+            renderUrlList();
+
+            const parser = new DOMParser();
+
+            for (const entry of urls) {
+                // Update to loading
+                entry.status = 'loading';
+                entry.statusText = 'Fetching…';
+                updateUrlItem(entry);
+
+                try {
+                    const { html } = await fetchPage(entry.url);
+
+                    const doc   = parser.parseFromString(html, 'text/html');
+                    const title = doc.querySelector('title')?.textContent?.trim() || '';
+                    const text  = extractTextFromDoc(doc, extractionMode);
+
+                    if (!text) {
+                        throw new Error('No readable content found on this page');
+                    }
+
+                    entry.status     = 'success';
+                    entry.statusText = title ? `"${title.slice(0, 60)}"` : 'Fetched';
+                    entry.content    = text;
+                    entry.title      = title;
+                } catch (err) {
+                    let msg = err.message || 'Unknown error';
+                    if (err.name === 'AbortError') msg = 'Request timed out';
+                    entry.status     = 'error';
+                    entry.statusText = msg.slice(0, 100);
+                }
+
+                done++;
+                const pct = Math.round((done / total) * 100);
+                progressBar.style.width = pct + '%';
+                progressLabel.textContent = `${done} / ${total}`;
+                updateUrlItem(entry);
+            }
+
+            // Done
+            isFetching = false;
+            updateControls();
+            progressWrap.classList.remove('visible');
+
+            const succeeded = urls.filter(u => u.status === 'success');
+            const failed    = urls.filter(u => u.status === 'error');
+
+            if (succeeded.length > 0) {
+                updateOutput(succeeded);
+                showToast(
+                    `Fetched ${succeeded.length} page${succeeded.length > 1 ? 's' : ''}` +
+                    (failed.length ? `, ${failed.length} failed` : '') + '.',
+                    'success'
+                );
+            } else {
+                showToast('All pages failed to fetch. Check URLs or try again.', 'error');
+            }
+        }
+
+        function updateUrlItem(entry) {
+            const li = urlListEl.querySelector(`[data-id="${entry.id}"]`);
+            if (!li) return;
+
+            const iconEl   = li.querySelector('.url-item-icon');
+            const statusEl = li.querySelector('.url-item-status');
+
+            iconEl.className   = `url-item-icon status-${entry.status}`;
+            iconEl.innerHTML   = getStatusIcon(entry.status);
+            statusEl.textContent = entry.statusText || '';
+            statusEl.className = 'url-item-status' +
+                (entry.status === 'error'   ? ' error'   :
+                 entry.status === 'success' ? ' success' : '');
+        }
+
+        /* ── Clear All ── */
+        function clearAll() {
+            urls = [];
+            outputCard.hidden = true;
+            renderUrlList();
+        }
+
+        /* ── Copy ── */
+        async function copyOutput() {
+            const text = outputTextarea.value;
+            if (!text) return;
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast('Copied to clipboard!', 'success');
+            } catch {
+                outputTextarea.select();
+                document.execCommand('copy');
+                showToast('Copied!', 'success');
+            }
+        }
+
+        /* ── Download ── */
+        function downloadOutput() {
+            const text = outputTextarea.value;
+            if (!text) return;
+            const fmt  = document.getElementById('output-format').value;
+            const ext  = fmt === 'markdown' ? '.md' : '.txt';
+            const name = 'web-content' + ext;
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            saveAs(blob, name);
+        }
+
+        /* ── Event Listeners ── */
+        addUrlBtn.addEventListener('click', () => {
+            addUrl(urlInput.value);
+            urlInput.value = '';
+            urlInput.focus();
+        });
+
+        urlInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                addUrl(urlInput.value);
+                urlInput.value = '';
+            }
+        });
+
+        fetchBtn.addEventListener('click', fetchAll);
+        clearBtn.addEventListener('click', clearAll);
+        copyBtn.addEventListener('click', copyOutput);
+        downloadBtn.addEventListener('click', downloadOutput);
+
+        // Re-render output on option change
+        ['include-url-header', 'include-title', 'include-separator', 'output-format'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => {
+                const succeeded = urls.filter(u => u.status === 'success');
+                if (succeeded.length > 0) updateOutput(succeeded);
+            });
+        });
+
+        /* ── Init ── */
+        renderUrlList();
+    </script>
+</body>
+</html>
