@@ -395,6 +395,19 @@
         const infographicStyle = document.getElementById('infographic-style');
         const recordingStyle = document.getElementById('recording-style');
 
+        // Check badge helper: insert/remove Font Awesome check icon
+        function setCheckBadge(el, show, small = false) {
+            const existing = el.querySelector('.check-badge, .check-badge-sm');
+            if (show && !existing) {
+                const icon = document.createElement('i');
+                icon.className = `fas fa-check ${small ? 'check-badge-sm' : 'check-badge'}`;
+                icon.setAttribute('aria-hidden', 'true');
+                el.appendChild(icon);
+            } else if (!show && existing) {
+                existing.remove();
+            }
+        }
+
         // Roving tabindex utility for radiogroup keyboard navigation
         function makeRoving(items) {
             items.forEach((item, i) => {
@@ -483,10 +496,12 @@
                     t.classList.remove('selected');
                     t.setAttribute('aria-checked', 'false');
                     t.setAttribute('tabindex', '-1');
+                    setCheckBadge(t, false, true);
                 });
                 theme.classList.add('selected');
                 theme.setAttribute('aria-checked', 'true');
                 theme.setAttribute('tabindex', '0');
+                setCheckBadge(theme, true, true);
 
                 state.selectedTheme = theme.dataset.theme;
                 updateColorsFromTheme(state.selectedTheme);
@@ -568,10 +583,12 @@
                     c.classList.remove('selected');
                     c.setAttribute('aria-checked', 'false');
                     c.setAttribute('tabindex', '-1');
+                    setCheckBadge(c, false);
                 });
                 card.classList.add('selected');
                 card.setAttribute('aria-checked', 'true');
                 card.setAttribute('tabindex', '0');
+                setCheckBadge(card, true);
                 state.selectedConcept = card.dataset.concept;
                 saveFormState();
             });
@@ -1127,6 +1144,7 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
                     const isSelected = card.dataset.concept === saved.selectedConcept;
                     card.classList.toggle('selected', isSelected);
                     card.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+                    setCheckBadge(card, isSelected);
                 });
             }
 
@@ -1151,6 +1169,7 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
                     const isSelected = t.dataset.theme === saved.selectedTheme;
                     t.classList.toggle('selected', isSelected);
                     t.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+                    setCheckBadge(t, isSelected, true);
                 });
             }
 
@@ -1210,6 +1229,10 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
                     localStorage.removeItem(FORM_STATE_KEY);
                 }
             }
+
+            // Initialize check badges for default selected elements
+            conceptCards.forEach(card => setCheckBadge(card, card.classList.contains('selected')));
+            themeItems.forEach(t => setCheckBadge(t, t.classList.contains('selected'), true));
 
             // Initialize Mermaid previews
             updateMermaidPreviews();
