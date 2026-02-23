@@ -725,7 +725,8 @@
             font-weight: normal;
         }
 
-        .tooltip:hover .tooltip-text {
+        .tooltip:hover .tooltip-text,
+        .tooltip:focus-within .tooltip-text {
             visibility: visible;
             opacity: 1;
         }
@@ -1642,10 +1643,10 @@
                     });
             } catch (error) {
                 container.innerHTML = `
-                    <div style="color: #e53e3e; padding: 1rem; background-color: #fee2e2; border-radius: 0.5rem;">
+                    <div style="color: var(--accent-color); padding: 1rem; background-color: var(--surface-color); border-radius: 0.5rem;">
                         Error: Failed to render diagram
                     </div>
-                    <pre style="margin-top: 1rem; padding: 1rem; background-color: #f8f8f8; border-radius: 0.5rem; overflow-x: auto;">${mermaidCode}</pre>
+                    <pre style="margin-top: 1rem; padding: 1rem; background-color: var(--bg-color); border-radius: 0.5rem; overflow-x: auto; color: var(--text-primary);">${mermaidCode}</pre>
                 `;
                 console.error('Mermaid rendering error:', error);
             }
