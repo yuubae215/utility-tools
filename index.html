@@ -5,120 +5,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PromptCraft IO</title>
-    <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/components.css">
     <style>
-        :root {
-            /* Common color variables */
-            --primary-color: #3498db;
-            --primary-dark: #2980b9;
-            --primary-light: #EEF2FF;
-            --accent-color: #e74c3c;
-            --secondary-color: #12B981;
-            --text-color: #2c3e50;
-            --text-light: #636e72;
-            --text-primary: #2c3e50;
-            --text-secondary: #636e72;
-            --text-tertiary: #9CA3AF;
-            --bg-color: #f8fafc;
-            --card-color: #fff;
-            --surface-color: #F9FAFB;
-            --border-color: #E5E7EB;
-            --border-radius: 12px;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            --transition: all 0.3s ease;
-            --transition-normal: 0.2s ease-in-out;
-            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            --space-xs: 0.25rem;
-            --space-sm: 0.5rem;
-            --space-md: 1rem;
-            --space-lg: 1.5rem;
-            --space-xl: 2rem;
-            --space-2xl: 3rem;
-        }
-
-        /* Dark mode variables */
-        body.dark-mode {
-            --primary-color: #5dade2;
-            --primary-dark: #3498db;
-            --primary-light: #2d3748;
-            --accent-color: #e76f51;
-            --text-color: #ecf0f1;
-            --text-light: #bdc3c7;
-            --text-primary: #ecf0f1;
-            --text-secondary: #bdc3c7;
-            --text-tertiary: #a0aec0;
-            --bg-color: #1a202c;
-            --card-color: #2d3748;
-            --surface-color: #2d3748;
-            --border-color: #4a5568;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-        }
-
         body {
-            font-family: var(--font-sans);
-            line-height: 1.6;
-            color: var(--text-color);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: var(--bg-color);
-            transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        header {
+        /* ── Portal Intro ── */
+        .portal-intro {
             text-align: center;
-            padding: 30px 0;
-            background-color: var(--card-color);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 40px;
-            position: relative;
+            padding: var(--space-xl) 0 var(--space-lg);
         }
 
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: transparent;
-            border: none;
-            color: var(--text-color);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .theme-toggle:hover {
-            transform: rotate(30deg);
-        }
-
-        h1 {
-            color: var(--text-color);
-            margin: 0 0 10px 0;
-            font-size: 2.5rem;
-        }
-
-        .description {
-            max-width: 800px;
-            margin: 20px auto;
-            text-align: center;
+        .portal-description {
+            max-width: 600px;
+            margin: 0 auto var(--space-xl);
             color: var(--text-light);
-            font-size: 1.1rem;
+            font-size: 1.05rem;
         }
 
         .search-bar {
-            max-width: 600px;
-            margin: 30px auto 20px;
+            max-width: 560px;
+            margin: 0 auto var(--space-md);
             position: relative;
         }
 
         .search-bar input {
             width: 100%;
-            padding: 15px 20px 15px 45px;
+            padding: 14px 20px 14px 46px;
             border: none;
             border-radius: 50px;
             box-shadow: var(--shadow);
@@ -134,24 +52,9 @@
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.4);
         }
 
-        .button:focus-visible {
-            outline: 2px solid var(--primary-color);
-            outline-offset: 2px;
-        }
-
-        .theme-toggle:focus-visible {
-            outline: 2px solid var(--primary-color);
-            outline-offset: 2px;
-        }
-
-        .category-btn:focus-visible {
-            outline: 2px solid var(--primary-color);
-            outline-offset: 2px;
-        }
-
         .search-bar i {
             position: absolute;
-            left: 20px;
+            left: 18px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-light);
@@ -160,34 +63,47 @@
         .categories {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
         .category-btn {
-            padding: 8px 18px;
+            padding: 8px 20px;
             min-height: 44px;
             border: none;
             border-radius: 50px;
             background-color: var(--card-color);
             color: var(--text-color);
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-sm);
         }
 
         .category-btn:hover,
         .category-btn.active {
             background-color: var(--primary-color);
-            color: white;
+            color: #fff;
+        }
+
+        .category-btn:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* ── Tools Grid ── */
+        .tools-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+            flex: 1;
         }
 
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
+            gap: 28px;
+            padding-bottom: var(--space-2xl);
         }
 
         .tool-card {
@@ -199,21 +115,27 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
         }
 
         .tool-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-6px);
             box-shadow: var(--hover-shadow);
         }
 
+        .tool-card:nth-child(1) { animation-delay: 0.1s; }
+        .tool-card:nth-child(2) { animation-delay: 0.2s; }
+        .tool-card:nth-child(3) { animation-delay: 0.3s; }
+
         .tool-icon {
-            height: 160px;
+            height: 150px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 4rem;
+            font-size: 3.5rem;
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
+            color: #fff;
             position: relative;
             overflow: hidden;
         }
@@ -235,221 +157,68 @@
             top: 100%;
         }
 
+        .tool-card:nth-child(1) .tool-icon { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .tool-card:nth-child(2) .tool-icon { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .tool-card:nth-child(3) .tool-icon { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+
         .tool-content {
-            padding: 25px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
         }
 
         .tool-content h3 {
-            margin-top: 0;
+            margin: 0 0 var(--space-sm);
             color: var(--text-color);
-            font-size: 1.4rem;
+            font-size: 1.3rem;
         }
 
         .tool-content p {
             color: var(--text-light);
-            margin-bottom: 20px;
+            margin-bottom: var(--space-lg);
             flex-grow: 1;
         }
 
-        .button {
+        .tool-btn {
             display: inline-block;
             background-color: var(--primary-color);
-            color: white;
-            padding: 12px 24px;
+            color: #fff;
+            padding: 10px 22px;
             border-radius: 50px;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
             transition: var(--transition);
             text-align: center;
-            border: none;
-            cursor: pointer;
         }
 
-        .button:hover {
+        .tool-btn:hover {
             background-color: var(--primary-dark);
             transform: translateY(-2px);
         }
 
-        /* Tool card colors */
-        .tool-card:nth-child(1) .tool-icon {
-            background: linear-gradient(135deg, #3498db, #2980b9);
+        .tool-btn:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
         }
 
-        .tool-card:nth-child(2) .tool-icon {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-
-        .tool-card:nth-child(3) .tool-icon {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-        }
-
-        .section-title {
-            color: var(--text-color);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--primary-color);
-            font-size: 1.6rem;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 70px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(99, 110, 114, 0.2);
-            color: var(--text-light);
-        }
-
-        .github-link {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .github-link:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
-        }
-
-        /* Card animations */
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .tool-card {
-            animation: fadeInUp 0.5s ease forwards;
-            opacity: 0;
-        }
-
-        .tool-card:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .tool-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .tool-card:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        /* Mobile responsiveness improvements */
+        /* ── Responsive ── */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-
-            .description {
-                font-size: 1rem;
-                padding: 0 15px;
-            }
-
-            .search-bar {
-                width: 90%;
-            }
-
-            .categories {
-                gap: 10px;
-            }
-
-            .category-btn {
-                padding: 6px 12px;
-                font-size: 0.9rem;
-            }
-
-            .tools-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .tool-icon {
-                height: 120px;
-                font-size: 3rem;
-            }
-
-            .tool-content {
-                padding: 20px;
-            }
-
-            .tool-content h3 {
-                font-size: 1.2rem;
-            }
-
-            .button {
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
-        }
-
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border-width: 0;
+            .tools-grid { grid-template-columns: 1fr; gap: 18px; }
+            .tool-icon  { height: 120px; font-size: 2.8rem; }
         }
 
         @media (max-width: 480px) {
-            body {
-                padding: 15px;
-            }
-
-            header {
-                padding: 20px 0;
-            }
-
-            h1 {
-                font-size: 1.8rem;
-            }
-
-            .description {
-                font-size: 0.9rem;
-            }
-
-            .theme-toggle {
-                top: 15px;
-                right: 15px;
-                font-size: 1.2rem;
-            }
-
-            .search-bar input {
-                padding: 12px 20px 12px 40px;
-            }
-
-            .search-bar i {
-                left: 15px;
-            }
-
-            .tool-icon {
-                height: 100px;
-            }
-
-            .category-btn {
-                min-height: 44px;
-            }
+            .portal-description { font-size: 0.95rem; }
+            .tool-icon { height: 100px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-delay: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-            }
             .tool-card { opacity: 1 !important; }
         }
     </style>
@@ -463,73 +232,81 @@
     if(s === 'dark' || (s === null && p)) document.body.classList.add('dark-mode');
 })();
 </script>
-    <header>
-        <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode" aria-pressed="false">
-            <i class="fas fa-moon" aria-hidden="true"></i>
-        </button>
-        <h1>PromptCraft IO</h1>
-        <p class="description">Input/Output tools for crafting powerful LLM prompts and controlling AI-generated content.</p>
-    
-        <div class="search-bar">
-            <i class="fas fa-search" aria-hidden="true"></i>
-            <input type="text" id="search-tools" placeholder="Search tools..." aria-label="Search tools">
-        </div>
-    
-        <div class="categories" role="group" aria-label="Filter tools by category">
-            <button class="category-btn active" data-category="all" aria-pressed="true">All</button>
-            <button class="category-btn" data-category="utility" aria-pressed="false">Utility</button>
-            <button class="category-btn" data-category="typography" aria-pressed="false">Typography</button>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="header-brand">
+                <h1 class="header-title">PromptCraft IO</h1>
+                <p class="header-subtitle">Input/Output tools for crafting powerful LLM prompts</p>
+            </div>
+            <nav class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode" aria-pressed="false">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                </button>
+            </nav>
         </div>
     </header>
 
-    <main role="main">
-        <div aria-live="polite" aria-atomic="true" class="sr-only" id="filter-status"></div>
-        <div id="no-results" hidden style="text-align:center;padding:40px 0;">
-            <p style="color:var(--text-light);font-size:1.1rem;margin-bottom:0.75rem;">No tools found matching your search.</p>
-            <p style="color:var(--text-tertiary);font-size:0.95rem;">Try different keywords or <button id="reset-filters" style="background:none;border:none;color:var(--primary-color);cursor:pointer;font-size:0.95rem;text-decoration:underline;padding:0;">reset filters</button>.</p>
-        </div>
-        <h2 class="sr-only">Available Tools</h2>
-        <div class="tools-grid" id="tools-grid">
-            <!-- File Management Tool -->
-            <div class="tool-card" data-category="utility">
-                <div class="tool-icon" aria-hidden="true">
-                    <i class="fas fa-folder-open"></i>
-                </div>
-                <div class="tool-content">
-                    <h3>File Binder</h3>
-                    <p>A tool to combine multiple files. Generate a Markdown document while preserving file structure.</p>
-                    <a href="file-binder.html" class="button">Use Tool</a>
-                </div>
+    <div class="tools-section">
+        <div class="portal-intro">
+            <p class="portal-description">Input/Output tools for crafting powerful LLM prompts and controlling AI-generated content.</p>
+            <div class="search-bar">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="text" id="search-tools" placeholder="Search tools..." aria-label="Search tools">
             </div>
-
-            <!-- Prompt Generator -->
-            <div class="tool-card" data-category="typography">
-                <div class="tool-icon" aria-hidden="true">
-                    <i class="fas fa-pencil-alt"></i>
-                </div>
-                <div class="tool-content">
-                    <h3>Layout & Style Prompt Generator</h3>
-                    <p>A tool to easily create design instruction prompts. Automatically generates effective layout and style instructions.</p>
-                    <a href="prompt-generator.html" class="button">Use Tool</a>
-                </div>
-            </div>
-
-            <!-- Web Content Aggregator -->
-            <div class="tool-card" data-category="utility">
-                <div class="tool-icon" aria-hidden="true">
-                    <i class="fas fa-globe"></i>
-                </div>
-                <div class="tool-content">
-                    <h3>Web Content Aggregator</h3>
-                    <p>Fetch text from multiple web pages and combine them into a single Markdown document for LLM context.</p>
-                    <a href="web-content-aggregator.html" class="button">Use Tool</a>
-                </div>
+            <div class="categories" role="group" aria-label="Filter tools by category">
+                <button class="category-btn active" data-category="all" aria-pressed="true">All</button>
+                <button class="category-btn" data-category="utility" aria-pressed="false">Utility</button>
+                <button class="category-btn" data-category="typography" aria-pressed="false">Typography</button>
             </div>
         </div>
-    </main>
 
-    <footer>
-        <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools" class="github-link">GitHub</a></p>
+        <main role="main">
+            <div aria-live="polite" aria-atomic="true" class="sr-only" id="filter-status"></div>
+            <div id="no-results" hidden style="text-align:center;padding:40px 0;">
+                <p style="color:var(--text-light);font-size:1.1rem;margin-bottom:0.75rem;">No tools found matching your search.</p>
+                <p style="color:var(--text-tertiary);font-size:0.95rem;">Try different keywords or <button id="reset-filters" style="background:none;border:none;color:var(--primary-color);cursor:pointer;font-size:0.95rem;text-decoration:underline;padding:0;">reset filters</button>.</p>
+            </div>
+            <h2 class="sr-only">Available Tools</h2>
+            <div class="tools-grid" id="tools-grid">
+                <div class="tool-card" data-category="utility">
+                    <div class="tool-icon" aria-hidden="true">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>File Binder</h3>
+                        <p>A tool to combine multiple files. Generate a Markdown document while preserving file structure.</p>
+                        <a href="file-binder.html" class="tool-btn">Use Tool</a>
+                    </div>
+                </div>
+
+                <div class="tool-card" data-category="typography">
+                    <div class="tool-icon" aria-hidden="true">
+                        <i class="fas fa-pencil-alt"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Layout &amp; Style Prompt Generator</h3>
+                        <p>A tool to easily create design instruction prompts. Automatically generates effective layout and style instructions.</p>
+                        <a href="prompt-generator.html" class="tool-btn">Use Tool</a>
+                    </div>
+                </div>
+
+                <div class="tool-card" data-category="utility">
+                    <div class="tool-icon" aria-hidden="true">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Web Content Aggregator</h3>
+                        <p>Fetch text from multiple web pages and combine them into a single Markdown document for LLM context.</p>
+                        <a href="web-content-aggregator.html" class="tool-btn">Use Tool</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
     </footer>
 
     <script>
@@ -539,21 +316,13 @@
             const themeIcon = themeToggle.querySelector('i');
 
             function applyTheme(isDark) {
-                if (isDark) {
-                    document.body.classList.add('dark-mode');
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                } else {
-                    document.body.classList.remove('dark-mode');
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                }
+                document.body.classList.toggle('dark-mode', isDark);
+                themeIcon.classList.toggle('fa-sun', isDark);
+                themeIcon.classList.toggle('fa-moon', !isDark);
                 themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
             }
 
-            // Restore saved theme preference
-            const savedTheme = localStorage.getItem('theme');
-            applyTheme(savedTheme === 'dark');
+            applyTheme(localStorage.getItem('theme') === 'dark');
 
             themeToggle.addEventListener('click', function () {
                 const isDark = !document.body.classList.contains('dark-mode');

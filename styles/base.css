@@ -1,0 +1,87 @@
+/* ============================================================
+   base.css -- PromptCraft IO shared design tokens & reset
+   ============================================================ */
+
+/* ── CSS Custom Properties ── */
+:root {
+    --primary-color: #3498db;
+    --primary-dark: #2980b9;
+    --primary-light: #EEF2FF;
+    --accent-color: #e74c3c;
+    --secondary-color: #12B981;
+    --text-color: #2c3e50;
+    --text-light: #636e72;
+    --text-primary: #2c3e50;
+    --text-secondary: #636e72;
+    --text-tertiary: #9CA3AF;
+    --bg-color: #f8fafc;
+    --card-color: #fff;
+    --surface-color: #F9FAFB;
+    --border-color: #E5E7EB;
+    --border-radius: 12px;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.2);
+    --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s ease;
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.2s ease-in-out;
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        'Helvetica Neue', Arial, sans-serif;
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --toast-bg: #2c3e50;
+    --toast-color: #f8fafc;
+}
+
+/* ── Dark Mode Overrides ── */
+body.dark-mode {
+    --primary-color: #5dade2;
+    --primary-dark: #3498db;
+    --primary-light: #2d3748;
+    --accent-color: #e76f51;
+    --text-color: #ecf0f1;
+    --text-light: #bdc3c7;
+    --text-primary: #ecf0f1;
+    --text-secondary: #bdc3c7;
+    --text-tertiary: #a0aec0;
+    --bg-color: #1a202c;
+    --card-color: #2d3748;
+    --surface-color: #2d3748;
+    --border-color: #4a5568;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    --toast-bg: #1e293b;
+    --toast-color: #f1f5f9;
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Base Typography & Body ── */
+body {
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    transition: var(--transition);
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

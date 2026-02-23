@@ -136,3 +136,5 @@ dist
 .pnp.*
 
 .loadignore
+
+settings.local.json

@@ -8,182 +8,30 @@
     <meta name="description" content="Fetch and combine text content from multiple web pages into a single Markdown document for LLM context.">
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- Shared design system -->
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/components.css">
     <!-- FileSaver for downloading files -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
+        /* ── Page-specific color overrides (green theme) ── */
         :root {
             --primary-color: #2ecc71;
             --primary-dark: #27ae60;
             --primary-light: #eafaf1;
-            --accent-color: #e74c3c;
             --secondary-color: #3498db;
-            --text-color: #2c3e50;
-            --text-light: #636e72;
-            --text-primary: #2c3e50;
-            --text-secondary: #636e72;
-            --text-tertiary: #9CA3AF;
-            --bg-color: #f8fafc;
-            --card-color: #fff;
-            --surface-color: #F9FAFB;
-            --border-color: #E5E7EB;
-            --border-radius: 12px;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            --transition: all 0.3s ease;
-            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            --space-xs: 0.25rem;
-            --space-sm: 0.5rem;
-            --space-md: 1rem;
-            --space-lg: 1.5rem;
-            --space-xl: 2rem;
-            --space-2xl: 3rem;
         }
 
         body.dark-mode {
             --primary-color: #2ecc71;
             --primary-dark: #27ae60;
             --primary-light: #1a3329;
-            --accent-color: #e76f51;
-            --text-color: #ecf0f1;
-            --text-light: #bdc3c7;
-            --text-primary: #ecf0f1;
-            --text-secondary: #bdc3c7;
-            --text-tertiary: #a0aec0;
-            --bg-color: #1a202c;
-            --card-color: #2d3748;
-            --surface-color: #2d3748;
-            --border-color: #4a5568;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-        }
-
-        *, *::before, *::after {
-            box-sizing: border-box;
         }
 
         body {
-            font-family: var(--font-sans);
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-            transition: var(--transition);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-        }
-
-        /* ── Header ── */
-        header {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
-            color: #fff;
-            padding: var(--space-lg) var(--space-xl);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: var(--space-md);
-            flex-wrap: wrap;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-            flex: 1;
-            min-width: 0;
-        }
-
-        .header-icon {
-            width: 44px;
-            height: 44px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            flex-shrink: 0;
-            border: 1px solid rgba(255,255,255,0.25);
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        header h1 .badge {
-            display: inline-block;
-            font-size: 0.65rem;
-            font-weight: 600;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 4px;
-            padding: 1px 6px;
-            margin-left: 8px;
-            vertical-align: middle;
-            letter-spacing: 0.5px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: rgba(255,255,255,0.85);
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            padding: 8px 14px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: var(--transition);
-        }
-
-        .back-link:hover {
-            background: rgba(255,255,255,0.22);
-            color: #fff;
-        }
-
-        #theme-toggle {
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #fff;
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-
-        #theme-toggle:hover {
-            background: rgba(255,255,255,0.22);
-        }
-
-        #theme-toggle:focus-visible {
-            outline: 2px solid #fff;
-            outline-offset: 2px;
         }
 
         /* ── Main Layout ── */
@@ -655,36 +503,10 @@
             font-size: 0.9rem;
         }
 
-        /* ── Footer ── */
-        footer {
-            text-align: center;
-            padding: var(--space-lg);
-            color: var(--text-light);
-            font-size: 0.875rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
         /* ── Responsive ── */
         @media (max-width: 600px) {
             main {
                 padding: var(--space-md);
-            }
-
-            header {
-                padding: var(--space-md);
-            }
-
-            header h1 {
-                font-size: 1.1rem;
             }
 
             .url-input-row {
@@ -708,22 +530,24 @@
 </head>
 
 <body>
-    <header>
-        <div class="header-left">
-            <div class="header-icon" aria-hidden="true">
-                <i class="fas fa-globe"></i>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="header-brand">
+                <h1 class="header-title">
+                    <i class="fas fa-globe" aria-hidden="true"></i>
+                    Web Content Aggregator <span class="badge">BETA</span>
+                </h1>
+                <p class="header-subtitle">Fetch and combine text from multiple web pages</p>
             </div>
-            <h1>Web Content Aggregator <span class="badge">BETA</span></h1>
-        </div>
-        <div class="header-right">
-            <a href="index.html" class="back-link">
-                <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                <span class="sr-only">Back to Home</span>
-                <span aria-hidden="true">Home</span>
-            </a>
-            <button id="theme-toggle" aria-label="Toggle dark mode">
-                <i class="fas fa-moon" aria-hidden="true"></i>
-            </button>
+            <nav class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                    <span>Home</span>
+                </a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode" aria-pressed="false">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                </button>
+            </nav>
         </div>
     </header>
 
@@ -733,8 +557,8 @@
             <i class="fas fa-circle-info" aria-hidden="true"></i>
             <div>
                 Fetches publicly accessible web pages and extracts their text content.
-                Due to browser security restrictions (CORS), a proxy service is used as a fallback.
-                <strong>JavaScript-rendered content and login-required pages are not supported.</strong>
+                Due to browser security restrictions (CORS), multiple proxy services are tried as a fallback.
+                <strong>JavaScript-rendered content and login-required pages are not supported. Some sites may block all proxies.</strong>
             </div>
         </div>
 
@@ -856,7 +680,7 @@
         </div>
     </main>
 
-    <footer>
+    <footer class="site-footer">
         <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
     </footer>
 
@@ -867,8 +691,27 @@
         'use strict';
 
         /* ── Constants ── */
-        const CORS_PROXY = 'https://api.allorigins.win/get?url=';
         const FETCH_TIMEOUT_MS = 15000;
+
+        // CORS proxies tried in order until one succeeds
+        const CORS_PROXIES = [
+            {
+                name: 'allorigins',
+                buildUrl: url => 'https://api.allorigins.win/get?url=' + encodeURIComponent(url),
+                async parse(res) {
+                    const json = await res.json();
+                    if (!json.contents) throw new Error('Empty contents from proxy');
+                    return json.contents;
+                }
+            },
+            {
+                name: 'corsproxy.io',
+                buildUrl: url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+                async parse(res) {
+                    return await res.text();
+                }
+            }
+        ];
 
         /* ── State ── */
         let urls = []; // [{ id, url, status, statusText, content, title }]
@@ -1034,7 +877,7 @@
         }
 
         /**
-         * Attempt to fetch the URL directly, then fall back to CORS proxy.
+         * Attempt to fetch the URL directly, then fall back to each CORS proxy in order.
          * Returns { html, finalUrl } or throws.
          */
         async function fetchPage(url) {
@@ -1046,20 +889,38 @@
                     return { html, finalUrl: url };
                 }
             } catch (directErr) {
-                // CORS or network error — fall through to proxy
+                // CORS or network error — fall through to proxies
             }
 
-            // 2. Fall back to allorigins proxy
-            const proxyUrl = CORS_PROXY + encodeURIComponent(url);
-            const res = await fetchWithTimeout(proxyUrl, FETCH_TIMEOUT_MS);
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status} from proxy`);
+            // 2. Try each CORS proxy in order
+            let lastError;
+            for (const proxy of CORS_PROXIES) {
+                try {
+                    const proxyUrl = proxy.buildUrl(url);
+                    const res = await fetchWithTimeout(proxyUrl, FETCH_TIMEOUT_MS);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const html = await proxy.parse(res);
+                    return { html, finalUrl: url };
+                } catch (err) {
+                    lastError = err;
+                }
             }
-            const json = await res.json();
-            if (!json.contents) {
-                throw new Error('Proxy returned empty content');
-            }
-            return { html: json.contents, finalUrl: url };
+
+            throw new Error(`All proxies failed: ${lastError?.message || 'Unknown error'}`);
+        }
+
+        /* ── HTML Sanitization ── */
+        /**
+         * Strip tags that cause the browser to fire network requests when
+         * DOMParser processes the raw HTML from a proxy.  We only need text
+         * content, so removing <link>, <style>, and <script> is safe and
+         * eliminates spurious CORS errors for fonts / stylesheets in the console.
+         */
+        function sanitizeHtmlForParsing(html) {
+            return html
+                .replace(/<link\b[^>]*\/?>/gi, '')                      // preload / stylesheet links
+                .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')       // inline styles (@font-face)
+                .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');   // inline / external scripts
         }
 
         /* ── Text Extraction ── */
@@ -1273,7 +1134,8 @@
                 updateUrlItem(entry);
 
                 try {
-                    const { html } = await fetchPage(entry.url);
+                    const { html: rawHtml } = await fetchPage(entry.url);
+                    const html = sanitizeHtmlForParsing(rawHtml);
 
                     const doc   = parser.parseFromString(html, 'text/html');
                     const title = doc.querySelector('title')?.textContent?.trim() || '';
