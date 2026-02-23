@@ -733,8 +733,8 @@
             <i class="fas fa-circle-info" aria-hidden="true"></i>
             <div>
                 Fetches publicly accessible web pages and extracts their text content.
-                Due to browser security restrictions (CORS), a proxy service is used as a fallback.
-                <strong>JavaScript-rendered content and login-required pages are not supported.</strong>
+                Due to browser security restrictions (CORS), multiple proxy services are tried as a fallback.
+                <strong>JavaScript-rendered content and login-required pages are not supported. Some sites may block all proxies.</strong>
             </div>
         </div>
 
@@ -867,8 +867,27 @@
         'use strict';
 
         /* ── Constants ── */
-        const CORS_PROXY = 'https://api.allorigins.win/get?url=';
         const FETCH_TIMEOUT_MS = 15000;
+
+        // CORS proxies tried in order until one succeeds
+        const CORS_PROXIES = [
+            {
+                name: 'allorigins',
+                buildUrl: url => 'https://api.allorigins.win/get?url=' + encodeURIComponent(url),
+                async parse(res) {
+                    const json = await res.json();
+                    if (!json.contents) throw new Error('Empty contents from proxy');
+                    return json.contents;
+                }
+            },
+            {
+                name: 'corsproxy.io',
+                buildUrl: url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+                async parse(res) {
+                    return await res.text();
+                }
+            }
+        ];
 
         /* ── State ── */
         let urls = []; // [{ id, url, status, statusText, content, title }]
@@ -1034,7 +1053,7 @@
         }
 
         /**
-         * Attempt to fetch the URL directly, then fall back to CORS proxy.
+         * Attempt to fetch the URL directly, then fall back to each CORS proxy in order.
          * Returns { html, finalUrl } or throws.
          */
         async function fetchPage(url) {
@@ -1046,20 +1065,38 @@
                     return { html, finalUrl: url };
                 }
             } catch (directErr) {
-                // CORS or network error — fall through to proxy
+                // CORS or network error — fall through to proxies
             }
 
-            // 2. Fall back to allorigins proxy
-            const proxyUrl = CORS_PROXY + encodeURIComponent(url);
-            const res = await fetchWithTimeout(proxyUrl, FETCH_TIMEOUT_MS);
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status} from proxy`);
+            // 2. Try each CORS proxy in order
+            let lastError;
+            for (const proxy of CORS_PROXIES) {
+                try {
+                    const proxyUrl = proxy.buildUrl(url);
+                    const res = await fetchWithTimeout(proxyUrl, FETCH_TIMEOUT_MS);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const html = await proxy.parse(res);
+                    return { html, finalUrl: url };
+                } catch (err) {
+                    lastError = err;
+                }
             }
-            const json = await res.json();
-            if (!json.contents) {
-                throw new Error('Proxy returned empty content');
-            }
-            return { html: json.contents, finalUrl: url };
+
+            throw new Error(`All proxies failed: ${lastError?.message || 'Unknown error'}`);
+        }
+
+        /* ── HTML Sanitization ── */
+        /**
+         * Strip tags that cause the browser to fire network requests when
+         * DOMParser processes the raw HTML from a proxy.  We only need text
+         * content, so removing <link>, <style>, and <script> is safe and
+         * eliminates spurious CORS errors for fonts / stylesheets in the console.
+         */
+        function sanitizeHtmlForParsing(html) {
+            return html
+                .replace(/<link\b[^>]*\/?>/gi, '')                      // preload / stylesheet links
+                .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')       // inline styles (@font-face)
+                .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');   // inline / external scripts
         }
 
         /* ── Text Extraction ── */
@@ -1273,7 +1310,8 @@
                 updateUrlItem(entry);
 
                 try {
-                    const { html } = await fetchPage(entry.url);
+                    const { html: rawHtml } = await fetchPage(entry.url);
+                    const html = sanitizeHtmlForParsing(rawHtml);
 
                     const doc   = parser.parseFromString(html, 'text/html');
                     const title = doc.querySelector('title')?.textContent?.trim() || '';
