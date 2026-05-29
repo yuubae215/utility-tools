@@ -449,8 +449,9 @@ function updateMermaidPreviews() {
             })
             .catch(error => {
                 container.innerHTML = `
-                    <div style="color: var(--accent-color); padding: 1rem; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 0.5rem;">
-                        Error: Failed to render diagram
+                    <div role="alert" style="color: var(--text-primary); padding: 1rem; background-color: var(--surface-color); border: 2px solid var(--accent-color); border-radius: 0.5rem; display:flex; align-items:center; gap:0.5rem;">
+                        <span aria-hidden="true" style="font-size:1.2em;">⚠️</span>
+                        <span>Error: Failed to render diagram</span>
                     </div>
                     <pre style="margin-top: 1rem; padding: 1rem; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 0.5rem; overflow-x: auto; color: var(--text-primary);">${mermaidCode}</pre>
                 `;
@@ -458,10 +459,11 @@ function updateMermaidPreviews() {
             });
     } catch (error) {
         container.innerHTML = `
-            <div style="color: var(--accent-color); padding: 1rem; background-color: var(--surface-color); border-radius: 0.5rem;">
-                Error: Failed to render diagram
+            <div role="alert" style="color: var(--text-primary); padding: 1rem; background-color: var(--surface-color); border: 2px solid var(--accent-color); border-radius: 0.5rem; display:flex; align-items:center; gap:0.5rem;">
+                <span aria-hidden="true" style="font-size:1.2em;">⚠️</span>
+                <span>Error: Failed to render diagram</span>
             </div>
-            <pre style="margin-top: 1rem; padding: 1rem; background-color: var(--bg-color); border-radius: 0.5rem; overflow-x: auto; color: var(--text-primary);">${mermaidCode}</pre>
+            <pre style="margin-top: 1rem; padding: 1rem; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 0.5rem; overflow-x: auto; color: var(--text-primary);">${mermaidCode}</pre>
         `;
         console.error('Mermaid rendering error:', error);
     }
@@ -894,6 +896,7 @@ if (savedForm) {
         restoreFormState(JSON.parse(savedForm));
     } catch (e) {
         localStorage.removeItem(FORM_STATE_KEY);
+        console.warn('Saved form state was corrupted and has been cleared.', e);
     }
 }
 
