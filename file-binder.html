@@ -331,7 +331,7 @@
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <button id="filterButton" aria-label="Advanced Filters"
-                            class="btn bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm">
+                            class="btn bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm min-h-[44px]">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" aria-hidden="true">
@@ -342,7 +342,7 @@
                             <span class="tooltip-text" aria-hidden="true">Filter files by pattern</span>
                         </button>
                         <button id="sizeAnalysisButton" aria-label="Size Analysis"
-                            class="btn bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm">
+                            class="btn bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm min-h-[44px]">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" aria-hidden="true">
@@ -356,7 +356,7 @@
                             <span class="tooltip-text" aria-hidden="true">Analyze file sizes</span>
                         </button>
                         <button id="combineButton" aria-label="Combine files (Ctrl+Enter)" title="Combine files (Ctrl+Enter)"
-                            class="btn bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm">
+                            class="btn bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm min-h-[44px]">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" aria-hidden="true">
@@ -367,7 +367,7 @@
                             <span class="tooltip-text" aria-hidden="true">Generate markdown document</span>
                         </button>
                         <button id="copyButton" aria-label="Copy to clipboard"
-                            class="btn bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center hidden tooltip text-sm">
+                            class="btn bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center hidden tooltip text-sm min-h-[44px]">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" aria-hidden="true">
@@ -379,7 +379,7 @@
                             <span class="tooltip-text" aria-hidden="true">Copy to clipboard</span>
                         </button>
                         <button id="downloadButton" aria-label="Download as markdown file (Ctrl+D)" title="Download as markdown (Ctrl+D)"
-                            class="btn bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center hidden tooltip text-sm">
+                            class="btn bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center hidden tooltip text-sm min-h-[44px]">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" aria-hidden="true">
@@ -2547,17 +2547,20 @@ poetry.lock
                 const isOpen = !shortcutPanel.hidden;
                 shortcutPanel.hidden = isOpen;
                 shortcutHelpBtn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+                shortcutHelpBtn.setAttribute('aria-label', isOpen ? 'Show keyboard shortcuts' : 'Hide keyboard shortcuts');
             });
             document.addEventListener('click', (e) => {
                 if (!shortcutPanel.hidden && !shortcutPanel.contains(e.target)) {
                     shortcutPanel.hidden = true;
                     shortcutHelpBtn.setAttribute('aria-expanded', 'false');
+                    shortcutHelpBtn.setAttribute('aria-label', 'Show keyboard shortcuts');
                 }
             });
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && !shortcutPanel.hidden) {
                     shortcutPanel.hidden = true;
                     shortcutHelpBtn.setAttribute('aria-expanded', 'false');
+                    shortcutHelpBtn.setAttribute('aria-label', 'Show keyboard shortcuts');
                     shortcutHelpBtn.focus();
                 }
             });
