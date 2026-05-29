@@ -158,7 +158,8 @@
             <tbody>
                 <tr><td class="py-1 pr-4 font-mono text-xs" style="color: var(--text-secondary);"><kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">Ctrl</kbd>+<kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">Enter</kbd></td><td style="color: var(--text-color);">Combine files</td></tr>
                 <tr><td class="py-1 pr-4 font-mono text-xs" style="color: var(--text-secondary);"><kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">Ctrl</kbd>+<kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">D</kbd></td><td style="color: var(--text-color);">Download as .md</td></tr>
-                <tr><td class="py-1 pr-4 font-mono text-xs" style="color: var(--text-secondary);"><kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">Escape</kbd></td><td style="color: var(--text-color);">Close dialog / popover</td></tr>
+                <tr><td class="py-1 pr-4 font-mono text-xs" style="color: var(--text-secondary);"><kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">?</kbd></td><td style="color: var(--text-color);">Toggle this shortcuts panel</td></tr>
+                <tr><td class="py-1 pr-4 font-mono text-xs" style="color: var(--text-secondary);"><kbd style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:4px;padding:1px 5px;">Escape</kbd></td><td style="color: var(--text-color);">Close dialog / exit fullscreen</td></tr>
             </tbody>
         </table>
     </div>
@@ -196,12 +197,13 @@
                             aria-label="Learn about .loadignore pattern filtering"
                             aria-expanded="false"
                             aria-controls="loadignorePopover"
-                            style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--primary-500,#6366f1);border:none;cursor:pointer;font-size:14px;font-weight:bold;color:white;line-height:1;">ⓘ</button>
+                            style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--primary-500,#6366f1);border:none;cursor:pointer;font-size:14px;font-weight:bold;color:white;line-height:1;">ⓘ</button>
                         <div id="loadignorePopover" role="region" aria-label="Loadignore pattern filtering help" hidden
                             style="position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);width:280px;background:var(--card-color);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:12px 14px;font-size:0.8rem;text-align:left;z-index:100;color:var(--text-color);">
                             <p style="margin:0 0 6px;font-weight:600;">.loadignore — Pattern Filtering</p>
                             <p style="margin:0 0 6px;">Add a file named <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">.loadignore</code> or <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">loadignore.txt</code> to your dropped folder to exclude files from being loaded.</p>
-                            <p style="margin:0;color:var(--text-light);">Each line is a glob pattern. Lines starting with <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">#</code> are comments. Example: <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">*.log</code>, <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">node_modules/</code></p>
+                            <p style="margin:0 0 6px;color:var(--text-light);">Each line is a glob pattern. Lines starting with <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">#</code> are comments. Example: <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">*.log</code>, <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">node_modules/</code></p>
+                            <p style="margin:0;color:var(--text-light);">Tip: adding <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">*.png</code>, <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">*.exe</code> and other binary patterns speeds up loading significantly.</p>
                         </div>
                     </span>
                 </h2>
@@ -616,11 +618,11 @@
                     <div id="combinedContent" class="hidden h-full flex flex-col">
                         <div
                             class="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center">
+                            <div class="flex items-center gap-2 flex-wrap">
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                     class="h-5 w-5 text-slate-500 dark:text-slate-400 mr-2" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
+                                    stroke-linejoin="round" aria-hidden="true">
                                     <path
                                         d="M15.5 2H8.6c-.4 0-.8.2-1.1.5-.3.3-.5.7-.5 1.1v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8c.4 0 .8-.2 1.1-.5.3-.3.5-.7.5-1.1V6.5L15.5 2z" />
                                     <path d="M3 7.6v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8" />
@@ -628,7 +630,21 @@
                                 </svg>
                                 <h2 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white">Combined
                                     Files</h2>
+                                <span id="tokenCount" hidden
+                                    class="inline-flex items-center text-xs font-mono font-semibold px-2 py-0.5 rounded-full"
+                                    style="background:var(--primary-light);color:var(--primary-color);"
+                                    title="Estimated token count (1 token ≈ 4 characters)"></span>
                             </div>
+                            <button id="fullscreenToggle" aria-label="Expand to fullscreen" aria-pressed="false"
+                                class="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                style="min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <svg id="fsExpandIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                                </svg>
+                                <svg id="fsCollapseIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 0 2-2h3M3 16h3a2 2 0 0 0 2 2v3"/>
+                                </svg>
+                            </button>
                         </div>
                         <div class="flex-1 overflow-hidden">
                             <pre id="combinedContentView"
@@ -661,6 +677,9 @@
     <!-- Screen reader live region for operation status announcements -->
     <div id="operationStatus" role="status" aria-live="polite" aria-atomic="true"
          class="sr-only"></div>
+
+    <!-- Toast notification -->
+    <div id="fb-toast" class="fb-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <!-- Footer -->
     <footer class="site-footer">
@@ -1265,6 +1284,10 @@
                 files = allFiles;
                 log(`Processed ${files.length} files (${skippedFiles.length} skipped, ${ignoredFiles.length} ignored)`, 'info');
 
+                if (skippedFiles.length > 0) {
+                    showFbToast(`${skippedFiles.length} file${skippedFiles.length > 1 ? 's' : ''} skipped (binary or too large)`);
+                }
+
                 // Show the clear button
                 clearButton.classList.remove('hidden');
 
@@ -1350,6 +1373,10 @@
 
                 files = results;
                 log(`Processed ${files.length} files (${skippedFiles.length} skipped, ${ignoredFiles.length} ignored)`, 'info');
+
+                if (skippedFiles.length > 0) {
+                    showFbToast(`${skippedFiles.length} file${skippedFiles.length > 1 ? 's' : ''} skipped (binary or too large)`);
+                }
 
                 clearButton.classList.remove('hidden');
 
@@ -1992,6 +2019,14 @@
             combinedContentView.textContent = combinedContentText;
             combinedContentView.className = 'language-markdown';
 
+            // Show estimated token count (~4 chars per token)
+            const tokenCountEl = document.getElementById('tokenCount');
+            if (tokenCountEl) {
+                const estTokens = Math.round(combinedContentText.length / 4);
+                tokenCountEl.textContent = `~${estTokens.toLocaleString()} tokens`;
+                tokenCountEl.removeAttribute('hidden');
+            }
+
             // Apply syntax highlighting
             hljs.highlightElement(combinedContentView);
 
@@ -2081,6 +2116,11 @@
             fileContainer.classList.add('hidden');
             emptyState.classList.remove('hidden');
             clearButton.classList.add('hidden');
+
+            // Hide token count and exit fullscreen
+            const tokenCountEl = document.getElementById('tokenCount');
+            if (tokenCountEl) tokenCountEl.setAttribute('hidden', '');
+            exitFullscreen();
 
             log('All files cleared');
         }
@@ -2491,6 +2531,43 @@ poetry.lock
         document.getElementById('excludeSelectedBtn').addEventListener('click', excludeSelectedFiles);
         document.getElementById('applySizeAnalysis').addEventListener('click', excludeSelectedFiles);
 
+        // Toast notification helper
+        let fbToastTimer = null;
+        function showFbToast(message, duration = 4000) {
+            const toast = document.getElementById('fb-toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.add('active');
+            clearTimeout(fbToastTimer);
+            fbToastTimer = setTimeout(() => toast.classList.remove('active'), duration);
+        }
+
+        // Fullscreen toggle for combined view
+        const fullscreenToggle = document.getElementById('fullscreenToggle');
+        const fsExpandIcon = document.getElementById('fsExpandIcon');
+        const fsCollapseIcon = document.getElementById('fsCollapseIcon');
+
+        function exitFullscreen() {
+            if (!combinedContent.classList.contains('fullscreen')) return;
+            combinedContent.classList.remove('fullscreen');
+            if (fsExpandIcon) fsExpandIcon.classList.remove('hidden');
+            if (fsCollapseIcon) fsCollapseIcon.classList.add('hidden');
+            if (fullscreenToggle) {
+                fullscreenToggle.setAttribute('aria-label', 'Expand to fullscreen');
+                fullscreenToggle.setAttribute('aria-pressed', 'false');
+            }
+        }
+
+        if (fullscreenToggle) {
+            fullscreenToggle.addEventListener('click', () => {
+                const isFullscreen = combinedContent.classList.toggle('fullscreen');
+                fsExpandIcon.classList.toggle('hidden', isFullscreen);
+                fsCollapseIcon.classList.toggle('hidden', !isFullscreen);
+                fullscreenToggle.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen' : 'Expand to fullscreen');
+                fullscreenToggle.setAttribute('aria-pressed', isFullscreen ? 'true' : 'false');
+            });
+        }
+
         // Add keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             // Ctrl/Cmd + D to download combined file
@@ -2505,9 +2582,20 @@ poetry.lock
                 combineFiles();
             }
 
-            // Escape to close modal
+            // ? to toggle shortcuts panel (not when typing in a field)
+            if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey &&
+                !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                e.preventDefault();
+                document.getElementById('shortcutHelpBtn')?.click();
+            }
+
+            // Escape to close modal / exit fullscreen
             if (e.key === 'Escape') {
-                closeSizeAnalysisModal();
+                if (combinedContent.classList.contains('fullscreen')) {
+                    exitFullscreen();
+                } else {
+                    closeSizeAnalysisModal();
+                }
             }
         });
 
