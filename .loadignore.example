@@ -1,13 +1,106 @@
-.git
-.vscode
-node_modules
-__pycache__
+# .loadignore — Example ignore pattern file for File Binder
+# Rename this file to ".loadignore" (or "loadignore.txt") and drop it
+# alongside your project folder to exclude files from being loaded.
+# Lines starting with # are comments.
 
-*.toml
-uv.lock
-.gitignore
-.loadignore
-
+# --------------------------------------------------
+# Binary files — images, media, compiled, archives
+# Adding these patterns dramatically speeds up loading
+# and prevents garbled output in your LLM prompt.
+# --------------------------------------------------
+# Images
 *.jpg
-*.svg
+*.jpeg
 *.png
+*.gif
+*.bmp
+*.ico
+*.webp
+*.tiff
+*.tif
+*.psd
+*.ai
+*.eps
+# SVG can be text — keep it if you need markup, skip if not
+# *.svg
+# Videos
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.mkv
+*.webm
+*.m4v
+# Audio
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.m4a
+# Archives
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+*.bz2
+*.xz
+*.iso
+# Executables & compiled artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.bin
+*.wasm
+*.obj
+*.o
+*.class
+*.pyc
+# Documents (binary formats)
+*.pdf
+*.docx
+*.xlsx
+*.pptx
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# --------------------------------------------------
+# Node.js / npm
+# --------------------------------------------------
+node_modules/
+package-lock.json
+yarn.lock
+.npm/
+.yarn/
+
+# --------------------------------------------------
+# Python / uv
+# --------------------------------------------------
+.venv/
+.uv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+dist/
+build/
+*.egg-info/
+
+# --------------------------------------------------
+# Common development
+# --------------------------------------------------
+.git/
+.DS_Store
+.env
+.env.*
+.cache/
+coverage/
+.idea/
+.vscode/
+*.log
+logs/
+tmp/
+temp/

@@ -594,3 +594,42 @@ header .max-w-7xl {
         animation-iteration-count: 1 !important;
     }
 }
+
+/* ── Toast notification ── */
+.fb-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 0.625rem 1rem;
+    background: var(--card-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    box-shadow: var(--shadow-md);
+    z-index: 300;
+    transform: translateY(calc(100% + 2rem));
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    max-width: min(360px, calc(100vw - 2rem));
+}
+
+.fb-toast.active {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* ── Fullscreen combined view ── */
+#combinedContent.fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: var(--card-color);
+    border-radius: 0;
+    display: flex !important;
+}
+
+#combinedContent.fullscreen #combinedContentView {
+    height: calc(100dvh - 58px) !important;
+}

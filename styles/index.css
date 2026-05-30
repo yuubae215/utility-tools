@@ -196,10 +196,16 @@ body {
     to   { opacity: 1; transform: translateY(0); }
 }
 
+/* K7 Motion Safety: cards start opacity:0 for animation; override must cover
+   nth-child selectors (higher specificity) that set animation-delay. */
 @media (prefers-reduced-motion: reduce) {
-    .tool-card {
-        opacity: 1;
-        animation: none;
+    .tool-card,
+    .tool-card:nth-child(1),
+    .tool-card:nth-child(2),
+    .tool-card:nth-child(3) {
+        opacity: 1 !important;
+        animation: none !important;
+        animation-delay: 0.01ms !important;
     }
 }
 
@@ -212,8 +218,4 @@ body {
 @media (max-width: 480px) {
     .portal-description { font-size: 0.95rem; }
     .tool-icon { height: 100px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .tool-card { opacity: 1 !important; }
 }
