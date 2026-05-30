@@ -552,6 +552,14 @@
                             <p class="text-xs text-slate-500 dark:text-slate-400">Wrap file contents in <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">&lt;details&gt;</code> tags — collapses by default in Markdown viewers for easier scanning</p>
                         </div>
                     </label>
+                    <label class="flex items-start gap-3 cursor-pointer select-none">
+                        <input type="checkbox" id="optStripComments"
+                            class="mt-0.5 rounded border-slate-300 dark:border-slate-600 text-violet-600 focus:ring-violet-500">
+                        <div>
+                            <p class="text-sm font-medium text-slate-900 dark:text-white">Strip Comments &amp; Blank Lines</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Remove full-line code comments (<code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">//</code> <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">#</code> <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">/* */</code>) and collapse blank lines — reduces token count by ~20–40%. Skips <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">.md</code> / <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">.json</code> files.</p>
+                        </div>
+                    </label>
                 </div>
             </div>
 
@@ -717,6 +725,28 @@
                                 </svg>
                             </button>
                         </div>
+                        <!-- Secret detection warning banner -->
+                        <div id="secretWarning" hidden
+                            role="alert"
+                            class="px-3 sm:px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-700 flex items-start gap-2 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-amber-800 dark:text-amber-300">Potential secrets detected</p>
+                                <p id="secretWarningText" class="text-xs text-amber-700 dark:text-amber-400 mt-0.5"></p>
+                            </div>
+                            <button id="dismissSecretWarning"
+                                aria-label="Dismiss secret warning"
+                                class="flex-shrink-0 text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500 rounded">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
                         <div class="flex-1 overflow-hidden">
                             <pre id="combinedContentView"
                                 class="overflow-y-auto overflow-x-auto p-4 m-0 rounded-none text-sm bg-slate-50 dark:bg-slate-900 language-markdown h-[60vh]"><code class="whitespace-pre-wrap break-words"></code></pre>
@@ -820,6 +850,19 @@
             // Other binary formats
             'bin', 'dat', 'class', 'pyc', 'o', 'obj', 'wasm'
         ]);
+
+        const SECRET_PATTERNS = [
+            { name: 'GitHub Token (ghp_/gho_/ghs_)', pattern: /gh[pos]_[a-zA-Z0-9]{36}/g },
+            { name: 'GitHub Fine-grained PAT', pattern: /github_pat_[a-zA-Z0-9_]{82}/g },
+            { name: 'Google API Key', pattern: /AIzaSy[a-zA-Z0-9_-]{35}/g },
+            { name: 'AWS Access Key ID', pattern: /AKIA[A-Z0-9]{16}/g },
+            { name: 'Stripe Live Secret Key', pattern: /sk_live_[a-zA-Z0-9]{24,}/g },
+            { name: 'Slack Token', pattern: /xox[baprs]-\d+-[a-zA-Z0-9-]+/g },
+            { name: 'OpenAI API Key', pattern: /sk-[a-zA-Z0-9]{48}/g },
+            { name: 'Anthropic API Key', pattern: /sk-ant-[a-zA-Z0-9_-]{95,}/g },
+            { name: 'Private Key Block', pattern: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/g },
+            { name: 'Generic .env secret', pattern: /(?:^|[\r\n])[ \t]*(?:PASSWORD|TOKEN|SECRET|API_KEY|PRIVATE_KEY|ACCESS_KEY)\s*=\s*[^\s'"#]{8,}/gim },
+        ];
 
         // Global variables
         let files = [];
@@ -1035,6 +1078,76 @@
         function isBinaryFile(fileName) {
             const extension = getFileExtension(fileName).toLowerCase();
             return BINARY_EXTENSIONS.has(extension);
+        }
+
+        function collapseBlankLines(text) {
+            text = text.replace(/[ \t]+$/gm, '');
+            text = text.replace(/\n{3,}/g, '\n\n');
+            return text.trim();
+        }
+
+        function compressCode(text, extension) {
+            const ext = extension.toLowerCase();
+            const skipExts = new Set(['md', 'txt', 'csv', 'tsv', 'json', 'lock', '']);
+            if (skipExts.has(ext)) return collapseBlankLines(text);
+
+            const hasSlashSlash = !['py', 'rb', 'sh', 'bash', 'zsh', 'fish', 'pl', 'r',
+                                     'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'env'].includes(ext);
+            const hasHash = ['py', 'rb', 'sh', 'bash', 'zsh', 'fish', 'pl', 'r',
+                              'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'env',
+                              'gitignore', 'dockerignore', 'editorconfig'].includes(ext);
+            const hasDoubleDash = ['sql', 'lua', 'hs', 'elm'].includes(ext);
+            const hasBlockComments = ['js', 'ts', 'jsx', 'tsx', 'java', 'c', 'cpp', 'cs',
+                                       'go', 'rs', 'swift', 'kotlin', 'css', 'scss', 'less',
+                                       'php', 'scala', 'dart', 'groovy', 'mjs', 'cjs'].includes(ext);
+            const hasHtmlComments = ['html', 'xml', 'vue', 'svelte'].includes(ext);
+
+            const lines = text.split('\n');
+            const result = [];
+            let inBlockComment = false;
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+
+                if (hasBlockComments) {
+                    if (inBlockComment) {
+                        if (line.includes('*/')) inBlockComment = false;
+                        continue;
+                    }
+                    if (trimmed.startsWith('/*')) {
+                        if (!line.includes('*/')) inBlockComment = true;
+                        continue;
+                    }
+                }
+
+                if (hasHtmlComments) {
+                    if (inBlockComment) {
+                        if (line.includes('-->')) inBlockComment = false;
+                        continue;
+                    }
+                    if (trimmed.startsWith('<!--')) {
+                        if (!line.includes('-->')) inBlockComment = true;
+                        continue;
+                    }
+                }
+
+                if (hasSlashSlash && trimmed.startsWith('//')) continue;
+                if (hasHash && trimmed.startsWith('#') && !trimmed.startsWith('#!')) continue;
+                if (hasDoubleDash && trimmed.startsWith('--')) continue;
+
+                result.push(line);
+            }
+
+            return collapseBlankLines(result.join('\n'));
+        }
+
+        function scanForSecrets(text) {
+            const hits = [];
+            for (const { name, pattern } of SECRET_PATTERNS) {
+                pattern.lastIndex = 0;
+                if (pattern.test(text)) hits.push(name);
+            }
+            return hits;
         }
 
         // Check if file size is acceptable
@@ -2056,6 +2169,7 @@
             const useXml = document.getElementById('optXmlTags').checked;
             const useDetails = document.getElementById('optDetailsAccordion').checked;
             const useFrontMatter = document.getElementById('optFrontMatter').checked;
+            const useStripComments = document.getElementById('optStripComments').checked;
 
             // Add each file's content - process in chunks to prevent browser freeze
             combinedContentText += '## File Contents\n\n';
@@ -2077,6 +2191,10 @@
                     } else {
                         // Read file with timeout
                         text = await readFileWithTimeout(file.file);
+                    }
+
+                    if (useStripComments && text) {
+                        text = compressCode(text, extension);
                     }
 
                     const lineCount = text ? text.split('\n').length : 0;
@@ -2136,6 +2254,18 @@
                 mermaid.init(undefined, '.language-mermaid');
             }, 100);
 
+            // Secret scanning
+            const secretWarningEl = document.getElementById('secretWarning');
+            const secretWarningText = document.getElementById('secretWarningText');
+            const secretHits = scanForSecrets(combinedContentText);
+            if (secretHits.length > 0) {
+                secretWarningText.textContent = `Matched pattern${secretHits.length > 1 ? 's' : ''}: ${secretHits.join(', ')}. Review before sharing.`;
+                secretWarningEl.removeAttribute('hidden');
+                document.getElementById('operationStatus').textContent = `Warning: potential secrets detected — ${secretHits.join(', ')}`;
+            } else {
+                secretWarningEl.setAttribute('hidden', '');
+            }
+
             selectedFileContent.classList.add('hidden');
             combinedContent.classList.remove('hidden');
             noFileSelected.classList.add('hidden');
@@ -2150,8 +2280,10 @@
 
             // Announce completion to screen readers
             const totalBytes = files.reduce((sum, f) => sum + f.file.size, 0);
-            document.getElementById('operationStatus').textContent =
-                `Files combined: ${files.length} files, ${formatFileSize(totalBytes)}`;
+            if (secretHits.length === 0) {
+                document.getElementById('operationStatus').textContent =
+                    `Files combined: ${files.length} files, ${formatFileSize(totalBytes)}`;
+            }
         }
 
         // Download combined file
@@ -2686,12 +2818,16 @@ poetry.lock
         document.getElementById('toggleFormatPanel').addEventListener('click', toggleFormatPanel);
 
         // Persist format options to localStorage
-        ['optFrontMatter', 'optXmlTags', 'optDetailsAccordion'].forEach(id => {
+        ['optFrontMatter', 'optXmlTags', 'optDetailsAccordion', 'optStripComments'].forEach(id => {
             const el = document.getElementById(id);
             if (localStorage.getItem('fb_' + id) === 'true') el.checked = true;
             el.addEventListener('change', () => {
                 localStorage.setItem('fb_' + id, el.checked);
             });
+        });
+
+        document.getElementById('dismissSecretWarning').addEventListener('click', () => {
+            document.getElementById('secretWarning').setAttribute('hidden', '');
         });
         document.getElementById('clearFilters').addEventListener('click', clearFiltersHandler);
         document.getElementById('includePattern').addEventListener('input', updateFilterPreview);
