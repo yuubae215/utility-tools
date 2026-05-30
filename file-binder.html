@@ -1194,16 +1194,19 @@ build/
             };
         }
 
+        // Returns the raw file extension (e.g. 'xlsx'), bypassing the language-label map
+        function getRawExtension(fileName) {
+            return fileName.split('.').pop()?.toLowerCase() || '';
+        }
+
         // Check if file is binary based on extension
         function isBinaryFile(fileName) {
-            const extension = getFileExtension(fileName).toLowerCase();
-            return BINARY_EXTENSIONS.has(extension);
+            return BINARY_EXTENSIONS.has(getRawExtension(fileName));
         }
 
         // Check if file is a document whose text can be extracted in-browser
         function isDocumentFile(fileName) {
-            const extension = getFileExtension(fileName).toLowerCase();
-            return DOCUMENT_EXTENSIONS.has(extension);
+            return DOCUMENT_EXTENSIONS.has(getRawExtension(fileName));
         }
 
         function collapseBlankLines(text) {
@@ -1416,7 +1419,7 @@ build/
 
         // Dispatch to the correct extractor based on file extension
         async function extractDocumentText(file) {
-            const ext = getFileExtension(file.name).toLowerCase();
+            const ext = getRawExtension(file.name);
             const arrayBuffer = await file.arrayBuffer();
             switch (ext) {
                 case 'pdf':  return extractTextFromPDF(arrayBuffer);
