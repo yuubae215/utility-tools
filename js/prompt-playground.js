@@ -1,4 +1,4 @@
-import { CreateWebWorkerMLCEngine } from "https://esm.sh/@mlc-ai/web-llm";
+import { CreateWebWorkerMLCEngine } from "https://esm.sh/@mlc-ai/web-llm@0.2.83";
 import { initTheme } from './theme.js';
 
 initTheme();
@@ -125,8 +125,10 @@ async function loadModel() {
         btnRun.disabled = false;
         userInputEl.focus();
     } catch (err) {
+        const errText = typeof err === 'string' ? err : (err?.message || String(err) || 'Unknown error');
         loadProgress.hidden = true;
-        setStatus('error', 'Error: ' + (err.message || 'Unknown error'));
+        setStatus('error', errText.startsWith('Error') ? errText : 'Error: ' + errText);
+        console.error('[Prompt Playground] Model load error:', err);
         btnLoad.disabled = false;
         btnLoad.innerHTML = '<i class="fas fa-bolt" aria-hidden="true"></i> Load Model';
         engine = null;
@@ -225,7 +227,8 @@ async function handleSend() {
         }
     } catch (err) {
         if (!abortRequested) {
-            streamText += streamText ? '\n\n[Error: ' + err.message + ']' : '[Error: ' + err.message + ']';
+            const errMsg = typeof err === 'string' ? err : (err?.message || String(err) || 'Unknown error');
+            streamText += streamText ? '\n\n[Error: ' + errMsg + ']' : '[Error: ' + errMsg + ']';
         }
     }
 
