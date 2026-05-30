@@ -357,6 +357,23 @@
                             <span class="sm:hidden" aria-hidden="true">Size</span>
                             <span class="tooltip-text" aria-hidden="true">Analyze file sizes</span>
                         </button>
+                        <button id="formatButton" aria-label="Output Format Options"
+                            class="btn bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm min-h-[44px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="4" y1="21" x2="4" y2="14"></line>
+                                <line x1="4" y1="10" x2="4" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12" y2="3"></line>
+                                <line x1="20" y1="21" x2="20" y2="16"></line>
+                                <line x1="20" y1="12" x2="20" y2="3"></line>
+                                <line x1="1" y1="14" x2="7" y2="14"></line>
+                                <line x1="9" y1="8" x2="15" y2="8"></line>
+                                <line x1="17" y1="16" x2="23" y2="16"></line>
+                            </svg>
+                            <span class="hidden sm:inline" aria-hidden="true">Output Format</span>
+                            <span class="sm:hidden" aria-hidden="true">Format</span>
+                            <span class="tooltip-text" aria-hidden="true">Configure output format options</span>
+                        </button>
                         <button id="combineButton" aria-label="Combine files (Ctrl+Enter)" title="Combine files (Ctrl+Enter)"
                             class="btn bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm min-h-[44px]">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24"
@@ -481,6 +498,60 @@
                             Clear Filters
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Output Format Panel -->
+            <div id="formatPanel" class="card mb-4 sm:mb-6 p-3 sm:p-4 w-full overflow-hidden hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-600 dark:text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="4" y1="21" x2="4" y2="14"></line>
+                            <line x1="4" y1="10" x2="4" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12" y2="3"></line>
+                            <line x1="20" y1="21" x2="20" y2="16"></line>
+                            <line x1="20" y1="12" x2="20" y2="3"></line>
+                            <line x1="1" y1="14" x2="7" y2="14"></line>
+                            <line x1="9" y1="8" x2="15" y2="8"></line>
+                            <line x1="17" y1="16" x2="23" y2="16"></line>
+                        </svg>
+                        <h2 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white">Output Format</h2>
+                    </div>
+                    <button id="toggleFormatPanel" aria-label="Collapse output format panel" aria-expanded="true"
+                            class="text-sm text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 flex items-center gap-1 py-2">
+                        <span id="formatToggleText">Collapse</span>
+                        <svg id="formatToggleIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="18 15 12 9 6 15"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <div id="formatContent" class="space-y-3">
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Options apply the next time you click <strong>Combine Files</strong>. Settings are saved automatically.</p>
+                    <label class="flex items-start gap-3 cursor-pointer select-none">
+                        <input type="checkbox" id="optFrontMatter"
+                            class="mt-0.5 rounded border-slate-300 dark:border-slate-600 text-violet-600 focus:ring-violet-500">
+                        <div>
+                            <p class="text-sm font-medium text-slate-900 dark:text-white">YAML Front Matter</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Prepend metadata — <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">generated_at</code>, <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">total_files</code>, <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">estimated_tokens</code>, <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">ignored_patterns</code></p>
+                        </div>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer select-none">
+                        <input type="checkbox" id="optXmlTags"
+                            class="mt-0.5 rounded border-slate-300 dark:border-slate-600 text-violet-600 focus:ring-violet-500">
+                        <div>
+                            <p class="text-sm font-medium text-slate-900 dark:text-white">XML File Tags</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Wrap each file in <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">&lt;file path="…" size="…" lines="…"&gt;</code> for precise LLM boundary detection</p>
+                        </div>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer select-none">
+                        <input type="checkbox" id="optDetailsAccordion"
+                            class="mt-0.5 rounded border-slate-300 dark:border-slate-600 text-violet-600 focus:ring-violet-500">
+                        <div>
+                            <p class="text-sm font-medium text-slate-900 dark:text-white">Collapsible Sections</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Wrap file contents in <code class="px-1 bg-slate-100 dark:bg-slate-700 rounded">&lt;details&gt;</code> tags — collapses by default in Markdown viewers for easier scanning</p>
+                        </div>
+                    </label>
                 </div>
             </div>
 
@@ -1981,6 +2052,11 @@
             combinedContentText += generateMermaidDiagram(tree);
             combinedContentText += '```\n\n';
 
+            // Read output format options
+            const useXml = document.getElementById('optXmlTags').checked;
+            const useDetails = document.getElementById('optDetailsAccordion').checked;
+            const useFrontMatter = document.getElementById('optFrontMatter').checked;
+
             // Add each file's content - process in chunks to prevent browser freeze
             combinedContentText += '## File Contents\n\n';
 
@@ -2003,7 +2079,20 @@
                         text = await readFileWithTimeout(file.file);
                     }
 
-                    combinedContentText += `### ${fileName}\n\`\`\`${extension}\n${text}\n\`\`\`\n\n`;
+                    const lineCount = text ? text.split('\n').length : 0;
+                    const fileSizeStr = formatFileSize(file.file.size);
+                    const codeBlock = `\`\`\`${extension}\n${text}\n\`\`\``;
+                    const icon = '📄 ';
+
+                    if (useXml && useDetails) {
+                        combinedContentText += `### ${icon}${fileName}\n<file path="${fileName}" size="${fileSizeStr}" lines="${lineCount}">\n<details>\n<summary>View code (${lineCount} lines)</summary>\n\n${codeBlock}\n\n</details>\n</file>\n\n`;
+                    } else if (useXml) {
+                        combinedContentText += `### ${icon}${fileName}\n<file path="${fileName}" size="${fileSizeStr}" lines="${lineCount}">\n${codeBlock}\n</file>\n\n`;
+                    } else if (useDetails) {
+                        combinedContentText += `### ${icon}${fileName}\n<details>\n<summary>View code (${lineCount} lines)</summary>\n\n${codeBlock}\n\n</details>\n\n`;
+                    } else {
+                        combinedContentText += `### ${fileName}\n${codeBlock}\n\n`;
+                    }
 
                     // Allow UI to breathe every CHUNK_SIZE files
                     if ((i + 1) % CHUNK_SIZE === 0) {
@@ -2013,6 +2102,18 @@
                     console.error(`Error processing file ${file.path}:`, err);
                     combinedContentText += `### Error: ${file.path}\n\`\`\`\nError: ${err.message}\n\`\`\`\n\n`;
                 }
+            }
+
+            // Prepend YAML front matter if enabled (computed after body is built for accurate token count)
+            if (useFrontMatter) {
+                const estTokens = Math.round(combinedContentText.length / 4);
+                const now = new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' UTC');
+                const ignoredArr = Array.from(ignorePatterns);
+                const ignoredYaml = ignoredArr.length > 0
+                    ? `ignored_patterns:\n${ignoredArr.map(p => `  - "${p}"`).join('\n')}`
+                    : 'ignored_patterns: []';
+                const frontMatter = `---\ngenerated_at: "${now}"\ntotal_files: ${files.length}\nestimated_tokens: ${estTokens.toLocaleString()}\n${ignoredYaml}\n---\n\n`;
+                combinedContentText = frontMatter + combinedContentText;
             }
 
             // Update UI
@@ -2499,6 +2600,32 @@ poetry.lock
             filterPanel.classList.remove('hidden');
         }
 
+        function showFormatPanel() {
+            const formatPanel = document.getElementById('formatPanel');
+            formatPanel.classList.remove('hidden');
+        }
+
+        function toggleFormatPanel() {
+            const formatContent = document.getElementById('formatContent');
+            const formatToggleText = document.getElementById('formatToggleText');
+            const formatToggleIcon = document.getElementById('formatToggleIcon');
+            const toggleBtn = document.getElementById('toggleFormatPanel');
+
+            if (formatContent.classList.contains('hidden')) {
+                formatContent.classList.remove('hidden');
+                formatToggleText.textContent = 'Collapse';
+                formatToggleIcon.classList.remove('rotate-180');
+                toggleBtn.setAttribute('aria-label', 'Collapse output format panel');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+            } else {
+                formatContent.classList.add('hidden');
+                formatToggleText.textContent = 'Expand';
+                formatToggleIcon.classList.add('rotate-180');
+                toggleBtn.setAttribute('aria-label', 'Expand output format panel');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+            }
+        }
+
         // Update total size display
         function updateTotalSize() {
             const totalSize = files.reduce((sum, file) => sum + (file.size || 0), 0);
@@ -2547,6 +2674,25 @@ poetry.lock
         });
         document.getElementById('toggleFilterPanel').addEventListener('click', toggleFilterPanel);
         document.getElementById('applyFilters').addEventListener('click', applyFiltersHandler);
+
+        // Format panel listeners
+        document.getElementById('formatButton').addEventListener('click', () => {
+            showFormatPanel();
+            const formatContent = document.getElementById('formatContent');
+            if (formatContent.classList.contains('hidden')) {
+                toggleFormatPanel();
+            }
+        });
+        document.getElementById('toggleFormatPanel').addEventListener('click', toggleFormatPanel);
+
+        // Persist format options to localStorage
+        ['optFrontMatter', 'optXmlTags', 'optDetailsAccordion'].forEach(id => {
+            const el = document.getElementById(id);
+            if (localStorage.getItem('fb_' + id) === 'true') el.checked = true;
+            el.addEventListener('change', () => {
+                localStorage.setItem('fb_' + id, el.checked);
+            });
+        });
         document.getElementById('clearFilters').addEventListener('click', clearFiltersHandler);
         document.getElementById('includePattern').addEventListener('input', updateFilterPreview);
         document.getElementById('excludePattern').addEventListener('input', updateFilterPreview);
