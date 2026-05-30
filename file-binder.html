@@ -204,11 +204,11 @@
                             aria-controls="loadignorePopover"
                             style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--primary-500,#6366f1);border:none;cursor:pointer;font-size:14px;font-weight:bold;color:white;line-height:1;">ⓘ</button>
                         <div id="loadignorePopover" role="region" aria-label="Loadignore pattern filtering help" hidden
-                            style="position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);width:280px;background:var(--card-color);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:12px 14px;font-size:0.8rem;text-align:left;z-index:100;color:var(--text-color);">
-                            <p style="margin:0 0 6px;font-weight:600;">.loadignore — Pattern Filtering</p>
-                            <p style="margin:0 0 6px;">Add a file named <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">.loadignore</code> or <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">loadignore.txt</code> to your dropped folder to exclude files from being loaded.</p>
+                            style="position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);width:300px;background:var(--card-color);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:12px 14px;font-size:0.8rem;text-align:left;z-index:100;color:var(--text-color);">
+                            <p style="margin:0 0 6px;font-weight:600;">Ignore Patterns — Browser-based filtering</p>
+                            <p style="margin:0 0 6px;">Patterns are configured directly in the browser via the <strong>Ignore Patterns</strong> panel (orange button). Settings persist in <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">localStorage</code> — no file needed.</p>
                             <p style="margin:0 0 6px;color:var(--text-light);">Each line is a glob pattern. Lines starting with <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">#</code> are comments. Example: <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">*.log</code>, <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">node_modules/</code></p>
-                            <p style="margin:0;color:var(--text-light);">Tip: adding <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">*.png</code>, <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">*.exe</code> and other binary patterns speeds up loading significantly.</p>
+                            <p style="margin:0;color:var(--text-light);">A <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">.loadignore</code> or <code style="background:var(--surface-color);padding:1px 4px;border-radius:3px;">loadignore.txt</code> file inside a dropped folder is also supported and its patterns are merged with the UI patterns.</p>
                         </div>
                     </span>
                 </h2>
@@ -225,20 +225,21 @@
                     <span
                         class="inline-flex items-center rounded-lg bg-gradient-to-r from-accent-50 to-accent-100 dark:from-accent-900/40 dark:to-accent-800/30 px-3 py-1.5 text-xs font-semibold text-accent-700 dark:text-accent-300 shadow-sm border border-accent-200 dark:border-accent-700/30">.loadignore</span>
                 </div>
-                <div class="mt-4 flex flex-col">
+                <div class="mt-4 flex flex-col gap-1">
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        Ignore patterns are configured in your browser — no file needed.
+                        After loading files, click <strong class="text-orange-600 dark:text-orange-400">Ignore Patterns</strong> to edit them.
+                    </p>
                     <button id="downloadSampleIgnore"
-                        class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1">
+                        class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1 self-start">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
                             <polyline points="7 10 12 15 17 10" />
                             <line x1="12" y1="15" x2="12" y2="3" />
                         </svg>
-                        Download ignore pattern sample
+                        Download .loadignore sample (for folder-based overrides)
                     </button>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 ml-6 mt-1">
-                        Supports both <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-700 rounded">.loadignore</code> and <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-700 rounded">loadignore.txt</code> filenames. Use # for comments.
-                    </div>
                 </div>
                 <div class="mt-5">
                     <button id="selectFilesBtn"
@@ -361,6 +362,18 @@
                             <span class="hidden sm:inline" aria-hidden="true">Size Analysis</span>
                             <span class="sm:hidden" aria-hidden="true">Size</span>
                             <span class="tooltip-text" aria-hidden="true">Analyze file sizes</span>
+                        </button>
+                        <button id="ignoreButton" aria-label="Configure Ignore Patterns"
+                            class="btn bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm min-h-[44px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 sm:mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                                <path d="M9.17 9.17A4 4 0 0 0 12 17a4 4 0 0 0 2.83-6.83"></path>
+                                <path d="M10.73 5.08A10 10 0 0 1 22 15.92"></path>
+                                <path d="M2 12a10 10 0 0 1 14.92-8.68"></path>
+                            </svg>
+                            <span class="hidden sm:inline" aria-hidden="true">Ignore Patterns</span>
+                            <span class="sm:hidden" aria-hidden="true">Ignore</span>
+                            <span class="tooltip-text" aria-hidden="true">Configure ignore patterns (saved in browser)</span>
                         </button>
                         <button id="formatButton" aria-label="Output Format Options"
                             class="btn bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm flex items-center tooltip text-sm min-h-[44px]">
@@ -502,6 +515,61 @@
                             </svg>
                             Clear Filters
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ignore Patterns Panel -->
+            <div id="ignorePanel" class="card mb-4 sm:mb-6 p-3 sm:p-4 w-full overflow-hidden hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600 dark:text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                            <path d="M9.17 9.17A4 4 0 0 0 12 17a4 4 0 0 0 2.83-6.83"></path>
+                            <path d="M10.73 5.08A10 10 0 0 1 22 15.92"></path>
+                            <path d="M2 12a10 10 0 0 1 14.92-8.68"></path>
+                        </svg>
+                        <h2 class="text-base sm:text-lg font-medium text-slate-900 dark:text-white">Ignore Patterns</h2>
+                        <span id="ignorePatternsCount" class="text-xs font-medium px-2 py-0.5 bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 rounded-full">0 patterns</span>
+                    </div>
+                    <button id="toggleIgnorePanel" aria-label="Collapse ignore patterns panel" aria-expanded="true"
+                            class="text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 flex items-center gap-1 py-2">
+                        <span id="ignoreToggleText">Collapse</span>
+                        <svg id="ignoreToggleIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="18 15 12 9 6 15"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <div id="ignoreContent" class="space-y-3">
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        Patterns are applied when files are loaded. One pattern per line. Lines starting with <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-700 rounded">#</code> are comments.
+                        Patterns are saved automatically in your browser — no file needed.
+                        A <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-700 rounded">.loadignore</code> file inside a dropped folder will be merged with these patterns.
+                    </p>
+                    <textarea id="uiIgnorePatterns" rows="10"
+                        aria-label="Ignore patterns, one per line"
+                        class="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono resize-y"
+                        placeholder="node_modules/&#10;*.png&#10;*.bin&#10;# Lines starting with # are comments"></textarea>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button id="saveIgnoreBtn"
+                            class="btn bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm flex items-center text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            Save Patterns
+                        </button>
+                        <button id="resetIgnoreBtn"
+                            class="btn border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium py-2 px-4 rounded-lg shadow-sm flex items-center text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="1 4 1 10 7 10"></polyline>
+                                <path d="M3.51 15a9 9 0 1 0 .49-3.56"></path>
+                            </svg>
+                            Reset to Defaults
+                        </button>
+                        <span id="ignoreSaveStatus" role="status" aria-live="polite"
+                            class="text-xs text-green-600 dark:text-green-400 opacity-0 transition-opacity duration-300">Saved</span>
                     </div>
                 </div>
             </div>
@@ -893,6 +961,46 @@
         let ignoredFiles = []; // Track ignored files for UI feedback
         let skippedFiles = []; // Track skipped files (binary/too large)
         let patternCache = new Map(); // Cache for compiled regex patterns
+
+        // Default ignore patterns for the UI textarea
+        const DEFAULT_IGNORE_PATTERNS = `# -------- Binary files (speeds up loading significantly) --------
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.webp
+*.tiff
+*.bmp
+*.mp4
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+*.exe
+*.dll
+*.so
+*.dylib
+*.bin
+*.wasm
+*.pyc
+*.class
+*.pdf
+# -------- Generated / dependency folders --------
+node_modules/
+.git/
+__pycache__/
+.venv/
+dist/
+build/
+.DS_Store
+*.log`;
 
         // Filter-related variables
         let includeFilterPatterns = '';
@@ -1520,7 +1628,7 @@
             processedFiles = 0;
             estimatedTotalFiles = 0;
             error = null;
-            ignorePatterns.clear();
+            ignorePatterns = getUIIgnorePatterns();
             patternCache.clear(); // Clear regex cache
             ignoredFiles = [];
             skippedFiles = [];
@@ -1597,7 +1705,7 @@
             processedFiles = 0;
             estimatedTotalFiles = fileList.length;
             error = null;
-            ignorePatterns.clear();
+            ignorePatterns = getUIIgnorePatterns();
             patternCache.clear();
             ignoredFiles = [];
             skippedFiles = [];
@@ -2257,7 +2365,7 @@
                 }
 
                 if (ignoredFiles.length > 0) {
-                    combinedContentText += `- **Ignored files** (via loadignore): ${ignoredFiles.length}\n\n`;
+                    combinedContentText += `- **Ignored files** (via ignore patterns): ${ignoredFiles.length}\n\n`;
                 }
             }
 
@@ -2866,6 +2974,85 @@ poetry.lock
             }
         }
 
+        // ========================================
+        // Ignore Patterns Panel Functions
+        // ========================================
+
+        function getUIIgnorePatterns() {
+            const textarea = document.getElementById('uiIgnorePatterns');
+            if (!textarea) return new Set();
+            return new Set(
+                textarea.value
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line && !line.startsWith('#'))
+            );
+        }
+
+        function updateIgnorePatternsCount() {
+            const count = getUIIgnorePatterns().size;
+            const badge = document.getElementById('ignorePatternsCount');
+            if (badge) badge.textContent = `${count} pattern${count !== 1 ? 's' : ''}`;
+        }
+
+        function initIgnorePatternsPanel() {
+            const textarea = document.getElementById('uiIgnorePatterns');
+            const saveBtn = document.getElementById('saveIgnoreBtn');
+            const resetBtn = document.getElementById('resetIgnoreBtn');
+            const status = document.getElementById('ignoreSaveStatus');
+            if (!textarea) return;
+
+            const saved = localStorage.getItem('fb_ignorePatterns');
+            textarea.value = saved !== null ? saved : DEFAULT_IGNORE_PATTERNS;
+            updateIgnorePatternsCount();
+
+            textarea.addEventListener('input', updateIgnorePatternsCount);
+
+            saveBtn.addEventListener('click', () => {
+                localStorage.setItem('fb_ignorePatterns', textarea.value);
+                updateIgnorePatternsCount();
+                status.classList.remove('opacity-0');
+                setTimeout(() => status.classList.add('opacity-0'), 2000);
+            });
+
+            resetBtn.addEventListener('click', () => {
+                textarea.value = DEFAULT_IGNORE_PATTERNS;
+                localStorage.setItem('fb_ignorePatterns', DEFAULT_IGNORE_PATTERNS);
+                updateIgnorePatternsCount();
+                status.textContent = 'Reset to defaults';
+                status.classList.remove('opacity-0');
+                setTimeout(() => {
+                    status.classList.add('opacity-0');
+                    status.textContent = 'Saved';
+                }, 2000);
+            });
+        }
+
+        function showIgnorePatternsPanel() {
+            document.getElementById('ignorePanel').classList.remove('hidden');
+        }
+
+        function toggleIgnorePatternsPanel() {
+            const content = document.getElementById('ignoreContent');
+            const toggleText = document.getElementById('ignoreToggleText');
+            const toggleIcon = document.getElementById('ignoreToggleIcon');
+            const toggleBtn = document.getElementById('toggleIgnorePanel');
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                toggleText.textContent = 'Collapse';
+                toggleIcon.classList.remove('rotate-180');
+                toggleBtn.setAttribute('aria-label', 'Collapse ignore patterns panel');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+            } else {
+                content.classList.add('hidden');
+                toggleText.textContent = 'Expand';
+                toggleIcon.classList.add('rotate-180');
+                toggleBtn.setAttribute('aria-label', 'Expand ignore patterns panel');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+            }
+        }
+
         // Update total size display
         function updateTotalSize() {
             const totalSize = files.reduce((sum, file) => sum + (file.size || 0), 0);
@@ -2943,6 +3130,19 @@ poetry.lock
 
         // Initialize filter presets on load
         initializeFilterPresets();
+
+        // Ignore patterns panel listeners
+        document.getElementById('ignoreButton').addEventListener('click', () => {
+            showIgnorePatternsPanel();
+            const content = document.getElementById('ignoreContent');
+            if (content.classList.contains('hidden')) {
+                toggleIgnorePatternsPanel();
+            }
+        });
+        document.getElementById('toggleIgnorePanel').addEventListener('click', toggleIgnorePatternsPanel);
+
+        // Initialize ignore patterns panel (loads from localStorage or defaults)
+        initIgnorePatternsPanel();
 
         // Size analysis modal listeners
         document.getElementById('sizeAnalysisButton').addEventListener('click', openSizeAnalysisModal);
