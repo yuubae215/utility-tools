@@ -991,7 +991,6 @@
 *.wasm
 *.pyc
 *.class
-*.pdf
 # -------- Generated / dependency folders --------
 node_modules/
 .git/
@@ -1308,7 +1307,45 @@ build/
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
-                const pageText = textContent.items.map(item => item.str).join(' ');
+
+                const items = textContent.items.filter(item => typeof item.str === 'string' && item.str);
+                if (items.length === 0) {
+                    fullText += `--- Page ${i}/${pdf.numPages} ---\n(No text)\n\n`;
+                    continue;
+                }
+
+                // Derive Y-tolerance from average glyph height to handle different font sizes
+                const avgHeight = items.reduce((s, it) => s + (it.height || 0), 0) / items.length;
+                const tolerance = Math.max(2, avgHeight * 0.5);
+
+                // Sort top-to-bottom (descending Y in PDF coords), then left-to-right
+                const sorted = [...items].sort((a, b) => {
+                    const dy = b.transform[5] - a.transform[5];
+                    if (Math.abs(dy) > tolerance) return dy;
+                    return a.transform[4] - b.transform[4];
+                });
+
+                // Group into lines by proximity of Y coordinate
+                const lines = [];
+                let lineItems = [];
+                let lineY = null;
+                for (const item of sorted) {
+                    const y = item.transform[5];
+                    if (lineY === null || Math.abs(y - lineY) > tolerance) {
+                        if (lineItems.length) lines.push(lineItems);
+                        lineItems = [item];
+                        lineY = y;
+                    } else {
+                        lineItems.push(item);
+                    }
+                }
+                if (lineItems.length) lines.push(lineItems);
+
+                const pageText = lines
+                    .map(line => line.map(it => it.str).join('').trim())
+                    .filter(line => line)
+                    .join('\n');
+
                 fullText += `--- Page ${i}/${pdf.numPages} ---\n${pageText}\n\n`;
             }
             return fullText.trim() || '(No extractable text found. This may be a scanned image PDF.)';
