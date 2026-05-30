@@ -60,6 +60,7 @@ const tabs             = document.querySelectorAll('.tab');
 const generateBtn      = document.getElementById('generate-btn');
 const result           = document.getElementById('result');
 const copyBtn          = document.getElementById('copy-btn');
+const playgroundBtn    = document.getElementById('playground-btn');
 const copyStatus       = document.getElementById('copy-status');
 const toast            = document.getElementById('toast');
 const infographicPreview = document.getElementById('infographic-preview');
@@ -728,7 +729,17 @@ Remember to prioritize clarity, readability, and information hierarchy throughou
     setTimeout(() => {
         result.textContent = promptTemplate;
         result.style.opacity = '1';
+        playgroundBtn.style.display = 'inline-flex';
     }, 300);
+});
+
+// Send to AI Playground
+playgroundBtn.addEventListener('click', () => {
+    const text = result.textContent;
+    if (text) {
+        localStorage.setItem('promptcraft_shared_prompt', text);
+        window.location.href = 'prompt-playground.html';
+    }
 });
 
 // Copy to clipboard

@@ -258,6 +258,43 @@ async function handleSend() {
     userInputEl.focus();
 }
 
+// ── Shared data from other PromptCraft tools ──────────────
+(function applySharedData() {
+    const sharedContext = localStorage.getItem('promptcraft_shared_context');
+    const sharedPrompt  = localStorage.getItem('promptcraft_shared_prompt');
+
+    if (sharedContext) {
+        userInputEl.value = sharedContext;
+        localStorage.removeItem('promptcraft_shared_context');
+        showImportToast('Context imported from File Binder — add your question above and press Send');
+    }
+
+    if (sharedPrompt) {
+        systemPromptEl.value = sharedPrompt;
+        localStorage.removeItem('promptcraft_shared_prompt');
+        presetBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+        const customBtn = document.querySelector('[data-preset="custom"]');
+        customBtn.classList.add('active');
+        customBtn.setAttribute('aria-pressed', 'true');
+        showImportToast('System prompt imported from Prompt Generator — load a model and try it');
+    }
+})();
+
+function showImportToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'import-toast';
+    toast.setAttribute('role', 'status');
+    toast.innerHTML = `<i class="fas fa-check-circle" aria-hidden="true"></i> ${message}`;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => toast.classList.add('visible'));
+    });
+    setTimeout(() => {
+        toast.classList.remove('visible');
+        setTimeout(() => toast.remove(), 400);
+    }, 5000);
+}
+
 function appendMessage(role, text) {
     const msg = document.createElement('div');
     msg.className = `chat-msg ${role}`;
