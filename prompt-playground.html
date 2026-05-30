@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Playground - PromptCraft IO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/prompt-playground.css">
+    <script src="js/theme-init.js"></script>
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="header-brand">
+                <h1 class="header-title">AI Prompt Playground</h1>
+                <p class="header-subtitle">Run LLMs locally in your browser — no API key, no server, 100% private</p>
+            </div>
+            <nav class="header-actions">
+                <a href="index.html" class="back-link" aria-label="Back to home">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                    <span>Home</span>
+                </a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode" aria-pressed="false">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pg-layout" role="main">
+
+        <!-- WebGPU unavailable warning -->
+        <div class="webgpu-warn" id="webgpu-warn" role="alert">
+            <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+            <div>
+                <strong>WebGPU not available</strong> — This tool requires WebGPU to run AI models locally.
+                Please use <strong>Chrome 113+</strong> or <strong>Edge 113+</strong> on a desktop device.
+                Safari Technology Preview also supports WebGPU.
+            </div>
+        </div>
+
+        <!-- Privacy Banner -->
+        <div class="privacy-banner">
+            <i class="fas fa-shield-halved" aria-hidden="true"></i>
+            <p>
+                <strong>100% Private &amp; Zero Backend</strong> — Models run entirely in your browser via WebGPU.
+                No data ever leaves your device. After the first download, models load instantly from local cache.
+            </p>
+        </div>
+
+        <!-- Control Panel -->
+        <aside class="control-panel" aria-label="Model controls and settings">
+
+            <!-- Model Loader -->
+            <div class="panel-card">
+                <h2>Model</h2>
+                <select class="model-select" id="model-select" aria-label="Select AI model">
+                    <option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen2.5 0.5B — Fast (~400 MB)</option>
+                    <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC" selected>Qwen2.5 1.5B — Balanced (~900 MB)</option>
+                    <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama 3.2 1B — Meta (~700 MB)</option>
+                </select>
+                <p class="model-meta" id="model-meta"></p>
+
+                <button class="btn-load" id="btn-load">
+                    <i class="fas fa-bolt" aria-hidden="true"></i>
+                    Load Model
+                </button>
+
+                <div class="load-progress" id="load-progress" hidden>
+                    <p class="progress-label" id="progress-label">Initializing...</p>
+                    <div class="progress-track" role="progressbar" aria-label="Model loading progress" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="model-status">
+                    <div class="status-dot" id="status-dot" aria-hidden="true"></div>
+                    <span id="load-status">Not loaded</span>
+                </div>
+            </div>
+
+            <!-- System Prompt -->
+            <div class="panel-card">
+                <h2>System Prompt</h2>
+                <div class="system-presets" role="group" aria-label="System prompt presets">
+                    <button class="preset-btn active" data-preset="engineer" aria-pressed="true">Prompt Engineer</button>
+                    <button class="preset-btn" data-preset="code" aria-pressed="false">Code Expert</button>
+                    <button class="preset-btn" data-preset="analyzer" aria-pressed="false">Doc Analyzer</button>
+                    <button class="preset-btn" data-preset="custom" aria-pressed="false">Custom</button>
+                </div>
+                <textarea
+                    class="system-textarea"
+                    id="system-prompt"
+                    aria-label="System prompt — defines the AI's role and behavior"
+                    rows="5"
+                ></textarea>
+            </div>
+
+            <!-- Tips -->
+            <div class="panel-card tips-card">
+                <h2>Tips</h2>
+                <ul class="tips-list">
+                    <li>
+                        <i class="fas fa-folder-open" aria-hidden="true"></i>
+                        Paste <a href="file-binder.html">File Binder</a> output to give the AI your codebase as context
+                    </li>
+                    <li>
+                        <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                        Use <a href="prompt-generator.html">Prompt Generator</a> to craft design instructions, then test them here
+                    </li>
+                    <li>
+                        <i class="fas fa-keyboard" aria-hidden="true"></i>
+                        Press <kbd>Ctrl+Enter</kbd> (or <kbd>⌘+Enter</kbd>) to send
+                    </li>
+                    <li>
+                        <i class="fas fa-rotate-right" aria-hidden="true"></i>
+                        Models are cached — instant load on next visit
+                    </li>
+                </ul>
+            </div>
+
+        </aside>
+
+        <!-- Chat Area -->
+        <section class="chat-area" aria-label="AI conversation">
+
+            <div
+                class="chat-history"
+                id="chat-history"
+                role="log"
+                aria-live="polite"
+                aria-label="Conversation history"
+                aria-relevant="additions"
+            >
+                <div class="chat-empty" id="chat-empty">
+                    <i class="fas fa-robot" aria-hidden="true"></i>
+                    <p>Load a model, then type your message below.<br>The AI runs entirely in your browser — no internet required after the first load.</p>
+                </div>
+            </div>
+
+            <div class="input-panel">
+                <div class="input-toolbar">
+                    <label for="user-input">Your message</label>
+                    <button class="btn-clear" id="btn-clear" aria-label="Clear conversation history">
+                        <i class="fas fa-trash-can" aria-hidden="true"></i>
+                        Clear chat
+                    </button>
+                </div>
+                <textarea
+                    class="user-textarea"
+                    id="user-input"
+                    placeholder="Type your prompt here, or paste content from File Binder / Prompt Generator…"
+                    aria-label="Your message"
+                    rows="4"
+                ></textarea>
+                <div class="input-actions">
+                    <span class="token-stats" id="token-stats" aria-live="polite" aria-label="Generation stats"></span>
+                    <button class="btn-abort" id="btn-abort" hidden aria-label="Stop generating">
+                        <i class="fas fa-stop" aria-hidden="true"></i>
+                        Stop
+                    </button>
+                    <button class="btn-run" id="btn-run" disabled aria-label="Send message (Ctrl+Enter)">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                        Send
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 PromptCraft IO｜<a href="https://github.com/yuubae215/utility-tools">GitHub</a></p>
+    </footer>
+
+    <script type="module" src="js/prompt-playground.js"></script>
+</body>
+
+</html>

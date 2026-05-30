@@ -116,6 +116,7 @@ body {
 .tool-card:nth-child(1) { animation-delay: 0.1s; }
 .tool-card:nth-child(2) { animation-delay: 0.2s; }
 .tool-card:nth-child(3) { animation-delay: 0.3s; }
+.tool-card:nth-child(4) { animation-delay: 0.4s; }
 
 .tool-icon {
     height: 150px;
@@ -149,6 +150,7 @@ body {
 .tool-card:nth-child(1) .tool-icon { background: linear-gradient(135deg, #3498db, #2980b9); }
 .tool-card:nth-child(2) .tool-icon { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 .tool-card:nth-child(3) .tool-icon { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+.tool-card:nth-child(4) .tool-icon { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
 
 .tool-content {
     padding: 24px;
@@ -202,7 +204,8 @@ body {
     .tool-card,
     .tool-card:nth-child(1),
     .tool-card:nth-child(2),
-    .tool-card:nth-child(3) {
+    .tool-card:nth-child(3),
+    .tool-card:nth-child(4) {
         opacity: 1 !important;
         animation: none !important;
         animation-delay: 0.01ms !important;
