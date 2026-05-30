@@ -2224,34 +2224,99 @@
 # Lines starting with # are comments and will be ignored
 
 # --------------------------------------------------
-# Node.js npm related 
+# Binary files (images, media, compiled, archives)
+# Adding these patterns dramatically speeds up loading
+# and prevents garbled output in your LLM prompt.
 # --------------------------------------------------
-# Node modules directory (dependency files)
+# Images
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.ico
+*.webp
+*.tiff
+*.tif
+*.psd
+*.ai
+*.eps
+# SVG can be text — keep it if you need markup, skip if not
+# *.svg
+# Videos
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.mkv
+*.webm
+*.m4v
+*.flv
+# Audio
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.m4a
+*.wma
+# Archives
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+*.bz2
+*.xz
+*.iso
+# Executables & compiled artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.app
+*.bin
+*.dat
+*.wasm
+*.obj
+*.o
+*.class
+*.pyc
+*.pyd
+# Documents (binary formats)
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+*.mdb
+
+# --------------------------------------------------
+# Node.js / npm related
+# --------------------------------------------------
 node_modules/
-# Package lock files
 package-lock.json
-# Debug logs
 npm-debug.log
 yarn-error.log
-# Lock files
 yarn.lock
-# Cache directories
 .npm/
 .yarn/
 
 # --------------------------------------------------
-# Python uv related
+# Python / uv related
 # --------------------------------------------------
-# Virtual environment directories
 .venv/
 .uv/
-# Cached Python bytecode
 __pycache__/
 *.py[cod]
 *$py.class
-# C extensions
 *.so
-# Distribution / packaging directories
 .Python
 env/
 build/
@@ -2264,53 +2329,41 @@ lib64/
 parts/
 sdist/
 var/
-# Python package metadata
 *.egg-info/
 .installed.cfg
 *.egg
-# Test cache
 .pytest_cache/
 
 # --------------------------------------------------
-# Common development files to ignore
+# Common development files
 # --------------------------------------------------
-# Version control
 .git/
 .github/
-# OS generated files
 .DS_Store
-# Environment variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-# Caches
 .cache/
-# Testing
 .coverage
 coverage/
-# IDE settings
 .idea/
 .vscode/
-# Temporary files
 *.swp
 *.swo
 *~
 .tmp/
 tmp/
 temp/
-# Log files
 logs/
 *.log
 
 # --------------------------------------------------
 # Additional platform-specific files
 # --------------------------------------------------
-# Node.js specific configuration
 .npmrc
 .yarnrc
-# Python specific files
 .python-version
 pyrightconfig.json
 pyproject.toml
