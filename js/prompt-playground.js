@@ -1,4 +1,4 @@
-import { CreateWebWorkerMLCEngine } from "https://esm.sh/@mlc-ai/web-llm@0.2.83";
+import { CreateWebWorkerMLCEngine } from "https://esm.run/@mlc-ai/web-llm@0.2.83";
 import { initTheme } from './theme.js';
 
 initTheme();
