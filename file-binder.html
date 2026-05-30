@@ -33,6 +33,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/markdown.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+    <!-- Document parsing libraries (PDF, DOCX, XLSX, PPTX) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- FOUC prevention: must be synchronous, before first paint -->
     <script src="js/theme-init.js"></script>
 
@@ -843,13 +848,21 @@
             'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'iso',
             // Executables
             'exe', 'dll', 'so', 'dylib', 'app', 'deb', 'rpm',
-            // Documents
-            'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+            // Legacy Office formats (not browser-parseable)
+            'doc', 'xls', 'ppt',
             // Database
             'db', 'sqlite', 'mdb',
             // Other binary formats
             'bin', 'dat', 'class', 'pyc', 'o', 'obj', 'wasm'
         ]);
+
+        // Document extensions that can have text extracted in-browser
+        const DOCUMENT_EXTENSIONS = new Set(['pdf', 'docx', 'xlsx', 'pptx']);
+
+        // Initialize PDF.js worker
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        }
 
         const SECRET_PATTERNS = [
             { name: 'GitHub Token (ghp_/gho_/ghs_)', pattern: /gh[pos]_[a-zA-Z0-9]{36}/g },
@@ -1080,6 +1093,12 @@
             return BINARY_EXTENSIONS.has(extension);
         }
 
+        // Check if file is a document whose text can be extracted in-browser
+        function isDocumentFile(fileName) {
+            const extension = getFileExtension(fileName).toLowerCase();
+            return DOCUMENT_EXTENSIONS.has(extension);
+        }
+
         function collapseBlankLines(text) {
             text = text.replace(/[ \t]+$/gm, '');
             text = text.replace(/\n{3,}/g, '\n\n');
@@ -1172,6 +1191,75 @@
                         reject(err);
                     });
             });
+        }
+
+        // Extract text from a PDF using PDF.js
+        async function extractTextFromPDF(arrayBuffer) {
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                fullText += `--- Page ${i}/${pdf.numPages} ---\n${pageText}\n\n`;
+            }
+            return fullText.trim() || '(No extractable text found. This may be a scanned image PDF.)';
+        }
+
+        // Extract text from a DOCX using mammoth.js
+        async function extractTextFromDocx(arrayBuffer) {
+            const result = await mammoth.extractRawText({ arrayBuffer });
+            return result.value.trim() || '(No text content found.)';
+        }
+
+        // Extract text from an XLSX using SheetJS, formatted as CSV per sheet
+        async function extractTextFromXlsx(arrayBuffer) {
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            let fullText = '';
+            workbook.SheetNames.forEach(sheetName => {
+                const csv = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+                if (csv.trim()) {
+                    fullText += `--- Sheet: ${sheetName} ---\n${csv}\n\n`;
+                }
+            });
+            return fullText.trim() || '(Empty spreadsheet.)';
+        }
+
+        // Extract text from a PPTX by unzipping and reading slide XML
+        async function extractTextFromPptx(arrayBuffer) {
+            const zip = await JSZip.loadAsync(arrayBuffer);
+            let fullText = '';
+            let slideIndex = 1;
+            while (true) {
+                const slideFile = zip.file(`ppt/slides/slide${slideIndex}.xml`);
+                if (!slideFile) break;
+                const xml = await slideFile.async('text');
+                const matches = xml.match(/<a:t[^>]*>([^<]*)<\/a:t>/g);
+                if (matches) {
+                    const slideText = matches
+                        .map(tag => tag.replace(/<[^>]+>/g, ''))
+                        .filter(t => t.trim())
+                        .join(' ');
+                    if (slideText.trim()) {
+                        fullText += `--- Slide ${slideIndex} ---\n${slideText}\n\n`;
+                    }
+                }
+                slideIndex++;
+            }
+            return fullText.trim() || '(No text content found in slides.)';
+        }
+
+        // Dispatch to the correct extractor based on file extension
+        async function extractDocumentText(file) {
+            const ext = getFileExtension(file.name).toLowerCase();
+            const arrayBuffer = await file.arrayBuffer();
+            switch (ext) {
+                case 'pdf':  return extractTextFromPDF(arrayBuffer);
+                case 'docx': return extractTextFromDocx(arrayBuffer);
+                case 'xlsx': return extractTextFromXlsx(arrayBuffer);
+                case 'pptx': return extractTextFromPptx(arrayBuffer);
+                default: throw new Error(`Unsupported document type: .${ext}`);
+            }
         }
 
         // Prevent default behavior for drag over
@@ -1601,6 +1689,10 @@
                 html: '<svg aria-hidden="true" class="h-4 w-4 text-orange-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.56l4.07-1.13.55-6.1H9.38L9.2 8.3h7.6l.2-1.99H7l.56 6.01h6.89l-.23 2.58-2.22.6-2.22-.6-.14-1.66h-2l.29 3.19L12 17.56M4.07 3h15.86L18.5 19.2 12 21l-6.5-1.8L4.07 3z"/></svg>',
                 svg: '<svg aria-hidden="true" class="h-4 w-4 text-pink-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5.13 10.71h3.74l-2.6 2.61 2.6 2.6H5.13l-2.6-2.6 2.6-2.61zm6.97-8.54l5.63 5.66-5.63 5.66-5.64-5.66 5.64-5.66zM15.1 19.39l3.73.01-2.6-2.6 2.6-2.61h-3.73l-2.6 2.61 2.6 2.6z"/></svg>',
                 yml: '<svg aria-hidden="true" class="h-4 w-4 text-purple-500" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm2.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM12 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm5 2a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>',
+                pdf: '<svg aria-hidden="true" class="h-4 w-4 text-red-600" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg>',
+                docx: '<svg aria-hidden="true" class="h-4 w-4 text-blue-700" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM8 17h8v1.5H8V17zm0-3h8v1.5H8V14zm0-3h4v1.5H8V11z"/></svg>',
+                xlsx: '<svg aria-hidden="true" class="h-4 w-4 text-green-600" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM8 18v-1.5h2.5V18H8zm0-3v-1.5h2.5V15H8zm4 3v-1.5h2.5V18H12zm0-3v-1.5h2.5V15H12zm4 3v-1.5H18V18h-2zm0-3v-1.5H18V15h-2zM8 11h8v1.5H8V11z"/></svg>',
+                pptx: '<svg aria-hidden="true" class="h-4 w-4 text-orange-600" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM7 17.5v-9h10v9H7zm5-7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg>',
                 default: '<svg aria-hidden="true" class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
             };
 
@@ -1621,6 +1713,10 @@
                 svg: '<span class="inline-flex items-center rounded-md bg-pink-50 dark:bg-pink-900/30 px-2 py-1 text-xs font-medium text-pink-700 dark:text-pink-400 ring-1 ring-inset ring-pink-600/20 dark:ring-pink-500/30">SVG</span>',
                 yml: '<span class="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-900/30 px-2 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 ring-1 ring-inset ring-purple-700/10 dark:ring-purple-400/30">YML</span>',
                 svelte: '<span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/30 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-500/30">SVELTE</span>',
+                pdf:  '<span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/30 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-500/30">PDF</span>',
+                docx: '<span class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/30">DOCX</span>',
+                xlsx: '<span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/30 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/30">XLSX</span>',
+                pptx: '<span class="inline-flex items-center rounded-md bg-orange-50 dark:bg-orange-900/30 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-400 ring-1 ring-inset ring-orange-600/20 dark:ring-orange-500/30">PPTX</span>',
             };
 
             return labelMap[ext] || '';
@@ -2016,15 +2112,23 @@
                     return;
                 }
 
-                // Read file with timeout
-                const text = await readFileWithTimeout(file.file);
+                // Read file — use document extractor for Office/PDF, plain text otherwise
+                let text;
+                if (isDocumentFile(file.path)) {
+                    fileContentView.textContent = 'Extracting document text…';
+                    text = await extractDocumentText(file.file);
+                } else {
+                    text = await readFileWithTimeout(file.file);
+                }
                 fileContentText = text;
                 selectedFilePath.textContent = file.path;
                 fileContentView.textContent = text;
                 fileSize.textContent = formatFileSize(file.file.size);
 
-                // Set language class for syntax highlighting
-                fileContentView.className = `language-${getFileExtension(file.path)}`;
+                // Set language class for syntax highlighting (plain text for documents)
+                fileContentView.className = isDocumentFile(file.path)
+                    ? 'language-plaintext'
+                    : `language-${getFileExtension(file.path)}`;
 
                 // Apply syntax highlighting
                 hljs.highlightElement(fileContentView);
@@ -2188,12 +2292,16 @@
                     if (file.isEmpty || file.file.size === 0) {
                         text = ''; // Empty file
                         log(`Including empty file: ${fileName}`, 'info');
+                    } else if (isDocumentFile(fileName)) {
+                        combineButtonText.textContent = `Combining... (${i + 1}/${files.length}) — Extracting ${extension.toUpperCase()}…`;
+                        text = await extractDocumentText(file.file);
                     } else {
                         // Read file with timeout
                         text = await readFileWithTimeout(file.file);
                     }
 
-                    if (useStripComments && text) {
+                    // Skip comment-stripping for extracted document text
+                    if (useStripComments && text && !isDocumentFile(fileName)) {
                         text = compressCode(text, extension);
                     }
 
