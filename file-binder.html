@@ -991,7 +991,6 @@
 *.wasm
 *.pyc
 *.class
-*.pdf
 # -------- Generated / dependency folders --------
 node_modules/
 .git/
@@ -1195,16 +1194,19 @@ build/
             };
         }
 
+        // Returns the raw file extension (e.g. 'xlsx'), bypassing the language-label map
+        function getRawExtension(fileName) {
+            return fileName.split('.').pop()?.toLowerCase() || '';
+        }
+
         // Check if file is binary based on extension
         function isBinaryFile(fileName) {
-            const extension = getFileExtension(fileName).toLowerCase();
-            return BINARY_EXTENSIONS.has(extension);
+            return BINARY_EXTENSIONS.has(getRawExtension(fileName));
         }
 
         // Check if file is a document whose text can be extracted in-browser
         function isDocumentFile(fileName) {
-            const extension = getFileExtension(fileName).toLowerCase();
-            return DOCUMENT_EXTENSIONS.has(extension);
+            return DOCUMENT_EXTENSIONS.has(getRawExtension(fileName));
         }
 
         function collapseBlankLines(text) {
@@ -1308,7 +1310,65 @@ build/
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
-                const pageText = textContent.items.map(item => item.str).join(' ');
+
+                // Keep only actual text items (exclude MarkedContent markers); preserve empty-str items as they can be spaces
+                const items = textContent.items.filter(item => typeof item.str === 'string');
+                if (items.length === 0) {
+                    fullText += `--- Page ${i}/${pdf.numPages} ---\n(No text)\n\n`;
+                    continue;
+                }
+
+                // Derive Y-tolerance from average glyph height (skip zero-height items)
+                const heights = items.map(it => it.height || 0).filter(h => h > 0);
+                const avgHeight = heights.length ? heights.reduce((s, h) => s + h, 0) / heights.length : 10;
+                const tolerance = Math.max(2, avgHeight * 0.5);
+
+                // Sort top-to-bottom (descending Y in PDF coords), then left-to-right
+                const sorted = [...items].sort((a, b) => {
+                    const dy = b.transform[5] - a.transform[5];
+                    if (Math.abs(dy) > tolerance) return dy;
+                    return a.transform[4] - b.transform[4];
+                });
+
+                // Group into lines by proximity of Y coordinate
+                const lines = [];
+                let lineItems = [];
+                let lineY = null;
+                for (const item of sorted) {
+                    const y = item.transform[5];
+                    if (lineY === null || Math.abs(y - lineY) > tolerance) {
+                        if (lineItems.length) lines.push(lineItems);
+                        lineItems = [item];
+                        lineY = y;
+                    } else {
+                        lineItems.push(item);
+                    }
+                }
+                if (lineItems.length) lines.push(lineItems);
+
+                // Join items within each line; insert a space when the X gap between items is wide enough
+                const pageText = lines
+                    .map(line => {
+                        let text = '';
+                        for (let j = 0; j < line.length; j++) {
+                            const item = line[j];
+                            if (j > 0) {
+                                const prev = line[j - 1];
+                                const prevEnd = prev.transform[4] + (prev.width || 0);
+                                const gap = item.transform[4] - prevEnd;
+                                // font scale ≈ |transform[0]|; treat gap > 20% of font size as a word space
+                                const spaceThreshold = Math.abs(prev.transform[0]) * 0.2;
+                                if (gap > spaceThreshold && !text.endsWith(' ') && !item.str.startsWith(' ')) {
+                                    text += ' ';
+                                }
+                            }
+                            text += item.str;
+                        }
+                        return text.trim();
+                    })
+                    .filter(line => line.trim())
+                    .join('\n');
+
                 fullText += `--- Page ${i}/${pdf.numPages} ---\n${pageText}\n\n`;
             }
             return fullText.trim() || '(No extractable text found. This may be a scanned image PDF.)';
@@ -1359,7 +1419,7 @@ build/
 
         // Dispatch to the correct extractor based on file extension
         async function extractDocumentText(file) {
-            const ext = getFileExtension(file.name).toLowerCase();
+            const ext = getRawExtension(file.name);
             const arrayBuffer = await file.arrayBuffer();
             switch (ext) {
                 case 'pdf':  return extractTextFromPDF(arrayBuffer);
