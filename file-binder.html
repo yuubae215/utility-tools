@@ -1308,14 +1308,16 @@ build/
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
 
-                const items = textContent.items.filter(item => typeof item.str === 'string' && item.str);
+                // Keep only actual text items (exclude MarkedContent markers); preserve empty-str items as they can be spaces
+                const items = textContent.items.filter(item => typeof item.str === 'string');
                 if (items.length === 0) {
                     fullText += `--- Page ${i}/${pdf.numPages} ---\n(No text)\n\n`;
                     continue;
                 }
 
-                // Derive Y-tolerance from average glyph height to handle different font sizes
-                const avgHeight = items.reduce((s, it) => s + (it.height || 0), 0) / items.length;
+                // Derive Y-tolerance from average glyph height (skip zero-height items)
+                const heights = items.map(it => it.height || 0).filter(h => h > 0);
+                const avgHeight = heights.length ? heights.reduce((s, h) => s + h, 0) / heights.length : 10;
                 const tolerance = Math.max(2, avgHeight * 0.5);
 
                 // Sort top-to-bottom (descending Y in PDF coords), then left-to-right
@@ -1341,9 +1343,27 @@ build/
                 }
                 if (lineItems.length) lines.push(lineItems);
 
+                // Join items within each line; insert a space when the X gap between items is wide enough
                 const pageText = lines
-                    .map(line => line.map(it => it.str).join('').trim())
-                    .filter(line => line)
+                    .map(line => {
+                        let text = '';
+                        for (let j = 0; j < line.length; j++) {
+                            const item = line[j];
+                            if (j > 0) {
+                                const prev = line[j - 1];
+                                const prevEnd = prev.transform[4] + (prev.width || 0);
+                                const gap = item.transform[4] - prevEnd;
+                                // font scale ≈ |transform[0]|; treat gap > 20% of font size as a word space
+                                const spaceThreshold = Math.abs(prev.transform[0]) * 0.2;
+                                if (gap > spaceThreshold && !text.endsWith(' ') && !item.str.startsWith(' ')) {
+                                    text += ' ';
+                                }
+                            }
+                            text += item.str;
+                        }
+                        return text.trim();
+                    })
+                    .filter(line => line.trim())
                     .join('\n');
 
                 fullText += `--- Page ${i}/${pdf.numPages} ---\n${pageText}\n\n`;
